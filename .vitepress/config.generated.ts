@@ -11,7 +11,7 @@ export const generatedNav: DefaultTheme.NavItem[] = [
   },
   {
     "text": "Documentation",
-    "link": "/documentation/"
+    "link": "/notes/"
   },
   {
     "text": "Dotfiles",
@@ -28,10 +28,10 @@ export const generatedNav: DefaultTheme.NavItem[] = [
 ]
 
 export const generatedSidebar: DefaultTheme.SidebarMulti = {
-  "/documentation/": [
+  "/notes/": [
     {
       "text": "Overview",
-      "link": "/documentation/"
+      "link": "/notes/"
     },
     {
       "text": "Devops",
@@ -39,68 +39,68 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "items": [
         {
           "text": "Docker",
-          "link": "/documentation/devops/docker"
+          "link": "/notes/devops/docker"
         },
         {
           "text": "Firewall",
-          "link": "/documentation/devops/firewall"
+          "link": "/notes/devops/firewall"
         },
         {
           "text": "Git",
-          "link": "/documentation/devops/git"
+          "link": "/notes/devops/git"
         },
         {
           "text": "GitHub",
-          "link": "/documentation/devops/github"
+          "link": "/notes/devops/github"
         },
         {
           "text": "Hosting",
-          "link": "/documentation/devops/hosting"
+          "link": "/notes/devops/hosting"
         },
         {
           "text": "Kubernetes",
-          "link": "/documentation/devops/kubernetes",
+          "link": "/notes/devops/kubernetes",
           "collapsed": true,
           "items": [
             {
               "text": "Prerequisites",
-              "link": "/documentation/devops/kubernetes/01-prerequisites"
+              "link": "/notes/devops/kubernetes/01-prerequisites"
             },
             {
               "text": "k3s Master Setup",
-              "link": "/documentation/devops/kubernetes/02-kubeadm-setup"
+              "link": "/notes/devops/kubernetes/02-kubeadm-setup"
             },
             {
               "text": "Networking",
-              "link": "/documentation/devops/kubernetes/03-networking"
+              "link": "/notes/devops/kubernetes/03-networking"
             },
             {
               "text": "Worker Node — Join the Cluster",
-              "link": "/documentation/devops/kubernetes/04-worker-join"
+              "link": "/notes/devops/kubernetes/04-worker-join"
             },
             {
               "text": "Storage — Persistent Volumes with local-path",
-              "link": "/documentation/devops/kubernetes/05-storage"
+              "link": "/notes/devops/kubernetes/05-storage"
             },
             {
               "text": "Observability — Prometheus, Grafana, Alertmanager",
-              "link": "/documentation/devops/kubernetes/06-observability"
+              "link": "/notes/devops/kubernetes/06-observability"
             },
             {
               "text": "Architecture",
-              "link": "/documentation/devops/kubernetes/architecture"
+              "link": "/notes/devops/kubernetes/architecture"
             },
             {
               "text": "Kubernetes — k3s Setup Overview",
-              "link": "/documentation/devops/kubernetes/README"
+              "link": "/notes/devops/kubernetes/README"
             },
             {
               "text": "Roadmap — From Fresh VPS to a Fully Managed Cluster",
-              "link": "/documentation/devops/kubernetes/ROADMAP"
+              "link": "/notes/devops/kubernetes/ROADMAP"
             },
             {
               "text": "Troubleshooting",
-              "link": "/documentation/devops/kubernetes/troubleshooting"
+              "link": "/notes/devops/kubernetes/troubleshooting"
             }
           ]
         }
@@ -112,15 +112,15 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "items": [
         {
           "text": "Next.js",
-          "link": "/documentation/javascript/nextjs"
+          "link": "/notes/javascript/nextjs"
         },
         {
           "text": "Nuxt",
-          "link": "/documentation/javascript/nuxt"
+          "link": "/notes/javascript/nuxt"
         },
         {
           "text": "Vue 3",
-          "link": "/documentation/javascript/vue"
+          "link": "/notes/javascript/vue"
         }
       ]
     },
@@ -130,31 +130,31 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "items": [
         {
           "text": "Caddy",
-          "link": "/documentation/linux/caddy"
+          "link": "/notes/linux/caddy"
         },
         {
           "text": "Debian",
-          "link": "/documentation/linux/debian"
+          "link": "/notes/linux/debian"
         },
         {
           "text": "Fail2Ban",
-          "link": "/documentation/linux/fail2ban"
+          "link": "/notes/linux/fail2ban"
         },
         {
           "text": "SSH",
-          "link": "/documentation/linux/ssh"
+          "link": "/notes/linux/ssh"
         },
         {
           "text": "Tree",
-          "link": "/documentation/linux/tree"
+          "link": "/notes/linux/tree"
         },
         {
           "text": "Ubuntu — Configuration and Hardening Guide",
-          "link": "/documentation/linux/ubuntu"
+          "link": "/notes/linux/ubuntu"
         },
         {
           "text": "UFW",
-          "link": "/documentation/linux/ufw"
+          "link": "/notes/linux/ufw"
         }
       ]
     },
@@ -164,15 +164,15 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "items": [
         {
           "text": "FastAPI",
-          "link": "/documentation/python/fastapi"
+          "link": "/notes/python/fastapi"
         },
         {
           "text": "Ruff",
-          "link": "/documentation/python/ruff"
+          "link": "/notes/python/ruff"
         },
         {
           "text": "UV",
-          "link": "/documentation/python/uv"
+          "link": "/notes/python/uv"
         }
       ]
     }
@@ -183,12 +183,18 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "link": "/dotfiles/"
     },
     {
-      "text": "Debian Setup",
-      "link": "/dotfiles/debian"
-    },
-    {
-      "text": "macOS Setup",
-      "link": "/dotfiles/macos"
+      "text": "Setup",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Debian Setup",
+          "link": "/dotfiles/setup/debian"
+        },
+        {
+          "text": "macOS Setup",
+          "link": "/dotfiles/setup/macos"
+        }
+      ]
     }
   ],
   "/github-workflows/": [
@@ -197,36 +203,42 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "link": "/github-workflows/"
     },
     {
-      "text": "CI — Node.js",
-      "link": "/github-workflows/workflow-ci-node"
-    },
-    {
-      "text": "CI — Python",
-      "link": "/github-workflows/workflow-ci-python"
-    },
-    {
-      "text": "CI — Shell",
-      "link": "/github-workflows/workflow-ci-shell"
-    },
-    {
-      "text": "Deploy — Docker",
-      "link": "/github-workflows/workflow-deploy-docker"
-    },
-    {
-      "text": "Deploy — GitHub Pages",
-      "link": "/github-workflows/workflow-deploy-pages"
-    },
-    {
-      "text": "Deploy — Vercel",
-      "link": "/github-workflows/workflow-deploy-vercel"
-    },
-    {
-      "text": "Release",
-      "link": "/github-workflows/workflow-release"
-    },
-    {
-      "text": "Security",
-      "link": "/github-workflows/workflow-security"
+      "text": "Workflows",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "CI — Node.js",
+          "link": "/github-workflows/workflows/ci-node"
+        },
+        {
+          "text": "CI — Python",
+          "link": "/github-workflows/workflows/ci-python"
+        },
+        {
+          "text": "CI — Shell",
+          "link": "/github-workflows/workflows/ci-shell"
+        },
+        {
+          "text": "Deploy — Docker",
+          "link": "/github-workflows/workflows/deploy-docker"
+        },
+        {
+          "text": "Deploy — GitHub Pages",
+          "link": "/github-workflows/workflows/deploy-pages"
+        },
+        {
+          "text": "Deploy — Vercel",
+          "link": "/github-workflows/workflows/deploy-vercel"
+        },
+        {
+          "text": "Release",
+          "link": "/github-workflows/workflows/release"
+        },
+        {
+          "text": "Security",
+          "link": "/github-workflows/workflows/security"
+        }
+      ]
     }
   ],
   "/tools/": [
@@ -239,32 +251,56 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "link": "/tools/cli"
     },
     {
-      "text": "Docker Templates",
-      "link": "/tools/docker-templates"
-    },
-    {
       "text": "Getting Started",
       "link": "/tools/getting-started"
     },
     {
-      "text": "Makefile Fragments",
-      "link": "/tools/makefile-fragments"
+      "text": "Docker",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Docker Templates",
+          "link": "/tools/docker/docker-templates"
+        }
+      ]
     },
     {
-      "text": "Shell Tools",
-      "link": "/tools/shell-tools"
+      "text": "Makefiles",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Makefile Fragments",
+          "link": "/tools/makefiles/makefile-fragments"
+        }
+      ]
     },
     {
-      "text": "Testing and Quality",
-      "link": "/tools/testing-and-quality"
+      "text": "Shell",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Shell Tools",
+          "link": "/tools/shell/shell-tools"
+        }
+      ]
+    },
+    {
+      "text": "Tests",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Testing and Quality",
+          "link": "/tools/tests/testing-and-quality"
+        }
+      ]
     }
   ]
 }
 
 export function generatedEditLinkPattern({ filePath }: { filePath: string }): string {
-  if (filePath.startsWith('documentation/')) {
-    if (filePath === 'documentation/index.md') return 'https://github.com/KevinDeBenedetti/documentation/tree/main/docs'
-    return 'https://github.com/KevinDeBenedetti/documentation/edit/main/docs/' + filePath.slice(14)
+  if (filePath.startsWith('notes/')) {
+    if (filePath === 'notes/index.md') return 'https://github.com/KevinDeBenedetti/notes/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/notes/edit/main/docs/' + filePath.slice(6)
   }
   if (filePath.startsWith('dotfiles/')) {
     if (filePath === 'dotfiles/index.md') return 'https://github.com/KevinDeBenedetti/dotfiles/tree/main/docs'

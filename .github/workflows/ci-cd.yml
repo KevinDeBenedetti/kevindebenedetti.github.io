@@ -29,6 +29,18 @@ jobs:
       yamllint-strict: false
       run-bats: false
 
+  # ── Actionlint ─────────────────────────────────────────────────────────────
+  actionlint:
+    name: Actionlint
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Run actionlint
+        uses: raven-actions/actionlint@v2
+
   # ── TypeScript typecheck + build ───────────────────────────────────────────
   node:
     name: Node CI
@@ -59,7 +71,7 @@ jobs:
   # ── Build (with doc sync + generate) ───────────────────────────────────────
   build:
     name: Build Pages
-    needs: [shell, node]
+    needs: [shell, actionlint, node]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
     runs-on: ubuntu-latest
 

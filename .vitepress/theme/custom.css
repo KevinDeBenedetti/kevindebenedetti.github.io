@@ -200,3 +200,25 @@ html {
   padding: 2rem 0;
   cursor: pointer;
 }
+
+/* Overview page — GitHub repo button */
+.vp-repo-link {
+  display: inline-block;
+  margin: 12px 0;
+  padding: 8px 20px;
+  background: var(--vp-button-brand-bg);
+  color: var(--vp-button-brand-text) !important;
+  border-radius: 20px;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none !important;
+  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
+}
+
+.vp-repo-link:hover {
+  background: var(--vp-button-brand-hover-bg);
+  color: var(--vp-button-brand-hover-text) !important;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  transform: translateY(-2px);
+}

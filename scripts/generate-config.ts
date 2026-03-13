@@ -136,6 +136,52 @@ function buildSidebarItems(dir: string, baseLink: string): SidebarItem[] {
   return items
 }
 
+// ── Doc tree builder ──────────────────────────────────────────────────────
+function hasMdContent(dir: string): boolean {
+  for (const entry of readdirSync(dir, { withFileTypes: true })) {
+    if (entry.isFile() && entry.name.endsWith('.md') && entry.name !== 'index.md') return true
+    if (entry.isDirectory() && !entry.name.startsWith('.') && hasMdContent(join(dir, entry.name))) return true
+  }
+  return false
+}
+
+function buildDocTree(dir: string, prefix: string = '', isRoot: boolean = true): string {
+  if (!existsSync(dir)) return ''
+
+  const entries = readdirSync(dir, { withFileTypes: true })
+    .filter((e) => {
+      if (e.name.startsWith('.')) return false
+      if (e.name === 'index.md') return false
+      if (e.isFile()) return e.name.endsWith('.md')
+      if (e.isDirectory()) return hasMdContent(join(dir, e.name))
+      return false
+    })
+    .sort((a, b) => {
+      if (a.isDirectory() && !b.isDirectory()) return -1
+      if (!a.isDirectory() && b.isDirectory()) return 1
+      return a.name.localeCompare(b.name)
+    })
+
+  const lines: string[] = []
+  if (isRoot) lines.push('docs/')
+
+  entries.forEach((entry, i) => {
+    const last = i === entries.length - 1
+    const branch = prefix + (last ? '└── ' : '├── ')
+    const childPrefix = prefix + (last ? '    ' : '│   ')
+
+    if (entry.isDirectory()) {
+      lines.push(`${branch}${entry.name}/`)
+      const sub = buildDocTree(join(dir, entry.name), childPrefix, false)
+      if (sub) lines.push(sub)
+    } else {
+      lines.push(`${branch}${entry.name}`)
+    }
+  })
+
+  return lines.join('\n')
+}
+
 function flattenSidebarLinks(items: SidebarItem[]): SidebarItem[] {
   const links: SidebarItem[] = []
 
@@ -167,6 +213,8 @@ function writeProjectIndex(project: Project): void {
     .map((item) => `- [${item.text}](${toProjectMarkdownLink(project.slug, item.link ?? '')})`)
     .join('\n')
 
+  const tree = buildDocTree(projectDir)
+
   const md = `---
 title: Overview
 ---
@@ -175,7 +223,20 @@ title: Overview
 
 ${project.rc.description}
 
-- Repository: [${project.rc.repo}](https://github.com/${project.rc.repo})
+<a href="https://github.com/${project.rc.repo}" target="_blank" rel="noopener noreferrer" class="vp-repo-link">View on GitHub →</a>
+
+## Source repository
+
+| | |
+|---|---|
+| Repository | [${project.rc.repo}](https://github.com/${project.rc.repo}) |
+| Source docs | [\`docs/\`](https://github.com/${project.rc.repo}/tree/main/docs) |
+
+## Repository structure
+
+\`\`\`
+${tree}
+\`\`\`
 
 ## Documentation
 

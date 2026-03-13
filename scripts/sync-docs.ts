@@ -1,0 +1,106 @@
+import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
+
+const ROOT = fileURLToPath(new URL('..', import.meta.url))
+const DOCS_DIR = join(ROOT, 'docs')
+const TMP_DIR = join(ROOT, '.tmp-doc-sync')
+const OWNER = process.env.GITHUB_OWNER ?? 'KevinDeBenedetti'
+const API_URL = process.env.GITHUB_API_URL ?? 'https://api.github.com'
+
+interface GitHubRepo {
+  name: string
+  clone_url: string
+  archived: boolean
+  disabled: boolean
+}
+
+async function fetchPublicRepos(owner: string): Promise<GitHubRepo[]> {
+  const repos: GitHubRepo[] = []
+  const headers: Record<string, string> = {
+    Accept: 'application/vnd.github+json',
+    'User-Agent': 'kevindebenedetti-docs-sync',
+  }
+
+  if (process.env.GITHUB_TOKEN) {
+    headers.Authorization = `Bearer ${process.env.GITHUB_TOKEN}`
+  }
+
+  for (let page = 1; ; page += 1) {
+    const response = await fetch(
+      `${API_URL}/users/${owner}/repos?type=public&sort=updated&per_page=100&page=${page}`,
+      { headers },
+    )
+
+    if (!response.ok) {
+      throw new Error(`GitHub API request failed: ${response.status} ${response.statusText}`)
+    }
+
+    const data = (await response.json()) as GitHubRepo[]
+    repos.push(...data)
+
+    if (data.length < 100) break
+  }
+
+  return repos.filter((repo) => !repo.archived && !repo.disabled)
+}
+
+function runGit(args: string[]): void {
+  const proc = Bun.spawnSync(['git', ...args], {
+    cwd: ROOT,
+    stdout: 'inherit',
+    stderr: 'inherit',
+  })
+
+  if (proc.exitCode !== 0) {
+    throw new Error(`git ${args.join(' ')} failed with exit code ${proc.exitCode}`)
+  }
+}
+
+function resetDocsDir(): void {
+  rmSync(DOCS_DIR, { recursive: true, force: true })
+  rmSync(TMP_DIR, { recursive: true, force: true })
+  mkdirSync(DOCS_DIR, { recursive: true })
+  mkdirSync(TMP_DIR, { recursive: true })
+}
+
+function syncRepoDocs(repo: GitHubRepo): boolean {
+  const cloneDir = join(TMP_DIR, repo.name)
+  const sourceDocsDir = join(cloneDir, 'docs')
+  const rcPath = join(sourceDocsDir, '.vitepressrc.json')
+
+  runGit(['clone', '--depth=1', '--filter=blob:none', '--sparse', repo.clone_url, cloneDir])
+  runGit(['-C', cloneDir, 'sparse-checkout', 'set', 'docs'])
+
+  if (!existsSync(rcPath)) {
+    rmSync(cloneDir, { recursive: true, force: true })
+    return false
+  }
+
+  cpSync(sourceDocsDir, join(DOCS_DIR, repo.name), { recursive: true })
+  rmSync(cloneDir, { recursive: true, force: true })
+  return true
+}
+
+async function main(): Promise<void> {
+  console.log(`Syncing docs for public repos owned by ${OWNER}`)
+  resetDocsDir()
+
+  const repos = await fetchPublicRepos(OWNER)
+  const synced: string[] = []
+
+  for (const repo of repos) {
+    console.log(`→ ${repo.name}`)
+    if (syncRepoDocs(repo)) {
+      synced.push(repo.name)
+      console.log(`✓ synced ${repo.name}`)
+    } else {
+      console.log(`· skipped ${repo.name} (missing docs/.vitepressrc.json)`)
+    }
+  }
+
+  rmSync(TMP_DIR, { recursive: true, force: true })
+  console.log(`Synced ${synced.length} repo(s): ${synced.join(', ') || '(none)'}`)
+}
+
+await main()

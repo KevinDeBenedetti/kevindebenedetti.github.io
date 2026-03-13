@@ -1,18 +1,22 @@
-# VitePress Documentation — Personal Dev Notes
+# Kevin's Docs
 
-This repository contains my personal VitePress documentation: concise, practical notes about things I learned while building frontend, backend, AI, and DevOps projects. The goal is to capture useful patterns, commands, pitfalls, and small recipes I can re-use later.
+This repository builds a VitePress site from all public `KevinDeBenedetti/*` repositories that opt in by shipping both `docs/` and `docs/.vitepressrc.json`.
 
-- Audience: myself (primary), and any developer who finds these notes useful.
-- Scope: short explainers, code snippets, config tips, links, and troubleshooting steps.
+## How it works
 
-## What you'll find here
+- `bun run sync-docs` discovers public repositories from the GitHub API and sparse-clones only their `docs/` directory.
+- `bun run generate` syncs docs, creates missing project overview pages, and regenerates `docs/index.md`, the VitePress nav, sidebar, and edit links.
+- `bun run docs:build` and `bun run docs:dev` both use the generated docs tree, so local development matches CI.
 
-- Frontend: frameworks, UI patterns, performance tips, accessibility notes, bundler configs.
-- Backend: APIs, database patterns, authentication, deployment notes.
-- AI / ML: model experiments, prompt examples, tooling, data handling notes.
-- DevOps: CI/CD, infra as code, containerization, monitoring, backup strategies.
-- General: productivity tips, testing habits, debugging tricks, useful CLI commands.
+## Local commands
 
----
+- `bun run sync-docs`
+- `bun run generate`
+- `bun run docs:dev`
+- `bun run docs:build`
 
-Happy documenting — write what helps you remember and solve problems faster.
+## Opt-in contract for source repositories
+
+- The repository must be public.
+- The repository must contain `docs/` at the root.
+- The repository must contain `docs/.vitepressrc.json` with project metadata.

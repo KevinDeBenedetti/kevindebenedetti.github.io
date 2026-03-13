@@ -4,6 +4,8 @@ import { generatedNav, generatedSidebar, generatedEditLinkPattern } from './conf
 // https://vitepress.dev/reference/site-config
 // Static base config — nav/sidebar/editLink are in config.generated.ts (auto-generated)
 export default defineConfig({
+  srcDir: 'docs',
+
   title: "Kevin's Docs",
 
   description: 'Centralized developer documentation hub for all @KevinDeBenedetti open source projects.',

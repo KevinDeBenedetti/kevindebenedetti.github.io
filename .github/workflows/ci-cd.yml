@@ -17,29 +17,15 @@ permissions:
   id-token: write
 
 jobs:
-  # ── Lint YAML ──────────────────────────────────────────────────────────────
+  # ── Workflow validation ────────────────────────────────────────────────────
   shell:
-    name: Shell CI
+    name: Workflow CI
     uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@main
     with:
       run-shellcheck: false
-      run-yamllint: true
-      yamllint-paths: .github/workflows/
-      yamllint-config-file: .yamllint.yaml
-      yamllint-strict: false
+      run-actionlint: true
+      actionlint-paths: .github/workflows/
       run-bats: false
-
-  # ── Actionlint ─────────────────────────────────────────────────────────────
-  actionlint:
-    name: Actionlint
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-
-      - name: Run actionlint
-        uses: raven-actions/actionlint@v2
 
   # ── TypeScript typecheck + build ───────────────────────────────────────────
   node:
@@ -68,78 +54,13 @@ jobs:
       contents: read
       pull-requests: read
 
-  # ── Build (with doc sync + generate) ───────────────────────────────────────
-  build:
-    name: Build Pages
-    needs: [shell, actionlint, node]
+  # ── GitHub Pages deploy ────────────────────────────────────────────────────
+  pages:
+    name: Pages
+    needs: [shell, node]
     if: github.ref == 'refs/heads/main' && github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v5
-        with:
-          fetch-depth: 0
-
-      # Discover & sync: sparse-clone each known repo, include only those
-      # with docs/.vitepressrc.json (opt-in contract)
-      - name: Sync project docs
-        run: |
-          REPOS="dotfiles infra github-workflows feedwise tools"
-          mkdir -p _tmp
-          for REPO in $REPOS; do
-            echo "── $REPO ──"
-            git clone --depth=1 --filter=blob:none --sparse \
-              "https://github.com/KevinDeBenedetti/$REPO.git" "_tmp/$REPO"
-            git -C "_tmp/$REPO" sparse-checkout set docs
-            if [ -f "_tmp/$REPO/docs/.vitepressrc.json" ]; then
-              mkdir -p "docs/$REPO"
-              cp -r "_tmp/$REPO/docs/." "docs/$REPO/"
-              echo "✓ Synced $REPO"
-            else
-              echo "ℹ️  $REPO: no docs/.vitepressrc.json — skipped"
-            fi
-            rm -rf "_tmp/$REPO"
-          done
-          rm -rf _tmp
-
-      - name: Setup Node.js
-        uses: KevinDeBenedetti/github-workflows/.github/actions/setup-node@main
-        with:
-          node-version: '22'
-
-      - name: Generate VitePress config
-        run: bun run generate
-
-      - name: Configure GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Build VitePress
-        run: bun run docs:build
-
-      - name: Upload artifact
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: .vitepress/dist
-
-  # ── Deploy to GitHub Pages ─────────────────────────────────────────────────
-  deploy:
-    name: Deploy to GitHub Pages
-    needs: build
-    runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
-
-    steps:
-      - name: Deploy artifact to GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
-
-      - name: Summary
-        run: |
-          {
-            echo "### 📄 GitHub Pages Deployed"
-            echo ""
-            echo "🌍 **URL:** ${{ steps.deployment.outputs.page_url }}"
-          } >> "$GITHUB_STEP_SUMMARY"
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/deploy-pages.yml@main
+    with:
+      node-version: '22'
+      build-command: bun run docs:build
+      output-directory: .vitepress/dist

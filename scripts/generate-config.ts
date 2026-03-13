@@ -1,13 +1,13 @@
 /**
  * Reads docs/<project>/.vitepressrc.json files and generates:
  *   - .vitepress/config.generated.ts  (nav, sidebar, editLink)
- *   - index.md                        (homepage with feature cards)
+ *   - docs/index.md                   (homepage with feature cards)
  *
  * Run: bun scripts/generate-config.ts
  */
 
-import { readdirSync, readFileSync, writeFileSync, existsSync, statSync } from 'node:fs'
-import { join, basename, relative } from 'node:path'
+import { readdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs'
+import { join, basename } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
@@ -24,6 +24,7 @@ interface ProjectRC {
 interface Project {
   slug: string
   rc: ProjectRC
+  hasSourceIndex: boolean
 }
 
 interface SidebarItem {
@@ -43,11 +44,24 @@ function getProjects(): Project[] {
     .map((d) => {
       const rcPath = join(docsDir, d.name, '.vitepressrc.json')
       if (!existsSync(rcPath)) return null
+      const projectDir = join(docsDir, d.name)
       const rc: ProjectRC = JSON.parse(readFileSync(rcPath, 'utf-8'))
-      return { slug: d.name, rc }
+      return {
+        slug: d.name,
+        rc,
+        hasSourceIndex: existsSync(join(projectDir, 'index.md')),
+      }
     })
     .filter((p): p is Project => p !== null)
     .sort((a, b) => a.rc.order - b.rc.order)
+}
+
+function sortEntries(a: { name: string; isDirectory(): boolean }, b: { name: string; isDirectory(): boolean }): number {
+  if (a.name === 'index.md') return -1
+  if (b.name === 'index.md') return 1
+  if (a.isDirectory() && !b.isDirectory()) return 1
+  if (!a.isDirectory() && b.isDirectory()) return -1
+  return a.name.localeCompare(b.name)
 }
 
 // ── Sidebar builder ────────────────────────────────────────────────────────
@@ -74,9 +88,7 @@ function getMdTitle(filePath: string): string {
 function buildSidebarItems(dir: string, baseLink: string): SidebarItem[] {
   if (!existsSync(dir)) return []
 
-  const entries = readdirSync(dir, { withFileTypes: true }).sort((a, b) =>
-    a.name.localeCompare(b.name),
-  )
+  const entries = readdirSync(dir, { withFileTypes: true }).sort(sortEntries)
 
   const items: SidebarItem[] = []
 
@@ -89,7 +101,7 @@ function buildSidebarItems(dir: string, baseLink: string): SidebarItem[] {
     if (entry.isFile() && entry.name.endsWith('.md')) {
       const slug = entry.name === 'index.md' ? '' : basename(entry.name, '.md')
       items.push({
-        text: getMdTitle(fullPath),
+        text: entry.name === 'index.md' ? 'Overview' : getMdTitle(fullPath),
         link: slug ? `${baseLink}${slug}` : baseLink,
       })
     } else if (entry.isDirectory()) {
@@ -105,6 +117,55 @@ function buildSidebarItems(dir: string, baseLink: string): SidebarItem[] {
   }
 
   return items
+}
+
+function flattenSidebarLinks(items: SidebarItem[]): SidebarItem[] {
+  const links: SidebarItem[] = []
+
+  for (const item of items) {
+    if (item.link) links.push(item)
+    if (item.items) links.push(...flattenSidebarLinks(item.items))
+  }
+
+  return links
+}
+
+function toProjectMarkdownLink(slug: string, link: string): string {
+  const prefix = `/${slug}/`
+  if (!link.startsWith(prefix)) return link
+
+  const path = link.slice(prefix.length)
+  return path ? `./${path}.md` : './index.md'
+}
+
+function writeProjectIndex(project: Project): void {
+  if (project.hasSourceIndex) return
+
+  const projectDir = join(ROOT, 'docs', project.slug)
+  const sidebarItems = buildSidebarItems(projectDir, `/${project.slug}/`).filter(
+    (item) => item.link !== `/${project.slug}/`,
+  )
+
+  const pageLinks = flattenSidebarLinks(sidebarItems)
+    .map((item) => `- [${item.text}](${toProjectMarkdownLink(project.slug, item.link ?? '')})`)
+    .join('\n')
+
+  const md = `---
+title: Overview
+---
+
+# ${project.rc.icon} ${project.rc.title}
+
+${project.rc.description}
+
+- Repository: [${project.rc.repo}](https://github.com/${project.rc.repo})
+
+## Documentation
+
+${pageLinks || '- No additional pages found.'}
+`
+
+  writeFileSync(join(projectDir, 'index.md'), md, 'utf-8')
 }
 
 // ── Write config.generated.ts ──────────────────────────────────────────────
@@ -135,7 +196,10 @@ function writeGeneratedConfig(projects: Project[]): void {
     .map(
       (p) =>
         `  if (filePath.startsWith('${p.slug}/')) {\n` +
-        `    return 'https://github.com/${p.rc.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n` +
+        (p.hasSourceIndex
+          ? `    return 'https://github.com/${p.rc.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`
+          : `    if (filePath === '${p.slug}/index.md') return 'https://github.com/${p.rc.repo}/tree/main/docs'\n` +
+            `    return 'https://github.com/${p.rc.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`) +
         `  }`,
     )
     .join('\n')
@@ -160,7 +224,7 @@ ${editLinkCases}
   console.log('✓ .vitepress/config.generated.ts written')
 }
 
-// ── Write index.md ─────────────────────────────────────────────────────────
+// ── Write docs/index.md ────────────────────────────────────────────────────
 function writeIndexMd(projects: Project[]): void {
   const features = projects
     .map(
@@ -193,13 +257,14 @@ ${features}
 ---
 `
 
-  writeFileSync(join(ROOT, 'index.md'), md, 'utf-8')
-  console.log('✓ index.md written')
+  writeFileSync(join(ROOT, 'docs', 'index.md'), md, 'utf-8')
+  console.log('✓ docs/index.md written')
 }
 
 // ── Main ───────────────────────────────────────────────────────────────────
 const projects = getProjects()
 console.log(`Found ${projects.length} project(s): ${projects.map((p) => p.slug).join(', ') || '(none)'}`)
 
+projects.forEach(writeProjectIndex)
 writeGeneratedConfig(projects)
 writeIndexMd(projects)

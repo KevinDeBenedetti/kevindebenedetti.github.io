@@ -11,11 +11,12 @@
     "yaml": "^2.8.1"
   },
   "scripts": {
-    "docs:dev": "vitepress dev",
-    "docs:build": "vitepress build",
+    "sync-docs": "bun scripts/sync-docs.ts",
+    "docs:dev": "bun run generate && vitepress dev",
+    "docs:build": "bun run generate && vitepress build",
     "docs:preview": "vitepress preview",
-    "generate": "bun scripts/generate-config.ts",
-    "build": "vitepress build",
+    "generate": "bun run sync-docs && bun scripts/generate-config.ts",
+    "build": "bun run docs:build",
     "lint": "bunx prek run --all-files",
     "typecheck": "vue-tsc --noEmit",
     "test": "echo 'No tests configured'"

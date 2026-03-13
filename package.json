@@ -2,19 +2,21 @@
   "author": "Kevin De Benedetti",
   "type": "module",
   "devDependencies": {
+    "@types/node": "^25.5.0",
+    "typescript": "^5.9.3",
     "vitepress": "^1.6.4",
+    "vue-tsc": "^3.2.5",
     "yaml": "^2.8.1"
   },
   "scripts": {
-    "docs:dev": "vitepress dev docs",
-    "docs:build": "vitepress build docs",
-    "docs:preview": "vitepress preview docs"
+    "docs:dev": "vitepress dev",
+    "docs:build": "vitepress build",
+    "docs:preview": "vitepress preview",
+    "generate": "bun scripts/generate-config.ts",
+    "build": "vitepress build",
+    "lint": "bunx prek run --all-files",
+    "typecheck": "vue-tsc --noEmit",
+    "test": "echo 'No JS tests — see bats tests in tests/bats/'"
   },
-  "pnpm": {
-    "overrides": {},
-    "onlyBuiltDependencies": [
-      "esbuild"
-    ]
-  },
-  "packageManager": "pnpm@10.15.1"
+  "packageManager": "bun@1.2.21"
 }

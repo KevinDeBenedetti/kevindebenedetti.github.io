@@ -4,3 +4,10 @@
 **/node_modules
 *.env
 *.DS_Store
+
+# Project docs synced by CI — never commit these
+docs/dotfiles/
+docs/infra/
+docs/github-workflows/
+docs/feedwise/
+docs/tools/

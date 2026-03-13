@@ -1,0 +1,37 @@
+name: CI
+
+on:
+  pull_request:
+    branches: [main]
+  push:
+    branches: [main]
+
+concurrency:
+  group: ci-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # ── Lint YAML + Bats tests ────────────────────────────────────────────────
+  shell:
+    name: Shell CI
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@main
+    with:
+      run-shellcheck: false
+      run-yamllint: true
+      yamllint-paths: .github/workflows/
+      yamllint-config-file: .yamllint.yaml
+      yamllint-strict: false
+      run-bats: true
+      bats-tests-dir: tests/bats/
+      bats-submodules: false
+
+  # ── TypeScript typecheck + build ──────────────────────────────────────────
+  node:
+    name: Node CI
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-node.yml@main
+    with:
+      node-version: '22'
+      run-lint: false
+      run-typecheck: true
+      run-test: false
+      run-build: true

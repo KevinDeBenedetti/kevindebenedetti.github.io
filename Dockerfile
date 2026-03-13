@@ -1,20 +1,14 @@
-ARG NODE_IMAGE=docker.io/node:22.19.0-slim
-ARG PNPM_VERSION=10.15.1
+ARG BUN_IMAGE=docker.io/oven/bun:1
 
-FROM ${NODE_IMAGE} AS base
-
-ENV PNPM_HOME="/pnpm"
-ENV PATH="$PNPM_HOME:$PATH"
+FROM ${BUN_IMAGE} AS base
 
 WORKDIR /app
 
-RUN corepack enable pnpm && corepack install -g pnpm@${PNPM_VERSION}
-
-COPY package.json pnpm-lock.yaml ./
+COPY package.json ./
 # COPY --chown=node:root . ./
 
 FROM base AS dev
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --ignore-scripts
+RUN --mount=type=cache,id=bun,target=/root/.bun/install/cache bun install
 
 EXPOSE 5173
-CMD ["pnpm", "run", "docs:dev"]
+CMD ["bun", "run", "docs:dev"]

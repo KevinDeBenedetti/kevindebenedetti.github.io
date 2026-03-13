@@ -1,4 +1,4 @@
-name: Deploy VitePress site to GitHub Pages
+name: Discover → Sync → Generate → Build → Deploy
 
 on:
   push:
@@ -11,10 +11,6 @@ permissions:
   pages: write
   id-token: write
 
-# defaults:
-#   run:
-#     working-directory: apps/client
-
 concurrency:
   group: pages
   cancel-in-progress: false
@@ -24,35 +20,53 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
         with:
           fetch-depth: 0
 
-      - uses: pnpm/action-setup@v3
-        with:
-          version: 10
+      # ── Discover & sync: sparse-clone each known repo, include only those
+      #    with docs/.vitepressrc.json (opt-in contract)
+      - name: Sync project docs
+        run: |
+          REPOS="dotfiles infra github-workflows feedwise tools"
+          mkdir -p _tmp
+          for REPO in $REPOS; do
+            echo "── $REPO ──"
+            git clone --depth=1 --filter=blob:none --sparse \
+              "https://github.com/KevinDeBenedetti/$REPO.git" "_tmp/$REPO"
+            git -C "_tmp/$REPO" sparse-checkout set docs
+            if [ -f "_tmp/$REPO/docs/.vitepressrc.json" ]; then
+              mkdir -p "docs/$REPO"
+              cp -r "_tmp/$REPO/docs/." "docs/$REPO/"
+              echo "✓ Synced $REPO"
+            else
+              echo "ℹ️  $REPO: no docs/.vitepressrc.json — skipped"
+            fi
+            rm -rf "_tmp/$REPO"
+          done
+          rm -rf _tmp
 
-      - name: Set up Node
-        uses: actions/setup-node@v4
+      # ── Install deps (auto-detects bun from bun.lock) ────────────────────
+      - name: Setup
+        uses: KevinDeBenedetti/github-workflows/.github/actions/setup-node@main
         with:
-          node-version: 22
-          check-latest: true
-          cache: pnpm
-          cache-dependency-path: pnpm-lock.yaml
+          node-version: '22'
 
+      # ── Generate nav / sidebar / editLink from .vitepressrc.json files ───
+      - name: Generate VitePress config
+        run: bun run generate
+
+      # ── Build ────────────────────────────────────────────────────────────
       - name: Configure GitHub Pages
-        uses: actions/configure-pages@v4
-
-      - name: Install dependencies
-        run: pnpm install
+        uses: actions/configure-pages@v5
 
       - name: Build VitePress
-        run: pnpm docs:build
+        run: bun run docs:build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/.vitepress/dist
+          path: .vitepress/dist
 
   deploy:
     name: Deploy to GitHub Pages

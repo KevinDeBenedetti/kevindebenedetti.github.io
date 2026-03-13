@@ -16,7 +16,7 @@
     "build": "vitepress build",
     "lint": "bunx prek run --all-files",
     "typecheck": "vue-tsc --noEmit",
-    "test": "echo 'No JS tests — see bats tests in tests/bats/'"
+    "test": "echo 'No tests configured'"
   },
   "packageManager": "bun@1.2.21"
 }

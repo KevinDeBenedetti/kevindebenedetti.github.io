@@ -10,7 +10,7 @@ export const generatedNav: DefaultTheme.NavItem[] = [
     "link": "/"
   },
   {
-    "text": "Documentation",
+    "text": "Notes",
     "link": "/notes/"
   },
   {
@@ -247,12 +247,18 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "link": "/tools/"
     },
     {
-      "text": "CLI App",
-      "link": "/tools/cli"
-    },
-    {
       "text": "Getting Started",
       "link": "/tools/getting-started"
+    },
+    {
+      "text": "App",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "CLI App",
+          "link": "/tools/app/cli"
+        }
+      ]
     },
     {
       "text": "Docker",

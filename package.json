@@ -22,5 +22,8 @@
     "typecheck": "vue-tsc --noEmit",
     "test": "echo 'No tests configured'"
   },
-  "packageManager": "bun@1.2.21"
+  "packageManager": "bun@1.2.21",
+  "overrides": {
+    "esbuild": "^0.25.0"
+  }
 }

@@ -5,6 +5,8 @@ import { generatedNav, generatedSidebar, generatedEditLinkPattern } from './conf
 // Static base config — nav/sidebar/editLink are in config.generated.ts (auto-generated)
 export default defineConfig({
   srcDir: 'docs',
+  cleanUrls: true,
+  lastUpdated: true,
 
   title: "Kevin's Docs",
 

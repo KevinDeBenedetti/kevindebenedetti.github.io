@@ -90,21 +90,38 @@ function buildSidebarItems(dir: string, baseLink: string): SidebarItem[] {
 
   const entries = readdirSync(dir, { withFileTypes: true }).sort(sortEntries)
 
+  // Detect directories so file+directory pairs with the same name can be merged
+  const dirNames = new Set(entries.filter((e) => e.isDirectory()).map((e) => e.name))
+  const mergedDirs = new Set<string>()
+
   const items: SidebarItem[] = []
 
   for (const entry of entries) {
-    // Skip .vitepressrc.json and hidden files
+    // Skip hidden files / config files
     if (entry.name.startsWith('.')) continue
 
     const fullPath = join(dir, entry.name)
 
     if (entry.isFile() && entry.name.endsWith('.md')) {
       const slug = entry.name === 'index.md' ? '' : basename(entry.name, '.md')
-      items.push({
-        text: entry.name === 'index.md' ? 'Overview' : getMdTitle(fullPath),
-        link: slug ? `${baseLink}${slug}` : baseLink,
-      })
-    } else if (entry.isDirectory()) {
+
+      if (slug && dirNames.has(slug)) {
+        // file.md + file/ at same level → merge into one collapsible group
+        const nested = buildSidebarItems(join(dir, slug), `${baseLink}${slug}/`)
+        items.push({
+          text: getMdTitle(fullPath),
+          link: `${baseLink}${slug}`,
+          collapsed: true,
+          ...(nested.length > 0 ? { items: nested } : {}),
+        })
+        mergedDirs.add(slug)
+      } else {
+        items.push({
+          text: entry.name === 'index.md' ? 'Overview' : getMdTitle(fullPath),
+          link: slug ? `${baseLink}${slug}` : baseLink,
+        })
+      }
+    } else if (entry.isDirectory() && !mergedDirs.has(entry.name)) {
       const nested = buildSidebarItems(fullPath, `${baseLink}${entry.name}/`)
       if (nested.length > 0) {
         items.push({

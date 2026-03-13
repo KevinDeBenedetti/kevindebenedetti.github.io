@@ -59,10 +59,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
         },
         {
           "text": "Kubernetes",
-          "link": "/documentation/devops/kubernetes"
-        },
-        {
-          "text": "Kubernetes",
+          "link": "/documentation/devops/kubernetes",
           "collapsed": true,
           "items": [
             {

@@ -7,3 +7,4 @@
 
 # Project docs synced by CI — never commit these
 docs/*
+!docs/public

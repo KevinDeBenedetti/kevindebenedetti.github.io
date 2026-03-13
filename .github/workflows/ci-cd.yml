@@ -65,5 +65,5 @@ jobs:
     uses: KevinDeBenedetti/github-workflows/.github/workflows/deploy-pages.yml@main
     with:
       node-version: '22'
-      build-command: bun run docs:build
+      build-command: bun run build
       output-directory: .vitepress/dist

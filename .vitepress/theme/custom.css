@@ -3,63 +3,38 @@
  * https://github.com/vuejs/vitepress/blob/main/src/client/theme-default/styles/vars.css
  */
 
-/**
- * Colors
+/* ===========================================================
+ * Brand Palette Tokens
  *
- * Each colors have exact same color scale system with 3 levels of solid
- * colors with different brightness, and 1 soft color.
- *
- * - `XXX-1`: The most solid color used mainly for colored text. It must
- *   satisfy the contrast ratio against when used on top of `XXX-soft`.
- *
- * - `XXX-2`: The color used mainly for hover state of the button.
- *
- * - `XXX-3`: The color for solid background, such as bg color of the button.
- *   It must satisfy the contrast ratio with pure white (#ffffff) text on
- *   top of it.
- *
- * - `XXX-soft`: The color used for subtle background such as custom container
- *   or badges. It must satisfy the contrast ratio when putting `XXX-1` colors
- *   on top of it.
- *
- *   The soft color must be semi transparent alpha channel. This is crucial
- *   because it allows adding multiple "soft" colors on top of each other
- *   to create a accent, such as when having inline code block inside
- *   custom containers.
- *
- * - `default`: The color used purely for subtle indication without any
- *   special meanings attached to it such as bg color for menu hover state.
- *
- * - `brand`: Used for primary brand colors, such as link text, button with
- *   brand theme, etc.
- *
- * - `tip`: Used to indicate useful information. The default theme uses the
- *   brand color for this by default.
- *
- * - `warning`: Used to indicate warning to the users. Used in custom
- *   container, badges, etc.
- *
- * - `danger`: Used to show error, or dangerous message to the users. Used
- *   in custom container, badges, etc.
- * -------------------------------------------------------------------------- */
+ * Two main brand colors:
+ *   --color-dark-blue : #0d3b66  (primary)
+ *   --color-gold      : #f4d35e  (accent)
+ * =========================================================== */
 
-/* Tailwind CSS
-* Responsive
-*   min-width: 640px
-*   min-width: 960px
-*   min-width: 1280px 
-*/
+:root {
+  /* Dark blue — 3 shades (light → dark) + soft tint */
+  --color-dark-blue:      #0d3b66;
+  --color-dark-blue-2:    #0f4d80;
+  --color-dark-blue-3:    #185c9c;
+  --color-dark-blue-soft: rgba(13, 59, 102, 0.14);
 
-/* TAILWIND CSS - DISABLED DUE TO CONFLICTS WITH VITEPRESS DEFAULT THEME
+  /* Gold — main accent + muted variant + soft tint */
+  --color-gold:      #f4d35e;
+  --color-gold-2:    #e8c040;
+  --color-gold-soft: rgba(244, 211, 94, 0.18);
+}
 
-@import "tailwindcss";
+/* In dark mode expose lighter blues so text stays readable */
+.dark {
+  --color-dark-blue:      #4d9de0;
+  --color-dark-blue-2:    #3a8fd1;
+  --color-dark-blue-3:    #2a7dc0;
+  --color-dark-blue-soft: rgba(77, 157, 224, 0.16);
+}
 
-@custom-variant dark (&:where(.dark, .dark *));
-
-@theme {
-  --breakpoint-sm: 640px;
-  --breakpoint-md: 960px;
-} */
+/* ===========================================================
+ * VitePress semantic color overrides
+ * =========================================================== */
 
 :root {
   --vp-c-default-1: var(--vp-c-gray-1);
@@ -67,10 +42,11 @@
   --vp-c-default-3: var(--vp-c-gray-3);
   --vp-c-default-soft: var(--vp-c-gray-soft);
 
-  --vp-c-brand-1: var(--vp-c-indigo-1);
-  --vp-c-brand-2: var(--vp-c-indigo-2);
-  --vp-c-brand-3: var(--vp-c-indigo-3);
-  --vp-c-brand-soft: var(--vp-c-indigo-soft);
+  /* Brand → dark-blue palette */
+  --vp-c-brand-1: var(--color-dark-blue);
+  --vp-c-brand-2: var(--color-dark-blue-2);
+  --vp-c-brand-3: var(--color-dark-blue-3);
+  --vp-c-brand-soft: var(--color-dark-blue-soft);
 
   --vp-c-tip-1: var(--vp-c-brand-1);
   --vp-c-tip-2: var(--vp-c-brand-2);
@@ -88,6 +64,19 @@
   --vp-c-danger-soft: var(--vp-c-red-soft);
 }
 
+/* Dark mode also gets the lighter brand values */
+.dark {
+  --vp-c-brand-1: var(--color-dark-blue);
+  --vp-c-brand-2: var(--color-dark-blue-2);
+  --vp-c-brand-3: var(--color-dark-blue-3);
+  --vp-c-brand-soft: var(--color-dark-blue-soft);
+
+  --vp-c-tip-1: var(--vp-c-brand-1);
+  --vp-c-tip-2: var(--vp-c-brand-2);
+  --vp-c-tip-3: var(--vp-c-brand-3);
+  --vp-c-tip-soft: var(--vp-c-brand-soft);
+}
+
 /**
  * Component: Button
  * -------------------------------------------------------------------------- */
@@ -95,16 +84,13 @@
 :root {
   --vp-button-brand-border: transparent;
   --vp-button-brand-text: var(--vp-c-white);
-  /*
-  --vp-button-brand-bg: var(--vp-c-brand-3);
-  */
-  --vp-button-brand-bg: #0d3b66;
+  --vp-button-brand-bg: var(--color-dark-blue);
   --vp-button-brand-hover-border: transparent;
-  --vp-button-brand-hover-text: #f4d35e;
-  --vp-button-brand-hover-bg: #185c9c;
+  --vp-button-brand-hover-text: var(--color-gold);
+  --vp-button-brand-hover-bg: var(--color-dark-blue-3);
   --vp-button-brand-active-border: transparent;
   --vp-button-brand-active-text: var(--vp-c-white);
-  --vp-button-brand-active-bg: var(--vp-c-brand-1);
+  --vp-button-brand-active-bg: var(--color-dark-blue-2);
 }
 
 /**
@@ -113,21 +99,16 @@
 
 :root {
   --vp-home-hero-name-color: transparent;
-  /* --vp-home-hero-name-background: -webkit-linear-gradient(
-    120deg,
-    #bd34fe 30%,
-    #41d1ff
-  ); */
   --vp-home-hero-name-background: -webkit-linear-gradient(
     120deg,
-    #f4d35e,
-    #0d3b66 60%
+    var(--color-gold),
+    var(--color-dark-blue) 60%
   );
 
   --vp-home-hero-image-background-image: linear-gradient(
     -45deg,
-    #bd34fe 50%,
-    #47caff 50%
+    var(--color-gold) 30%,
+    var(--color-dark-blue) 70%
   );
   --vp-home-hero-image-filter: blur(44px);
 }
@@ -173,11 +154,11 @@ html {
 /* VPButton */
 .VPButton {
   transition: all 0.3s ease 0s !important;
-  box-shadow: 0px 0px 6px #f4d45e72;
+  box-shadow: 0 0 6px var(--color-gold-soft);
 }
 
 .VPButton:hover {
-  box-shadow: 0px 10px 20px #f4d45e72;
+  box-shadow: 0 10px 20px var(--color-gold-soft);
   transform: translateY(-7px);
 }
 
@@ -192,13 +173,34 @@ html {
 /* Features */
 .VPLink.VPFeature {
   padding: 2rem 0;
+  transition: box-shadow 0.3s ease, transform 0.3s ease;
 }
 
 .VPLink.VPFeature:hover {
-  /* background-color: #202128; */
-  box-shadow: 0px 10px 20px #999eb8;
-  padding: 2rem 0;
+  box-shadow: 0 10px 24px var(--color-gold-soft);
+  transform: translateY(-2px);
   cursor: pointer;
+}
+
+/* Hero image */
+.VPHero .image-src {
+  border-radius: 50%;
+  max-width: 96px;
+  max-height: 96px;
+}
+
+@media (min-width: 640px) {
+  .VPHero .image-src {
+    max-width: 128px;
+    max-height: 128px;
+  }
+}
+
+@media (min-width: 960px) {
+  .VPHero .image-src {
+    max-width: 160px;
+    max-height: 160px;
+  }
 }
 
 /* Overview page — GitHub repo button */
@@ -219,6 +221,6 @@ html {
 .vp-repo-link:hover {
   background: var(--vp-button-brand-hover-bg);
   color: var(--vp-button-brand-hover-text) !important;
-  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.2);
+  box-shadow: 0 6px 16px var(--color-gold-soft);
   transform: translateY(-2px);
 }

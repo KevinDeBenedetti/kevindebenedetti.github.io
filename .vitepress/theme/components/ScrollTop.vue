@@ -116,7 +116,7 @@ onUnmounted(() => {
   width: 35px;
   height: 35px;
   overflow: hidden;
-  background: white;
+  background: var(--vp-c-white);
   color: var(--vp-button-brand-bg);
   border-radius: 50%;
   display: flex;
@@ -130,16 +130,16 @@ onUnmounted(() => {
 }
 
 .button:hover {
-  background: white;
+  background: var(--color-dark-blue-3);
   transform: scale(1.05);
 }
 
 .button:hover .button__icon {
-  color: white;
+  color: var(--color-gold);
 }
 
 .button:hover .button__text {
-  color: var(--vp-button-brand-bg);
+  color: var(--color-gold);
 }
 
 .button:hover .button__circle {

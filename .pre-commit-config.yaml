@@ -1,0 +1,10 @@
+repos:
+  - repo: local
+    hooks:
+      - id: oxlint
+        name: oxlint
+        language: system
+        entry: bunx oxlint
+        args: [--tsconfig=tsconfig.json]
+        types_or: [ts, vue]
+        pass_filenames: true

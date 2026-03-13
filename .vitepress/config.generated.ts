@@ -183,6 +183,44 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "link": "/dotfiles/"
     },
     {
+      "text": "Getting Started",
+      "link": "/dotfiles/getting-started"
+    },
+    {
+      "text": "Config",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Git",
+          "link": "/dotfiles/config/git"
+        },
+        {
+          "text": "Oh My Zsh Theme",
+          "link": "/dotfiles/config/oh-my-zsh"
+        },
+        {
+          "text": "Proto",
+          "link": "/dotfiles/config/proto"
+        },
+        {
+          "text": "Shell",
+          "link": "/dotfiles/config/shell"
+        },
+        {
+          "text": "SSH",
+          "link": "/dotfiles/config/ssh"
+        },
+        {
+          "text": "VS Code",
+          "link": "/dotfiles/config/vscode"
+        },
+        {
+          "text": "Zsh",
+          "link": "/dotfiles/config/zsh"
+        }
+      ]
+    },
+    {
       "text": "Setup",
       "collapsed": true,
       "items": [

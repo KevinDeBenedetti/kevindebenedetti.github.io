@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, rmSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -57,8 +57,17 @@ function runGit(args: string[]): void {
   }
 }
 
+/** Folders inside docs/ that must never be deleted during a sync reset. */
+const PRESERVED_DIRS = new Set(['public'])
+
 function resetDocsDir(): void {
-  rmSync(DOCS_DIR, { recursive: true, force: true })
+  // Remove only synced entries — leave preserved folders (e.g. public/) intact.
+  if (existsSync(DOCS_DIR)) {
+    for (const entry of readdirSync(DOCS_DIR)) {
+      if (PRESERVED_DIRS.has(entry)) continue
+      rmSync(join(DOCS_DIR, entry), { recursive: true, force: true })
+    }
+  }
   rmSync(TMP_DIR, { recursive: true, force: true })
   mkdirSync(DOCS_DIR, { recursive: true })
   mkdirSync(TMP_DIR, { recursive: true })

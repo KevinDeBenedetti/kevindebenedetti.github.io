@@ -5,22 +5,26 @@
     "@j178/prek": "^0.3.5",
     "@types/bun": "^1.3.10",
     "@types/node": "^25.5.0",
+    "@vitejs/plugin-vue": "^6.0.5",
+    "@vue/test-utils": "^2.4.6",
+    "jsdom": "^28.1.0",
     "oxlint": "^1.55.0",
     "typescript": "^5.9.3",
     "vitepress": "^1.6.4",
+    "vitest": "^4.1.0",
     "vue-tsc": "^3.2.5",
     "yaml": "^2.8.1"
   },
   "scripts": {
+    "postinstall": "codesign --force --sign - node_modules/@esbuild/darwin-arm64/bin/esbuild 2>/dev/null || true",
     "sync-docs": "bun scripts/sync-docs.ts",
-    "docs:dev": "bun run generate && vitepress dev",
-    "docs:build": "bun run generate && vitepress build",
-    "docs:preview": "vitepress preview",
+    "dev": "bun run generate && vitepress dev",
+    "build": "bun run generate && vitepress build",
+    "preview": "vitepress preview",
     "generate": "bun run sync-docs && bun scripts/generate-config.ts",
-    "build": "bun run docs:build",
     "lint": "bunx prek run --all-files",
     "typecheck": "vue-tsc --noEmit",
-    "test": "echo 'No tests configured'"
+    "test": "vitest run"
   },
   "packageManager": "bun@1.2.21",
   "overrides": {

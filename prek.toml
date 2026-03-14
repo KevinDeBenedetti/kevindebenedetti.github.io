@@ -47,10 +47,10 @@ args = ["--tsconfig=tsconfig.json"]
 types_or = ["ts", "vue"]
 pass_filenames = true
 
-[[repos.hooks]]
-id = "check-docs-links"
-name = "No relative links escaping docs/"
-language = "script"
-entry = "scripts/check-docs-links.sh"
-files = "^docs/.*\\.md$"
-pass_filenames = true
+# ─── Docs link safety ────────────────────────────────────────────────────────
+[[repos]]
+repo = "https://github.com/KevinDeBenedetti/github-workflows"
+rev = "c91bedb2d28c23f8e4e42f49393ad5d2857b76c0"
+hooks = [
+  { id = "check-docs-links" },
+]

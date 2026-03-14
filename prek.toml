@@ -13,6 +13,27 @@ minimum_prek_version = "0.3.0"
 fail_fast = false
 default_install_hook_types = ["pre-commit"]
 
+# ─── General file hygiene ───────────────────────────────────────────────────
+[[repos]]
+repo = "https://github.com/pre-commit/pre-commit-hooks"
+rev = "v5.0.0"
+hooks = [
+  { id = "trailing-whitespace", args = ["--markdown-linebreak-ext=md"] },
+  { id = "end-of-file-fixer" },
+  { id = "check-yaml" },
+  { id = "check-merge-conflict" },
+  { id = "detect-private-key" },
+  { id = "mixed-line-ending", args = ["--fix=lf"] },
+]
+
+# ─── GitHub Actions workflow linting ────────────────────────────────────────
+[[repos]]
+repo = "https://github.com/rhysd/actionlint"
+rev = "v1.7.10"
+hooks = [
+  { id = "actionlint" },
+]
+
 # ─── Local hooks ────────────────────────────────────────────────────────────
 [[repos]]
 repo = "local"
@@ -24,4 +45,12 @@ language = "system"
 entry = "bunx oxlint"
 args = ["--tsconfig=tsconfig.json"]
 types_or = ["ts", "vue"]
+pass_filenames = true
+
+[[repos.hooks]]
+id = "check-docs-links"
+name = "No relative links escaping docs/"
+language = "script"
+entry = "scripts/check-docs-links.sh"
+files = "^docs/.*\\.md$"
 pass_filenames = true

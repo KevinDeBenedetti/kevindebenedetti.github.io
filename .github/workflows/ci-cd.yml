@@ -58,6 +58,14 @@ jobs:
       contents: read
       pull-requests: read
 
+  bot-check:
+    name: Bot check
+    if: github.event_name == 'pull_request'
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/check-bot-commits.yml@main
+    permissions:
+      contents: read
+      pull-requests: read
+
   # ── GitHub Pages deploy ────────────────────────────────────────────────────
   pages:
     name: Pages

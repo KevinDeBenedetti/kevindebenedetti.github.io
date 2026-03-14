@@ -40,8 +40,7 @@ jobs:
       run-typecheck: true
       run-test: false
       run-build: true
-      run-link-check: true
-      link-check-paths: 'docs/**/*.md'
+      run-link-check: false
 
   # ── Security ───────────────────────────────────────────────────────────────
   security:

@@ -355,6 +355,7 @@ export function generatedEditLinkPattern({ filePath }: { filePath: string }): st
     return 'https://github.com/KevinDeBenedetti/github-workflows/edit/main/docs/' + filePath.slice(17)
   }
   if (filePath.startsWith('tools/')) {
+    if (filePath === 'tools/index.md') return 'https://github.com/KevinDeBenedetti/tools/tree/main/docs'
     return 'https://github.com/KevinDeBenedetti/tools/edit/main/docs/' + filePath.slice(6)
   }
   return 'https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/edit/main/' + filePath

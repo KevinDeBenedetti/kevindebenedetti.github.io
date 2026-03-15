@@ -595,6 +595,12 @@ html {
   backdrop-filter: var(--glass-blur) !important;
   -webkit-backdrop-filter: var(--glass-blur) !important;
   border-right: 1px solid var(--glass-border) !important;
+  /* Hide scrollbar while keeping scroll behaviour */
+  scrollbar-width: none !important;
+}
+
+.VPSidebar::-webkit-scrollbar {
+  display: none !important;
 }
 
 /* Dark mode: match VitePress dark-grey — no blue tint */

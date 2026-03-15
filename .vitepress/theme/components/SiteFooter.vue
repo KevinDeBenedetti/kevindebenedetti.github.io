@@ -3,7 +3,7 @@ import { computed } from 'vue'
 import { useData } from 'vitepress'
 import type { DefaultTheme } from 'vitepress'
 
-const { theme } = useData()
+const { theme, frontmatter } = useData()
 
 // Extract project links from the "Projects" dropdown in nav
 const projects = computed(() => {
@@ -18,11 +18,16 @@ const projects = computed(() => {
   )
 })
 
+// Hide footer on doc pages (layout: 'doc' or no explicit layout, which defaults to doc)
+const isDocPage = computed(() =>
+  frontmatter.value.layout === 'doc' || frontmatter.value.layout == null
+)
+
 const year = new Date().getFullYear()
 </script>
 
 <template>
-  <footer class="sf">
+  <footer v-if="!isDocPage" class="sf">
     <div class="sf__inner">
       <!-- Per-project quick-links row -->
       <nav class="sf__projects" aria-label="Projects">

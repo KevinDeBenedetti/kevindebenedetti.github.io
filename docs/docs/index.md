@@ -1,6 +1,6 @@
 ---
-title: Overview
-description: Documentation for this documentation hub — sync, generation, and contribution guides.
+title: "Docs Generator"
+description: "Documentation for this documentation hub — sync, generation, and contribution guides."
 repo: KevinDeBenedetti/kevindebenedetti.github.io
 order: 0
 ---
@@ -17,15 +17,6 @@ Documentation for this documentation hub — sync, generation, and contribution 
 |---|---|
 | Repository | [KevinDeBenedetti/kevindebenedetti.github.io](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io) |
 | Source docs | [`docs/`](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/tree/main/docs) |
-
-## Repository structure
-
-```
-docs/
-├── architecture.md
-├── configuration.md
-└── development.md
-```
 
 ## Documentation
 

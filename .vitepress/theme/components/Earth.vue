@@ -93,6 +93,9 @@
   justify-content: center;
   align-items: center;
   margin: 2rem 0;
+  width: 100%;
+  /* Prevent absolutely-positioned stars from causing horizontal overflow */
+  overflow: hidden;
 }
 
 .section-banner {

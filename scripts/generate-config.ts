@@ -1,5 +1,5 @@
 /**
- * Reads docs/<project>/.vitepressrc.json files and generates:
+ * Reads docs/.repos-metadata.json (written by sync-docs.ts) and generates:
  *   - .vitepress/config.generated.ts  (nav, sidebar, editLink)
  *   - docs/index.md                   (homepage with feature cards)
  *
@@ -13,17 +13,14 @@ import { fileURLToPath } from 'node:url'
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 
 // ── Types ──────────────────────────────────────────────────────────────────
-interface ProjectRC {
+interface RepoMetadata {
+  slug: string
   title: string
   description: string
-  icon: string
-  order: number
   repo: string
 }
 
-interface Project {
-  slug: string
-  rc: ProjectRC
+interface Project extends RepoMetadata {
   hasSourceIndex: boolean
 }
 
@@ -36,24 +33,21 @@ interface SidebarItem {
 
 // ── Discovery ──────────────────────────────────────────────────────────────
 function getProjects(): Project[] {
-  const docsDir = join(ROOT, 'docs')
-  if (!existsSync(docsDir)) return []
+  const metadataPath = join(ROOT, 'docs', '.repos-metadata.json')
+  if (!existsSync(metadataPath)) return []
 
-  return readdirSync(docsDir, { withFileTypes: true })
-    .filter((d) => d.isDirectory())
-    .map((d) => {
-      const rcPath = join(docsDir, d.name, '.vitepressrc.json')
-      if (!existsSync(rcPath)) return null
-      const projectDir = join(docsDir, d.name)
-      const rc: ProjectRC = JSON.parse(readFileSync(rcPath, 'utf-8'))
+  const repos: RepoMetadata[] = JSON.parse(readFileSync(metadataPath, 'utf-8'))
+
+  return repos
+    .sort((a, b) => a.slug.localeCompare(b.slug))
+    .map((repo) => {
+      const projectDir = join(ROOT, 'docs', repo.slug)
       return {
-        slug: d.name,
-        rc,
+        ...repo,
         hasSourceIndex: existsSync(join(projectDir, 'index.md')),
       }
     })
-    .filter((p): p is Project => p !== null)
-    .sort((a, b) => a.rc.order - b.rc.order)
+    .filter((p) => existsSync(join(ROOT, 'docs', p.slug)))
 }
 
 function sortEntries(a: { name: string; isDirectory(): boolean }, b: { name: string; isDirectory(): boolean }): number {
@@ -219,18 +213,18 @@ function writeProjectIndex(project: Project): void {
 title: Overview
 ---
 
-# ${project.rc.icon} ${project.rc.title}
+# ${project.title}
 
-${project.rc.description}
+${project.description}
 
-<a href="https://github.com/${project.rc.repo}" target="_blank" rel="noopener noreferrer" class="vp-repo-link">View on GitHub →</a>
+<a href="https://github.com/${project.repo}" target="_blank" rel="noopener noreferrer" class="vp-repo-link">View on GitHub →</a>
 
 ## Source repository
 
 | | |
 |---|---|
-| Repository | [${project.rc.repo}](https://github.com/${project.rc.repo}) |
-| Source docs | [\`docs/\`](https://github.com/${project.rc.repo}/tree/main/docs) |
+| Repository | [${project.repo}](https://github.com/${project.repo}) |
+| Source docs | [\`docs/\`](https://github.com/${project.repo}/tree/main/docs) |
 
 ## Repository structure
 
@@ -248,9 +242,8 @@ ${pageLinks || '- No additional pages found.'}
 
 // ── Write config.generated.ts ──────────────────────────────────────────────
 function writeGeneratedConfig(projects: Project[]): void {
-  // Group all projects under a single "Projects" dropdown
   const projectItems = projects.map((p) => ({
-    text: `${p.rc.icon} ${p.rc.title}`,
+    text: p.title,
     link: `/${p.slug}/`,
   }))
 
@@ -280,9 +273,9 @@ function writeGeneratedConfig(projects: Project[]): void {
       (p) =>
         `  if (filePath.startsWith('${p.slug}/')) {\n` +
         (p.hasSourceIndex
-          ? `    return 'https://github.com/${p.rc.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`
-          : `    if (filePath === '${p.slug}/index.md') return 'https://github.com/${p.rc.repo}/tree/main/docs'\n` +
-            `    return 'https://github.com/${p.rc.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`) +
+          ? `    return 'https://github.com/${p.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`
+          : `    if (filePath === '${p.slug}/index.md') return 'https://github.com/${p.repo}/tree/main/docs'\n` +
+            `    return 'https://github.com/${p.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`) +
         `  }`,
     )
     .join('\n')
@@ -312,8 +305,8 @@ function writeIndexMd(projects: Project[]): void {
   const features = projects
     .map(
       (p) =>
-        `  - title: "${p.rc.icon} ${p.rc.title}"\n` +
-        `    details: ${p.rc.description}\n` +
+        `  - title: "${p.title}"\n` +
+        `    details: ${p.description}\n` +
         `    link: /${p.slug}/\n` +
         `    linkText: View docs`,
     )

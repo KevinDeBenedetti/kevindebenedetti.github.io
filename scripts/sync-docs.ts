@@ -1,4 +1,4 @@
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
@@ -10,9 +10,24 @@ const API_URL = process.env.GITHUB_API_URL ?? 'https://api.github.com'
 
 interface GitHubRepo {
   name: string
+  full_name: string
   clone_url: string
+  description: string | null
   archived: boolean
   disabled: boolean
+}
+
+export interface RepoMetadata {
+  slug: string
+  title: string
+  description: string
+  repo: string
+}
+
+function formatTitle(name: string): string {
+  return name
+    .replace(/[-_]/g, ' ')
+    .replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 async function fetchPublicRepos(owner: string): Promise<GitHubRepo[]> {
@@ -76,12 +91,11 @@ function resetDocsDir(): void {
 function syncRepoDocs(repo: GitHubRepo): boolean {
   const cloneDir = join(TMP_DIR, repo.name)
   const sourceDocsDir = join(cloneDir, 'docs')
-  const rcPath = join(sourceDocsDir, '.vitepressrc.json')
 
   runGit(['clone', '--depth=1', '--filter=blob:none', '--sparse', repo.clone_url, cloneDir])
   runGit(['-C', cloneDir, 'sparse-checkout', 'set', 'docs'])
 
-  if (!existsSync(rcPath)) {
+  if (!existsSync(sourceDocsDir)) {
     rmSync(cloneDir, { recursive: true, force: true })
     return false
   }
@@ -96,20 +110,34 @@ async function main(): Promise<void> {
   resetDocsDir()
 
   const repos = await fetchPublicRepos(OWNER)
-  const synced: string[] = []
+  const synced: RepoMetadata[] = []
 
   for (const repo of repos) {
-    console.log(`→ ${repo.name}`)
+    console.log(`-> ${repo.name}`)
     if (syncRepoDocs(repo)) {
-      synced.push(repo.name)
+      synced.push({
+        slug: repo.name,
+        title: formatTitle(repo.name),
+        description: repo.description ?? '',
+        repo: repo.full_name,
+      })
       console.log(`✓ synced ${repo.name}`)
     } else {
-      console.log(`· skipped ${repo.name} (missing docs/.vitepressrc.json)`)
+      console.log(`· skipped ${repo.name} (no docs/ folder)`)
     }
   }
 
+  // Sort alphabetically by slug before writing
+  synced.sort((a, b) => a.slug.localeCompare(b.slug))
+
+  writeFileSync(
+    join(DOCS_DIR, '.repos-metadata.json'),
+    JSON.stringify(synced, null, 2),
+    'utf-8',
+  )
+
   rmSync(TMP_DIR, { recursive: true, force: true })
-  console.log(`Synced ${synced.length} repo(s): ${synced.join(', ') || '(none)'}`)
+  console.log(`Synced ${synced.length} repo(s): ${synced.map((r) => r.slug).join(', ') || '(none)'}`)
 }
 
 await main()

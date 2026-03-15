@@ -25,10 +25,14 @@
     "generate": "bun run sync-docs && bun scripts/generate-config.ts",
     "lint": "oxlint --tsconfig=tsconfig.json .",
     "typecheck": "vue-tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "clean": "rm -rf node_modules dist .vitepress/dist .vitepress/cache synced"
   },
   "packageManager": "bun@1.2.21",
   "overrides": {
     "esbuild": "^0.25.0"
-  }
+  },
+  "trustedDependencies": [
+    "@j178/prek"
+  ]
 }

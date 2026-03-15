@@ -1,5 +1,6 @@
 /**
- * Reads docs/.repos-metadata.json (written by sync-docs.ts) and generates:
+ * Reads synced/.repos-metadata.json (written by sync-docs.ts) and discovers
+ * locally-managed projects from docs/<slug>/.vitepressrc.json, then generates:
  *   - .vitepress/config.generated.ts  (nav, sidebar, editLink)
  *   - docs/index.md                   (homepage with feature cards)
  *
@@ -22,6 +23,10 @@ interface RepoMetadata {
 
 interface Project extends RepoMetadata {
   hasSourceIndex: boolean
+  /** Absolute path to the directory containing this project's docs. */
+  dir: string
+  icon?: string
+  order?: number
 }
 
 interface SidebarItem {
@@ -32,22 +37,100 @@ interface SidebarItem {
 }
 
 // ── Discovery ──────────────────────────────────────────────────────────────
-function getProjects(): Project[] {
-  const metadataPath = join(ROOT, 'docs', '.repos-metadata.json')
+function getSyncedProjects(): Project[] {
+  const metadataPath = join(ROOT, 'synced', '.repos-metadata.json')
   if (!existsSync(metadataPath)) return []
 
   const repos: RepoMetadata[] = JSON.parse(readFileSync(metadataPath, 'utf-8'))
 
   return repos
-    .sort((a, b) => a.slug.localeCompare(b.slug))
     .map((repo) => {
-      const projectDir = join(ROOT, 'docs', repo.slug)
+      const projectDir = join(ROOT, 'synced', repo.slug)
       return {
         ...repo,
+        dir: projectDir,
         hasSourceIndex: existsSync(join(projectDir, 'index.md')),
       }
     })
-    .filter((p) => existsSync(join(ROOT, 'docs', p.slug)))
+    .filter((p) => existsSync(p.dir))
+}
+
+/**
+ * Reads project metadata from an index.md frontmatter block.
+ * A directory is treated as a local project when its index.md contains a `repo:` field.
+ */
+function readLocalProjectMeta(
+  indexPath: string,
+): { title: string; description: string; repo: string; icon?: string; order?: number } | null {
+  if (!existsSync(indexPath)) return null
+  const content = readFileSync(indexPath, 'utf-8')
+
+  const fmMatch = content.match(/^---\s*\n([\s\S]*?)\n---/)
+  if (!fmMatch) return null
+  const fm = fmMatch[1]
+
+  const getField = (key: string): string | undefined => {
+    const m = fm.match(new RegExp(`^${key}:\\s*(.+)$`, 'm'))
+    return m ? m[1].replace(/^["']|["']$/g, '').trim() : undefined
+  }
+
+  const repo = getField('repo')
+  if (!repo) return null
+
+  // Title comes from the first h1 heading
+  const h1Match = content.match(/^#\s+(.+)$/m)
+  const title = h1Match ? h1Match[1].trim() : ''
+  if (!title) return null
+
+  const orderStr = getField('order')
+  return {
+    repo,
+    title,
+    description: getField('description') ?? '',
+    icon: getField('icon'),
+    order: orderStr !== undefined ? Number(orderStr) : undefined,
+  }
+}
+
+function getLocalProjects(syncedSlugs: Set<string>): Project[] {
+  const docsDir = join(ROOT, 'docs')
+  if (!existsSync(docsDir)) return []
+
+  const projects: Project[] = []
+
+  for (const entry of readdirSync(docsDir, { withFileTypes: true })) {
+    if (!entry.isDirectory() || syncedSlugs.has(entry.name)) continue
+
+    const projectDir = join(docsDir, entry.name)
+    const meta = readLocalProjectMeta(join(projectDir, 'index.md'))
+    if (!meta) continue
+
+    projects.push({
+      slug: entry.name,
+      title: meta.title,
+      description: meta.description,
+      repo: meta.repo,
+      icon: meta.icon,
+      order: meta.order,
+      dir: projectDir,
+      hasSourceIndex: true,
+    })
+  }
+
+  return projects
+}
+
+function getProjects(): Project[] {
+  const synced = getSyncedProjects()
+  const syncedSlugs = new Set(synced.map((p) => p.slug))
+  const local = getLocalProjects(syncedSlugs)
+
+  return [...synced, ...local].sort((a, b) => {
+    const ao = a.order ?? Infinity
+    const bo = b.order ?? Infinity
+    if (ao !== bo) return ao - bo
+    return a.slug.localeCompare(b.slug)
+  })
 }
 
 function sortEntries(a: { name: string; isDirectory(): boolean }, b: { name: string; isDirectory(): boolean }): number {
@@ -198,7 +281,7 @@ function toProjectMarkdownLink(slug: string, link: string): string {
 function writeProjectIndex(project: Project): void {
   if (project.hasSourceIndex) return
 
-  const projectDir = join(ROOT, 'docs', project.slug)
+  const projectDir = project.dir
   const sidebarItems = buildSidebarItems(projectDir, `/${project.slug}/`).filter(
     (item) => item.link !== `/${project.slug}/`,
   )
@@ -256,8 +339,7 @@ function writeGeneratedConfig(projects: Project[]): void {
 
   const sidebar: Record<string, SidebarItem[]> = {}
   for (const p of projects) {
-    const projectDocsDir = join(ROOT, 'docs', p.slug)
-    const items = buildSidebarItems(projectDocsDir, `/${p.slug}/`)
+    const items = buildSidebarItems(p.dir, `/${p.slug}/`)
     if (items.length > 0) {
       sidebar[`/${p.slug}/`] = items
     } else {
@@ -266,18 +348,22 @@ function writeGeneratedConfig(projects: Project[]): void {
     }
   }
 
-  // Build editLink function body using string concatenation
-  // to avoid template-literal escaping issues in generated code
+  // Build editLink function body.
+  // filePath is the pre-rewrite source path relative to srcDir (repo root),
+  // e.g. 'synced/my-repo/page.md' or 'docs/docs/page.md'.
   const editLinkCases = projects
-    .map(
-      (p) =>
-        `  if (filePath.startsWith('${p.slug}/')) {\n` +
+    .map((p) => {
+      const prefix = p.dir.slice(ROOT.length + 1)  // e.g. 'synced/my-repo' or 'docs/docs'
+      const prefixSliceLen = prefix.length + 1      // +1 for trailing slash
+      return (
+        `  if (filePath.startsWith('${prefix}/')) {\n` +
         (p.hasSourceIndex
-          ? `    return 'https://github.com/${p.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`
-          : `    if (filePath === '${p.slug}/index.md') return 'https://github.com/${p.repo}/tree/main/docs'\n` +
-            `    return 'https://github.com/${p.repo}/edit/main/docs/' + filePath.slice(${p.slug.length + 1})\n`) +
-        `  }`,
-    )
+          ? `    return 'https://github.com/${p.repo}/edit/main/docs/' + filePath.slice(${prefixSliceLen})\n`
+          : `    if (filePath === '${prefix}/index.md') return 'https://github.com/${p.repo}/tree/main/docs'\n` +
+            `    return 'https://github.com/${p.repo}/edit/main/docs/' + filePath.slice(${prefixSliceLen})\n`) +
+        `  }`
+      )
+    })
     .join('\n')
 
   const code = `// ⚠️ GENERATED — do not edit manually.
@@ -303,13 +389,14 @@ ${editLinkCases}
 // ── Write docs/index.md ────────────────────────────────────────────────────
 function writeIndexMd(projects: Project[]): void {
   const features = projects
-    .map(
-      (p) =>
-        `  - title: "${p.title}"\n` +
-        `    details: ${p.description}\n` +
-        `    link: /${p.slug}/\n` +
-        `    linkText: View docs`,
-    )
+    .map((p) => {
+      const lines = [`  - title: "${p.title}"`]
+      if (p.icon) lines.push(`    icon: "${p.icon}"`)
+      lines.push(`    details: ${p.description}`)
+      lines.push(`    link: /${p.slug}/`)
+      lines.push(`    linkText: View docs`)
+      return lines.join('\n')
+    })
     .join('\n')
 
   const firstLink = projects.length > 0 ? `/${projects[0].slug}/` : '/'

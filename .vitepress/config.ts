@@ -9,7 +9,13 @@ const OG_IMAGE = `${SITE_URL}/og-image.png`
 // https://vitepress.dev/reference/site-config
 // Static base config — nav/sidebar/editLink are in config.generated.ts (auto-generated)
 export default defineConfig({
-  srcDir: 'docs',
+  srcDir: '.',
+  srcExclude: ['README.md', 'TODO.md'],
+  rewrites: {
+    'docs/index.md': 'index.md',
+    'docs/:slug/:rest*': ':slug/:rest*',
+    'synced/:slug/:rest*': ':slug/:rest*',
+  },
   cleanUrls: true,
   lastUpdated: true,
   lang: 'en',

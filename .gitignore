@@ -5,7 +5,5 @@
 *.env
 *.DS_Store
 
-# Project docs synced by CI — never commit these
-docs/*
-!docs/public
-*TODO.md
+# Synced project docs (raw clones) — rebuilt by CI, never commit
+synced/

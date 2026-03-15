@@ -25,10 +25,6 @@ export const generatedNav: DefaultTheme.NavItem[] = [
         "link": "/k3s-lab/"
       },
       {
-        "text": "Kevindebenedetti.Github.Io",
-        "link": "/kevindebenedetti.github.io/"
-      },
-      {
         "text": "Notes",
         "link": "/notes/"
       },
@@ -247,12 +243,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       ]
     }
   ],
-  "/kevindebenedetti.github.io/": [
-    {
-      "text": "Overview",
-      "link": "/kevindebenedetti.github.io/"
-    }
-  ],
   "/notes/": [
     {
       "text": "Overview",
@@ -465,29 +455,25 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
 }
 
 export function generatedEditLinkPattern({ filePath }: { filePath: string }): string {
-  if (filePath.startsWith('dotfiles/')) {
-    if (filePath === 'dotfiles/index.md') return 'https://github.com/KevinDeBenedetti/dotfiles/tree/main/docs'
-    return 'https://github.com/KevinDeBenedetti/dotfiles/edit/main/docs/' + filePath.slice(9)
+  if (filePath.startsWith('ynced/dotfiles/')) {
+    if (filePath === 'ynced/dotfiles/index.md') return 'https://github.com/KevinDeBenedetti/dotfiles/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/dotfiles/edit/main/docs/' + filePath.slice(15)
   }
-  if (filePath.startsWith('github-workflows/')) {
-    if (filePath === 'github-workflows/index.md') return 'https://github.com/KevinDeBenedetti/github-workflows/tree/main/docs'
-    return 'https://github.com/KevinDeBenedetti/github-workflows/edit/main/docs/' + filePath.slice(17)
+  if (filePath.startsWith('ynced/github-workflows/')) {
+    if (filePath === 'ynced/github-workflows/index.md') return 'https://github.com/KevinDeBenedetti/github-workflows/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/github-workflows/edit/main/docs/' + filePath.slice(23)
   }
-  if (filePath.startsWith('k3s-lab/')) {
-    if (filePath === 'k3s-lab/index.md') return 'https://github.com/KevinDeBenedetti/k3s-lab/tree/main/docs'
-    return 'https://github.com/KevinDeBenedetti/k3s-lab/edit/main/docs/' + filePath.slice(8)
+  if (filePath.startsWith('ynced/k3s-lab/')) {
+    if (filePath === 'ynced/k3s-lab/index.md') return 'https://github.com/KevinDeBenedetti/k3s-lab/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/k3s-lab/edit/main/docs/' + filePath.slice(14)
   }
-  if (filePath.startsWith('kevindebenedetti.github.io/')) {
-    if (filePath === 'kevindebenedetti.github.io/index.md') return 'https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/tree/main/docs'
-    return 'https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/edit/main/docs/' + filePath.slice(27)
+  if (filePath.startsWith('ynced/notes/')) {
+    if (filePath === 'ynced/notes/index.md') return 'https://github.com/KevinDeBenedetti/notes/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/notes/edit/main/docs/' + filePath.slice(12)
   }
-  if (filePath.startsWith('notes/')) {
-    if (filePath === 'notes/index.md') return 'https://github.com/KevinDeBenedetti/notes/tree/main/docs'
-    return 'https://github.com/KevinDeBenedetti/notes/edit/main/docs/' + filePath.slice(6)
-  }
-  if (filePath.startsWith('tools/')) {
-    if (filePath === 'tools/index.md') return 'https://github.com/KevinDeBenedetti/tools/tree/main/docs'
-    return 'https://github.com/KevinDeBenedetti/tools/edit/main/docs/' + filePath.slice(6)
+  if (filePath.startsWith('ynced/tools/')) {
+    if (filePath === 'ynced/tools/index.md') return 'https://github.com/KevinDeBenedetti/tools/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/tools/edit/main/docs/' + filePath.slice(12)
   }
   return 'https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/edit/main/' + filePath
 }

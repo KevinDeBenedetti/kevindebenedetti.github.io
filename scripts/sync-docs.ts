@@ -4,6 +4,7 @@ import { fileURLToPath } from 'node:url'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const DOCS_DIR = join(ROOT, 'docs')
+const SYNCED_DIR = join(ROOT, 'synced')
 const TMP_DIR = join(ROOT, '.tmp-doc-sync')
 const OWNER = process.env.GITHUB_OWNER ?? 'KevinDeBenedetti'
 const API_URL = process.env.GITHUB_API_URL ?? 'https://api.github.com'
@@ -23,6 +24,9 @@ export interface RepoMetadata {
   description: string
   repo: string
 }
+
+/** Repos skipped during sync — their docs are managed locally in docs/. */
+const EXCLUDED_REPOS = new Set(['kevindebenedetti.github.io'])
 
 function formatTitle(name: string): string {
   return name
@@ -73,18 +77,21 @@ function runGit(args: string[]): void {
 }
 
 /** Folders inside docs/ that must never be deleted during a sync reset. */
-const PRESERVED_DIRS = new Set(['public'])
+const PRESERVED_DIRS = new Set(['docs'])
 
 function resetDocsDir(): void {
-  // Remove only synced entries — leave preserved folders (e.g. public/) intact.
+  // Remove only synced symlinks and generated files from docs/ — leave committed dirs intact.
   if (existsSync(DOCS_DIR)) {
     for (const entry of readdirSync(DOCS_DIR)) {
       if (PRESERVED_DIRS.has(entry)) continue
       rmSync(join(DOCS_DIR, entry), { recursive: true, force: true })
     }
   }
+  // Clear and recreate synced/ and tmp/
+  rmSync(SYNCED_DIR, { recursive: true, force: true })
   rmSync(TMP_DIR, { recursive: true, force: true })
   mkdirSync(DOCS_DIR, { recursive: true })
+  mkdirSync(SYNCED_DIR, { recursive: true })
   mkdirSync(TMP_DIR, { recursive: true })
 }
 
@@ -100,8 +107,10 @@ function syncRepoDocs(repo: GitHubRepo): boolean {
     return false
   }
 
-  cpSync(sourceDocsDir, join(DOCS_DIR, repo.name), { recursive: true })
+  // Copy content into synced/<repo>/ (separate from committed docs/)
+  cpSync(sourceDocsDir, join(SYNCED_DIR, repo.name), { recursive: true })
   rmSync(cloneDir, { recursive: true, force: true })
+
   return true
 }
 
@@ -113,8 +122,13 @@ async function main(): Promise<void> {
   const synced: RepoMetadata[] = []
 
   for (const repo of repos) {
+    if (EXCLUDED_REPOS.has(repo.name)) {
+      console.log(`· skipped ${repo.name} (locally managed)`)
+      continue
+    }
     console.log(`-> ${repo.name}`)
-    if (syncRepoDocs(repo)) {
+    const hasDocs = syncRepoDocs(repo)
+    if (hasDocs) {
       synced.push({
         slug: repo.name,
         title: formatTitle(repo.name),
@@ -127,11 +141,11 @@ async function main(): Promise<void> {
     }
   }
 
-  // Sort alphabetically by slug before writing
+  // Sort alphabetically by slug
   synced.sort((a, b) => a.slug.localeCompare(b.slug))
 
   writeFileSync(
-    join(DOCS_DIR, '.repos-metadata.json'),
+    join(SYNCED_DIR, '.repos-metadata.json'),
     JSON.stringify(synced, null, 2),
     'utf-8',
   )

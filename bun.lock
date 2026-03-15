@@ -18,6 +18,9 @@
       },
     },
   },
+  "trustedDependencies": [
+    "@j178/prek",
+  ],
   "overrides": {
     "esbuild": "^0.25.0",
   },

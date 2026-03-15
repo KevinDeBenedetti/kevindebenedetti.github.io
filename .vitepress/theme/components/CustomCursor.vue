@@ -145,10 +145,10 @@ onUnmounted(() => {
 /* ── Dot ──────────────────────────────────────────────── */
 .cc__dot {
   position: fixed;
-  top:  -3px;
-  left: -3px;
-  width:  6px;
-  height: 6px;
+  top:  -1.5px;
+  left: -1.5px;
+  width:  3px;
+  height: 3px;
   border-radius: 50%;
   background: var(--color-gold);
   will-change: transform;
@@ -169,18 +169,18 @@ onUnmounted(() => {
 
 /* ── Ring visual ──────────────────────────────────────── */
 .cc__ring {
-  width:  40px;
-  height: 40px;
+  width:  20px;
+  height: 20px;
   border-radius: 50%;
   /* Center around the position anchor */
-  margin: -20px 0 0 -20px;
+  margin: -10px 0 0 -10px;
 
   background: rgba(255, 255, 255, 0.05);
-  backdrop-filter: blur(8px) saturate(160%);
-  -webkit-backdrop-filter: blur(8px) saturate(160%);
+  backdrop-filter: blur(4px) saturate(160%);
+  -webkit-backdrop-filter: blur(4px) saturate(160%);
   border: 1.5px solid rgba(244, 211, 94, 0.3);
   box-shadow:
-    0 0 12px rgba(244, 211, 94, 0.06),
+    0 0 6px rgba(244, 211, 94, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
   display: flex;
@@ -198,34 +198,34 @@ onUnmounted(() => {
 
 /* ── Hover: link ──────────────────────────────────────── */
 .cc--link .cc__ring {
-  width:  54px;
-  height: 54px;
-  margin: -27px 0 0 -27px;
+  width:  27px;
+  height: 27px;
+  margin: -13.5px 0 0 -13.5px;
   border-color: var(--color-gold);
   background: rgba(244, 211, 94, 0.08);
   box-shadow:
-    0 0 24px rgba(244, 211, 94, 0.14),
+    0 0 12px rgba(244, 211, 94, 0.14),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
 /* ── Hover: button ────────────────────────────────────── */
 .cc--button .cc__ring {
-  width:  54px;
-  height: 54px;
-  margin: -27px 0 0 -27px;
+  width:  27px;
+  height: 27px;
+  margin: -13.5px 0 0 -13.5px;
   border-color: rgba(13, 59, 102, 0.55);
   background: rgba(13, 59, 102, 0.08);
   box-shadow:
-    0 0 20px rgba(13, 59, 102, 0.1),
+    0 0 10px rgba(13, 59, 102, 0.1),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
 /* ── Hover: input ─────────────────────────────────────── */
 .cc--input .cc__ring {
-  width:  48px;
-  height: 24px;
-  border-radius: 12px;
-  margin: -12px 0 0 -24px;
+  width:  24px;
+  height: 12px;
+  border-radius: 6px;
+  margin: -6px 0 0 -12px;
   border-color: rgba(244, 211, 94, 0.45);
 }
 
@@ -242,7 +242,7 @@ onUnmounted(() => {
 
 /* ── Hint label ───────────────────────────────────────── */
 .cc__hint {
-  font-size: 15px;
+  font-size: 8px;
   font-weight: 700;
   color: var(--color-gold);
   opacity: 0;

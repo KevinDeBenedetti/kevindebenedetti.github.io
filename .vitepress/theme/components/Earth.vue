@@ -88,13 +88,20 @@
 </template>
 
 <style scoped>
+.earth-slot-wrapper {
+  width: 100%;
+  max-width: 100%;
+  overflow: hidden;
+}
+
 .container {
   display: flex;
   justify-content: center;
   align-items: center;
   margin: 2rem 0;
   width: 100%;
-  /* Prevent absolutely-positioned stars from causing horizontal overflow */
+  max-width: 100%;
+  /* Clip absolutely-positioned stars so they never cause horizontal overflow */
   overflow: hidden;
 }
 

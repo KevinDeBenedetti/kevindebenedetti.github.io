@@ -4,7 +4,7 @@
 layout: home
 
 hero:
-  name: "Kevin's Docs"
+  name: "Docs"
   text: "Centralized documentation hub"
   tagline: All @KevinDeBenedetti open source project docs in one place.
   image:

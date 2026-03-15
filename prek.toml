@@ -1,9 +1,8 @@
 # =============================================================================
 # prek.toml — git hook configuration (https://prek.j178.dev)
-# prek is a faster, dependency-free alternative to pre-commit (written in Rust)
+# prek is installed as a dev dependency: @j178/prek
 #
-# Install prek:   brew install j178/tap/prek
-# Install hooks:  prek install       (run once after cloning)
+# Install hooks:  bun run prepare   (runs automatically after bun install)
 # Run all:        prek run --all-files
 # Run staged:     prek run
 # Update revs:    prek autoupdate
@@ -37,15 +36,18 @@ hooks = [
 ]
 
 # ─── Local hooks ────────────────────────────────────────────────────────────
+# oxlint is a dev dependency — prek uses the node language to manage its own
+# Node.js runtime so the hook works regardless of the caller's $PATH (IDE, CI…)
 [[repos]]
 repo = "local"
 
 [[repos.hooks]]
 id = "oxlint"
 name = "oxlint"
-language = "system"
-entry = "bunx oxlint"
+language = "node"
+entry = "oxlint"
 args = ["--tsconfig=tsconfig.json"]
+additional_dependencies = ["oxlint"]
 types_or = ["ts", "vue"]
 pass_filenames = true
 

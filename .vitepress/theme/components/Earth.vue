@@ -2,7 +2,8 @@
 </script>
 
 <template>
-  <div class="container">
+  <div class="earth-slot-wrapper">
+    <div class="container">
     <div class="section-banner">
       <div id="star-1">
         <div class="curved-corner-star">
@@ -80,6 +81,7 @@
           <div id="curved-corner-topleft"></div>
         </div>
       </div>
+    </div>
     </div>
   </div>
 

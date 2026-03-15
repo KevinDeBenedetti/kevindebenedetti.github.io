@@ -248,12 +248,17 @@ ${pageLinks || '- No additional pages found.'}
 
 // ── Write config.generated.ts ──────────────────────────────────────────────
 function writeGeneratedConfig(projects: Project[]): void {
+  // Group all projects under a single "Projects" dropdown
+  const projectItems = projects.map((p) => ({
+    text: `${p.rc.icon} ${p.rc.title}`,
+    link: `/${p.slug}/`,
+  }))
+
   const nav = [
     { text: 'Home', link: '/' },
-    ...projects.map((p) => ({
-      text: p.rc.title,
-      link: `/${p.slug}/`,
-    })),
+    ...(projectItems.length > 0
+      ? [{ text: 'Projects', items: projectItems }]
+      : []),
   ]
 
   const sidebar: Record<string, SidebarItem[]> = {}

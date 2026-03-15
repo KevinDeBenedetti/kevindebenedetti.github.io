@@ -22,6 +22,18 @@
   --color-gold:      #f4d35e;
   --color-gold-2:    #e8c040;
   --color-gold-soft: rgba(244, 211, 94, 0.18);
+
+  /* Gold safe for TEXT on light backgrounds (WCAG AA) */
+  --color-gold-text: #7a6000;
+
+  /* Glass effect tokens — light mode */
+  --glass-bg:           rgba(240, 245, 255, 0.65);
+  --glass-bg-hover:     rgba(230, 238, 255, 0.82);
+  --glass-border:       rgba(13, 59, 102, 0.12);
+  --glass-border-hover: rgba(244, 211, 94, 0.55);
+  --glass-shadow:       0 4px 24px rgba(13, 59, 102, 0.1);
+  --glass-shadow-hover: 0 8px 36px rgba(13, 59, 102, 0.18);
+  --glass-blur:         blur(16px) saturate(180%);
 }
 
 /* In dark mode expose lighter blues so text stays readable */
@@ -30,6 +42,17 @@
   --color-dark-blue-2:    #3a8fd1;
   --color-dark-blue-3:    #2a7dc0;
   --color-dark-blue-soft: rgba(77, 157, 224, 0.16);
+
+  /* Gold is readable on dark backgrounds — keep as-is */
+  --color-gold-text: var(--color-gold);
+
+  /* Dark glass tokens */
+  --glass-bg:           rgba(8, 16, 34, 0.68);
+  --glass-bg-hover:     rgba(8, 16, 34, 0.85);
+  --glass-border:       rgba(77, 157, 224, 0.16);
+  --glass-border-hover: rgba(244, 211, 94, 0.55);
+  --glass-shadow:       0 4px 24px rgba(0, 0, 0, 0.45);
+  --glass-shadow-hover: 0 8px 40px rgba(0, 0, 0, 0.65);
 }
 
 /* ===========================================================
@@ -148,79 +171,1471 @@
  * Main CSS
  * -------------------------------------------------------------------------- */
 html {
-  scrollbar-width: none;
+  scrollbar-width: thin;
+  scrollbar-color: var(--glass-border) transparent;
 }
 
-/* VPButton */
-.VPButton {
-  transition: all 0.3s ease 0s !important;
-  box-shadow: 0 0 6px var(--color-gold-soft);
+::-webkit-scrollbar        { width: 6px; height: 6px; }
+::-webkit-scrollbar-track  { background: transparent; }
+::-webkit-scrollbar-thumb  { background: var(--glass-border); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--glass-border-hover); }
+
+/* ===========================================================
+ * Animated ambient background — homepage only
+ * Applied to .VPContent.is-home so it covers VPHome + Earth slot,
+ * eliminating the hard cut at the VPHome div boundary.
+ * @property allows the % positions to be animated smoothly.
+ * =========================================================== */
+@property --bg-x1 { syntax: '<percentage>'; inherits: false; initial-value: 20%; }
+@property --bg-y1 { syntax: '<percentage>'; inherits: false; initial-value: 10%; }
+@property --bg-x2 { syntax: '<percentage>'; inherits: false; initial-value: 80%; }
+@property --bg-y2 { syntax: '<percentage>'; inherits: false; initial-value: 90%; }
+
+@keyframes bgDrift {
+  0%,  100% { --bg-x1: 20%; --bg-y1: 10%; --bg-x2: 80%; --bg-y2: 90%; }
+  25%        { --bg-x1: 26%; --bg-y1: 18%; --bg-x2: 74%; --bg-y2: 82%; }
+  50%        { --bg-x1: 14%; --bg-y1: 22%; --bg-x2: 86%; --bg-y2: 78%; }
+  75%        { --bg-x1: 23%; --bg-y1:  7%; --bg-x2: 77%; --bg-y2: 93%; }
 }
 
-.VPButton:hover {
-  box-shadow: 0 10px 20px var(--color-gold-soft);
-  transform: translateY(-7px);
+/* The entire homepage content area (VPHome + Earth + empty space) */
+.VPContent.is-home {
+  background:
+    radial-gradient(ellipse 80% 50% at var(--bg-x1) var(--bg-y1), var(--color-dark-blue-soft) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 40% at var(--bg-x2) var(--bg-y2), var(--color-gold-soft) 0%, transparent 60%);
+  animation: bgDrift 18s ease-in-out infinite;
 }
 
-.VPButton:active {
-  transform: translateY(-1px);
+/* VPHome itself must be transparent so the gradient shows through */
+.VPHome {
+  background: transparent !important;
 }
 
-.VPButton.main {
+/* ===========================================================
+ * Earth — anchored at the bottom of the homepage
+ * Sits in home-features-after slot; negative margin-top pulls it
+ * up behind the cards so it's centered at the bottom.
+ * =========================================================== */
+.earth-slot-wrapper {
+  position: relative;
+  z-index: 0;
+  bottom: 2rem;
+  /* Pull Earth up so it overlaps the bottom of the cards grid */
+  margin-top: -220px;
+  margin-bottom: 2rem;
+  pointer-events: none;
+  display: flex;
+  justify-content: center;
+}
+
+.VPHomeFeatures {
+  position: relative;
+  z-index: 1;
+  padding-bottom: 0 !important;
+}
+
+/* Homepage feature cards: more transparent so Earth shows through */
+.VPHome .VPFeature {
+  background: rgba(240, 245, 255, 0.45) !important;
+  backdrop-filter: blur(18px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+}
+
+.VPHome .VPFeature:hover {
+  background: rgba(230, 238, 255, 0.65) !important;
+}
+
+.dark .VPHome .VPFeature {
+  background: rgba(14, 20, 36, 0.45) !important;
+}
+
+.dark .VPHome .VPFeature:hover {
+  background: rgba(14, 20, 36, 0.65) !important;
+}
+
+/* ===========================================================
+ * Navigation bar — frosted glass
+ * =========================================================== */
+/* ===========================================================
+ * Nav — glass effect on VPNavBar (INNER element), NOT VPNav.
+ * IMPORTANT: backdrop-filter on VPNav (position:fixed) would create
+ * a containing block for its fixed children (VPNavScreen), causing
+ * the mobile menu to be clipped to the 64px nav height and be
+ * invisible. Apply blur only to VPNavBar (sibling of VPNavScreen).
+ * =========================================================== */
+.VPNavBar {
+  background: rgba(248, 250, 255, 0.82) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+  transition: background 0.3s ease, border-color 0.3s ease;
+}
+
+.dark .VPNavBar {
+  background: rgba(27, 27, 31, 0.92) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+}
+
+/* VPNav wrapper: must have NO backdrop-filter or transform */
+.VPNav {
+  background: transparent !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+}
+
+/* Nav title — dark blue gradient in light, gold→sky in dark */
+.VPNavBarTitle .title {
+  font-weight: 700;
+  background: linear-gradient(120deg, var(--color-dark-blue), var(--color-dark-blue-3));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.dark .VPNavBarTitle .title {
+  background: linear-gradient(120deg, var(--color-gold), #7ec8f0);
+  -webkit-background-clip: text;
+  background-clip: text;
+}
+
+/* Nav links — color + scale only, NO background on hover */
+.VPNavBarMenuLink,
+.VPNavBarMenuGroup .button {
+  border-radius: 8px;
+  transition: color 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* Light: use readable dark-blue; Dark: use bright gold */
+.VPNavBarMenuLink:hover,
+.VPNavBarMenuGroup .button:hover {
+  color: var(--color-dark-blue-2) !important;
+  transform: scale(1.05);
+  background: transparent !important;
+}
+
+.dark .VPNavBarMenuLink:hover,
+.dark .VPNavBarMenuGroup .button:hover {
+  color: var(--color-gold) !important;
+}
+
+/* Nav dropdown — override the actual VPMenu panel (not the outer .menu wrapper)
+ * VitePress already styles .VPMenu with border + bg; targeting .menu instead
+ * created a duplicate outer border. */
+.VPFlyout .VPMenu {
+  border: 1px solid var(--vp-c-divider) !important;
+  border-radius: 12px !important;
+  background-color: var(--vp-c-bg-elv) !important;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.16), 0 2px 8px rgba(0, 0, 0, 0.08) !important;
+  padding: 0.35rem 0 !important;
+  min-width: 200px !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(20px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(160%) !important;
+}
+
+/* Each link row wrapper */
+.VPFlyout .VPMenu .VPMenuLink {
+  padding: 0 0.4rem !important;
+}
+
+/* The <a class="item"> — reset default bg, add transition */
+.VPFlyout .VPMenu .VPMenuLink .item {
+  display: flex !important;
+  align-items: center !important;
+  border-radius: 8px !important;
+  padding: 0.48rem 0.75rem !important;
+  font-size: 0.875rem !important;
+  font-weight: 500 !important;
+  color: var(--vp-c-text-1) !important;
+  background: transparent !important;
+  border-left: 2px solid transparent !important;
+  transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease !important;
+  text-decoration: none !important;
+}
+
+/* Active page — left accent, brand color, no heavy bg */
+.VPFlyout .VPMenu .VPMenuLink .item.active {
+  background: transparent !important;
+  color: var(--vp-c-brand-1) !important;
+  border-left-color: var(--vp-c-brand-1) !important;
+  font-weight: 600 !important;
+}
+
+/* Hover */
+.VPFlyout .VPMenu .VPMenuLink .item:hover {
+  background: color-mix(in srgb, var(--vp-c-text-1) 6%, transparent) !important;
+  color: var(--vp-c-brand-1) !important;
+}
+
+/* Group label */
+.VPFlyout .VPMenu .group-title {
+  font-size: 0.68rem !important;
+  font-weight: 700 !important;
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+  color: var(--vp-c-text-3) !important;
+  padding: 0.45rem 1.15rem 0.15rem !important;
+}
+
+/* Social links in nav */
+.VPSocialLink {
+  transition: transform 0.25s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.25s ease;
+  border-radius: 8px;
+  padding: 4px;
+}
+
+.VPSocialLink:hover {
+  transform: scale(1.18);
+  opacity: 1;
+}
+
+/* ===========================================================
+ * Mobile nav screen — full-screen overlay (hamburger menu)
+ * backdrop-filter REMOVED — it creates a stacking context that can
+ * conflict with position:fixed, causing the screen to be invisible.
+ * Use solid/semi-solid background-color instead.
+ * z-index:50 ensures it renders above the nav's backdrop-filter layer.
+ * =========================================================== */
+.VPNavScreen {
+  background-color: rgba(248, 250, 255, 0.98) !important;
+  z-index: 50 !important;
+  /* Make the screen a flex column so the container can use margin:auto */
+  display: flex !important;
+  flex-direction: column !important;
+  padding: 0 2rem !important;
+}
+
+.dark .VPNavScreen {
+  background-color: rgba(24, 24, 28, 0.98) !important;
+}
+
+/* Container: margin:auto on a flex child = true vertical + horizontal center */
+.VPNavScreen .container {
+  margin: auto !important;
+  padding: 1.5rem 0 !important;
   width: 100%;
+  max-width: 320px !important;
 }
 
-/* Features */
-.VPLink.VPFeature {
-  padding: 2rem 0;
-  transition: box-shadow 0.3s ease, transform 0.3s ease;
+/* Mobile nav links — simple direct links (e.g. "Home")
+   centered block, color + scale hover only */
+.VPNavScreenMenuLink {
+  border-bottom: none !important;
+  border: none !important;
+  background: transparent !important;
+  border-radius: 0 !important;
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+  font-size: 15px !important;
+  font-weight: 500;
+  color: var(--vp-c-text-1) !important;
+  transition: color 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.VPLink.VPFeature:hover {
-  box-shadow: 0 10px 24px var(--color-gold-soft);
-  transform: translateY(-2px);
-  cursor: pointer;
+.VPNavScreenMenuLink:hover {
+  color: var(--color-dark-blue-2) !important;
+  background: transparent !important;
+  transform: scale(1.04);
 }
 
-/* Hero image */
-.VPHero .image-src {
-  border-radius: 50%;
-  max-width: 96px;
-  max-height: 96px;
+.dark .VPNavScreenMenuLink:hover {
+  color: var(--color-gold) !important;
 }
 
-@media (min-width: 640px) {
-  .VPHero .image-src {
-    max-width: 128px;
-    max-height: 128px;
-  }
+/* Group sub-links (inside the Projects accordion) */
+.VPNavScreenMenuGroupLink {
+  border-bottom: none !important;
+  border: none !important;
+  background: transparent !important;
+  text-align: center !important;
+  display: block !important;
+  width: 100% !important;
+  font-size: 14px !important;
+  font-weight: 500;
+  color: var(--vp-c-text-2) !important;
+  transition: color 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.VPNavScreenMenuGroupLink:hover {
+  color: var(--vp-c-brand-1) !important;
+  background: transparent !important;
+  transform: scale(1.03);
+}
+
+/* Group accordion container.
+   Replace VitePress's height:48px/auto (no-transition) approach with
+   max-height animation so open/close is smooth. */
+.VPNavScreenMenuGroup {
+  border-bottom: none !important;
+  text-align: center !important;
+  overflow: hidden !important;
+  max-height: 48px !important;           /* collapsed = just the button */
+  transition: max-height 0.35s cubic-bezier(0.4, 0, 0.2, 1) !important;
+}
+
+.VPNavScreenMenuGroup.open {
+  max-height: 500px !important;          /* large enough for any project count */
+  height: auto !important;               /* override VitePress's height:auto */
+}
+
+/* Group toggle button — MUST stay display:flex so the icon stays visible.
+   Center text + icon together with gap. */
+.VPNavScreenMenuGroup .button {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  border: none !important;
+  background: transparent !important;
+  width: 100% !important;
+  font-size: 15px !important;
+  font-weight: 600 !important;
+  color: var(--vp-c-text-1) !important;
+  padding: 12px 0 !important;
+  transition: color 0.2s ease, transform 0.2s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.VPNavScreenMenuGroup .button:hover {
+  color: var(--vp-c-brand-1) !important;
+  background: transparent !important;
+  transform: scale(1.04);
+}
+
+.dark .VPNavScreenMenuGroup .button:hover {
+  color: var(--color-gold) !important;
+}
+
+/* Open state: accent color on the button */
+.VPNavScreenMenuGroup.open .button {
+  color: var(--vp-c-brand-1) !important;
+}
+
+/* Icon sizing for the + / × toggle */
+.VPNavScreenMenuGroup .button-icon {
+  width: 14px !important;
+  height: 14px !important;
+  flex-shrink: 0;
+}
+
+/* Items wrapper: override VitePress visibility toggle with opacity fade
+   so the transition is visible (visibility alone has no animation) */
+.VPNavScreenMenuGroup .items {
+  visibility: visible !important;        /* let opacity handle the show/hide */
+  text-align: center !important;
+  opacity: 0 !important;
+  transform: translateY(-6px) !important;
+  transition: opacity 0.25s ease 0.05s, transform 0.25s ease 0.05s !important;
+  pointer-events: none !important;
+}
+
+.VPNavScreenMenuGroup.open .items {
+  opacity: 1 !important;
+  transform: translateY(0) !important;
+  pointer-events: auto !important;
+}
+
+/* Item rows: center */
+.VPNavScreenMenuGroup .item {
+  text-align: center !important;
+}
+
+/* Sub-link: fix VitePress's scoped margin-left:12px that shifts text off-center */
+.VPNavScreenMenuGroupLink {
+  margin-left: 0 !important;
+}
+
+/* Only the appearance toggle row keeps a subtle separator */
+.VPNavScreenAppearance {
+  border-top: 1px solid var(--glass-border) !important;
+  padding-top: 0.75rem;
+}
+
+/* ===========================================================
+ * Sidebar — frosted glass
+ * =========================================================== */
+.VPSidebar {
+  background: rgba(248, 250, 255, 0.88) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border-right: 1px solid var(--glass-border) !important;
+}
+
+/* Dark mode: match VitePress dark-grey — no blue tint */
+.dark .VPSidebar {
+  background: rgba(24, 24, 28, 0.95) !important;
+  border-right-color: rgba(255, 255, 255, 0.07) !important;
+}
+
+/* Sidebar item links — color transition only, NO background, NO border */
+.VPSidebarItem .item .link {
+  transition: color 0.2s ease;
+  border-radius: 0 !important;
+}
+
+.VPSidebarItem .item .link:hover {
+  background: transparent !important;
+  color: var(--color-dark-blue-2) !important;
+}
+
+.dark .VPSidebarItem .item .link:hover {
+  background: transparent !important;
+  color: var(--color-gold) !important;
+}
+
+/* Active link: bold + brand color accent, no background */
+.VPSidebarItem.is-active > .item .link {
+  background: transparent !important;
+  color: var(--color-dark-blue-2) !important;
+  font-weight: 600;
+}
+
+.dark .VPSidebarItem.is-active > .item .link {
+  color: var(--color-gold) !important;
+}
+
+/* Active item text (nested deeper) */
+.VPSidebarItem.is-active > .item .text {
+  color: var(--color-dark-blue-2) !important;
+}
+
+.dark .VPSidebarItem.is-active > .item .text {
+  color: var(--color-gold) !important;
+}
+
+/* ===========================================================
+ * Aside / Table of Contents
+ * =========================================================== */
+.VPDocAside {
+  border-left: 1px solid var(--glass-border);
+  padding-left: 1rem;
+}
+
+.VPDocOutlineItem a:hover {
+  color: var(--color-gold-2) !important;
+  transition: color 0.2s ease;
+}
+
+.VPDocOutlineItem a.active {
+  color: var(--vp-c-brand-1) !important;
+}
+
+/* ===========================================================
+ * Feature cards — compact glass grid
+ * =========================================================== */
+
+/* Force compact 2→4 column grid */
+.VPFeatures .items {
+  display: grid !important;
+  grid-template-columns: 1fr 1fr !important;
+  gap: 12px !important;
+  margin: 0 !important;
 }
 
 @media (min-width: 960px) {
-  .VPHero .image-src {
-    max-width: 160px;
-    max-height: 160px;
+  .VPFeatures .items {
+    grid-template-columns: repeat(4, 1fr) !important;
+    gap: 14px !important;
   }
 }
 
-/* Overview page — GitHub repo button */
+@media (max-width: 639px) {
+  .VPFeatures .items {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Override VitePress item width so grid takes over */
+.VPFeatures .item {
+  width: 100% !important;
+  padding: 0 !important;
+}
+
+.VPFeature {
+  height: 100%;
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 14px !important;
+  box-shadow: var(--glass-shadow) !important;
+  padding: 1.25rem !important;
+  transition:
+    background 0.25s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.VPFeature:hover {
+  background: var(--glass-bg-hover) !important;
+  border-color: var(--glass-border-hover) !important;
+  box-shadow: var(--glass-shadow-hover), 0 0 0 1px var(--glass-border-hover) !important;
+  transform: scale(1.03) !important;
+  cursor: pointer;
+}
+
+.VPFeature .box {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.VPFeature .icon {
+  font-size: 1.4rem !important;
+  line-height: 1;
+  filter: drop-shadow(0 0 6px var(--color-gold-soft));
+  transition: filter 0.25s ease, transform 0.25s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.VPFeature:hover .icon {
+  filter: drop-shadow(0 0 12px var(--color-gold));
+  transform: scale(1.15);
+}
+
+.VPFeature .title {
+  font-size: 0.92rem !important;
+  font-weight: 600 !important;
+  line-height: 1.3 !important;
+  margin: 0 !important;
+}
+
+.VPFeature .details {
+  font-size: 0.8rem !important;
+  line-height: 1.5 !important;
+  opacity: 0.75;
+  margin: 0 !important;
+}
+
+.VPFeature .link-text {
+  font-size: 0.78rem !important;
+  margin-top: 4px;
+}
+
+.VPFeature .link-text-value {
+  color: var(--vp-c-brand-1);
+  transition: color 0.2s ease;
+}
+
+.VPFeature:hover .link-text-value {
+  color: var(--color-gold-2);
+}
+
+/* ===========================================================
+ * Buttons — ALL variants glass, scale-only hover
+ * =========================================================== */
+.VPButton {
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border-radius: 10px !important;
+  font-weight: 600 !important;
+  transition:
+    background 0.28s ease,
+    color 0.28s ease,
+    border-color 0.28s ease,
+    box-shadow 0.28s ease,
+    transform 0.28s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+/* brand */
+.VPButton.brand {
+  background: var(--color-dark-blue) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  box-shadow: 0 0 10px var(--color-dark-blue-soft), var(--glass-shadow);
+}
+
+.VPButton.brand:hover {
+  background: var(--color-dark-blue-3) !important;
+  color: var(--color-gold) !important;
+  box-shadow: 0 0 20px var(--color-gold-soft), 0 0 0 2px var(--glass-border-hover) !important;
+  transform: scale(1.05);
+}
+
+/* alt */
+.VPButton.alt {
+  background: var(--glass-bg) !important;
+  border: 1px solid var(--glass-border) !important;
+  color: var(--color-dark-blue) !important;
+  box-shadow: var(--glass-shadow);
+}
+
+.dark .VPButton.alt {
+  color: var(--vp-c-text-1) !important;
+}
+
+.VPButton.alt:hover {
+  background: var(--glass-bg-hover) !important;
+  border-color: var(--glass-border-hover) !important;
+  box-shadow: var(--glass-shadow-hover), 0 0 0 1px var(--glass-border-hover) !important;
+  transform: scale(1.05);
+}
+
+/* sponsor */
+.VPButton.sponsor {
+  background: var(--glass-bg) !important;
+  border: 1px solid rgba(255, 80, 100, 0.3) !important;
+  box-shadow: 0 0 10px rgba(255, 80, 100, 0.08);
+}
+
+.VPButton.sponsor:hover {
+  background: rgba(255, 80, 100, 0.12) !important;
+  border-color: rgba(255, 80, 100, 0.6) !important;
+  transform: scale(1.05);
+}
+
+.VPButton:active {
+  transform: scale(0.97) !important;
+}
+
+/* ===========================================================
+ * Hero section
+ * =========================================================== */
+.VPHero .name {
+  text-shadow: 0 0 40px var(--color-gold-soft);
+}
+
+.VPHero .tagline {
+  opacity: 0.85;
+}
+
+/* Hide default blur bg — HomeAvatar provides its own */
+.VPHero .image-container {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none !important;
+}
+
+.VPHero .image-bg {
+  display: none !important;
+}
+
+/* ===========================================================
+ * Homepage CTA — UIverse dry-sloth-51 inspired
+ * Minimal text button: color sweep + underline grow + arrow nudge
+ * =========================================================== */
+.VPHero .actions .VPButton.brand {
+  /* Strip all button chrome */
+  background: none !important;
+  border: none !important;
+  border-radius: 0 !important;
+  box-shadow: none !important;
+  backdrop-filter: none !important;
+  -webkit-backdrop-filter: none !important;
+  padding: 6px 0 !important;
+
+  /* Typography */
+  font-size: 1.05rem !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.02em !important;
+
+  /* Text color sweep: gradient slides in from right on hover */
+  background: linear-gradient(
+    to right,
+    var(--color-gold-text) 50%,
+    var(--color-dark-blue) 50%
+  ) !important;
+  background-size: 200% 100% !important;
+  background-position: 100% 0 !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+
+  position: relative;
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 0.4rem !important;
+  transition:
+    background-position 0.3s ease-out,
+    transform 0.2s ease !important;
+}
+
+/* Underline that grows left→right on hover */
+.VPHero .actions .VPButton.brand::after {
+  content: '';
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  width: 0;
+  height: 2px;
+  background: var(--color-gold-text);
+  border-radius: 2px;
+  transition: width 0.3s ease-out;
+}
+
+.VPHero .actions .VPButton.brand:hover {
+  background-position: 0% 0 !important;
+  transform: none !important;
+}
+
+.VPHero .actions .VPButton.brand:hover::after {
+  width: 100%;
+}
+
+/* Dark mode variant: white → gold sweep */
+.dark .VPHero .actions .VPButton.brand {
+  background: linear-gradient(
+    to right,
+    var(--color-gold) 50%,
+    rgba(255, 255, 255, 0.92) 50%
+  ) !important;
+  background-size: 200% 100% !important;
+  background-position: 100% 0 !important;
+  -webkit-background-clip: text !important;
+  background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+}
+
+.dark .VPHero .actions .VPButton.brand::after {
+  background: var(--color-gold);
+}
+
+.dark .VPHero .actions .VPButton.brand:hover {
+  background-position: 0% 0 !important;
+}
+
+/* ===========================================================
+ * CTA entrance animation — plays when hero enters the viewport
+ * (on page load the hero is always visible; staggered delay
+ * gives a polished "appear after content settles" feel)
+ * =========================================================== */
+@keyframes ctaEntrance {
+  from {
+    opacity: 0;
+    transform: translateY(14px);
+    filter: blur(4px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+    filter: blur(0);
+  }
+}
+
+.VPHero .actions {
+  animation: ctaEntrance 0.75s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation-delay: 0.55s;
+}
+
+/* ===========================================================
+ * Custom blocks (tip / info / warning / danger / details)
+ * =========================================================== */
+.custom-block {
+  backdrop-filter: blur(10px) saturate(150%) !important;
+  -webkit-backdrop-filter: blur(10px) saturate(150%) !important;
+  border-radius: 12px !important;
+  border-width: 1px !important;
+  border-style: solid !important;
+}
+
+.custom-block.tip {
+  background: rgba(13, 59, 102, 0.1) !important;
+  border-color: var(--color-dark-blue-soft) !important;
+}
+
+.custom-block.info {
+  background: var(--glass-bg) !important;
+  border-color: var(--glass-border) !important;
+}
+
+.custom-block.warning {
+  background: rgba(244, 211, 94, 0.08) !important;
+  border-color: rgba(244, 211, 94, 0.3) !important;
+}
+
+.custom-block.danger {
+  background: rgba(220, 50, 50, 0.08) !important;
+  border-color: rgba(220, 50, 50, 0.25) !important;
+}
+
+.custom-block.details {
+  background: var(--glass-bg) !important;
+  border-color: var(--glass-border) !important;
+}
+
+/* ===========================================================
+ * Code blocks
+ * =========================================================== */
+div[class*='language-'] {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(8px) saturate(130%) !important;
+  -webkit-backdrop-filter: blur(8px) saturate(130%) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--glass-shadow) !important;
+  /* Allow the "Copied" tooltip to float above the container without clipping.
+   * overflow-x: auto on the container is redundant — the <pre> inside already
+   * handles horizontal scroll — so visible is safe here. */
+  overflow: visible !important;
+}
+
+/* Code group tabs */
+.vp-code-group .tabs {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-bottom: none !important;
+  border-radius: 12px 12px 0 0 !important;
+}
+
+.vp-code-group .tabs label {
+  border-radius: 8px 8px 0 0;
+  transition: background 0.2s ease, color 0.2s ease;
+}
+
+.vp-code-group .tabs label:hover {
+  background: var(--glass-bg-hover);
+  color: var(--color-gold);
+}
+
+.vp-code-group .tabs input:checked + label {
+  background: var(--glass-bg-hover);
+  color: var(--color-gold);
+  border-bottom: 2px solid var(--color-gold);
+}
+
+/* Code copy button — reliable fix using direct background-image overrides
+ * CSS var cascade for --vp-icon-copy is unreliable (build order varies).
+ * Use explicit background-image with !important + high specificity for each theme.
+ * Light icon = dark blue stroke; Dark icon = light blue-gray stroke; Hover = brand accent.
+ * Copied tooltip: floats above the button (not left-side) with caret + pop animation. */
+
+/* ── Shared button sizing/transitions ──────────────────── */
+.vp-doc [class*='language-'] > button.copy {
+  border-radius: 6px !important;
+  width: 36px !important;
+  height: 36px !important;
+  opacity: 0.6 !important;
+  transition: background-color 0.2s ease, border-color 0.2s ease,
+              opacity 0.2s ease, transform 0.18s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.vp-doc [class*='language-']:hover > button.copy,
+.vp-doc [class*='language-'] > button.copy:focus {
+  opacity: 1 !important;
+}
+
+/* ── Light mode — dark-blue icon, brand hover ───────────── */
+.vp-doc [class*='language-'] > button.copy {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='rgba(30%2C70%2C120%2C0.8)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3C/svg%3E") !important;
+  background-color: rgba(240, 245, 255, 0.9) !important;
+  border-color: rgba(13, 59, 102, 0.18) !important;
+}
+
+.vp-doc [class*='language-'] > button.copy:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='rgba(13%2C59%2C102%2C1)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3C/svg%3E") !important;
+  background-color: rgba(13, 59, 102, 0.1) !important;
+  border-color: rgba(15, 77, 128, 0.6) !important;
+  transform: scale(1.08);
+  opacity: 1 !important;
+}
+
+/* ── Dark mode — light icon, gold hover ─────────────────── */
+.dark .vp-doc [class*='language-'] > button.copy {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='rgba(200%2C215%2C240%2C0.85)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3C/svg%3E") !important;
+  background-color: rgba(255, 255, 255, 0.07) !important;
+  border-color: rgba(255, 255, 255, 0.14) !important;
+}
+
+.dark .vp-doc [class*='language-'] > button.copy:hover {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' fill='none' stroke='rgba(244%2C211%2C94%2C1)' stroke-linecap='round' stroke-linejoin='round' stroke-width='2.5' viewBox='0 0 24 24'%3E%3Crect width='8' height='4' x='8' y='2' rx='1' ry='1'/%3E%3Cpath d='M16 4h2a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h2'/%3E%3C/svg%3E") !important;
+  background-color: rgba(244, 211, 94, 0.15) !important;
+  border-color: rgba(244, 211, 94, 0.55) !important;
+  transform: scale(1.08);
+  opacity: 1 !important;
+}
+
+/* ── Copied state — keep button fully rounded (override VP split) */
+.vp-doc [class*='language-'] > button.copy.copied,
+.vp-doc [class*='language-'] > button.copy:hover.copied {
+  border-radius: 6px !important;
+  background-color: rgba(13, 59, 102, 0.1) !important;
+  border-color: rgba(15, 77, 128, 0.55) !important;
+  transform: scale(1) !important;
+  opacity: 1 !important;
+}
+
+.dark .vp-doc [class*='language-'] > button.copy.copied,
+.dark .vp-doc [class*='language-'] > button.copy:hover.copied {
+  background-color: rgba(244, 211, 94, 0.15) !important;
+  border-color: rgba(244, 211, 94, 0.55) !important;
+}
+
+/* ── Tooltip — floats above the button, not left-side ───── */
+.vp-doc [class*='language-'] > button.copy.copied::before,
+.vp-doc [class*='language-'] > button.copy:hover.copied::before {
+  /* Override VP inline (left-side) placement */
+  position: absolute !important;
+  top: auto !important;
+  bottom: calc(100% + 10px) !important;
+  right: 50% !important;
+  left: auto !important;
+  transform: translateX(50%) !important;
+
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+
+  padding: 5px 12px !important;
+  border-radius: 6px !important;
+  border: 1px solid rgba(13, 59, 102, 0.35) !important;
+  border-right: 1px solid rgba(13, 59, 102, 0.35) !important;
+
+  font-size: 11px !important;
+  font-weight: 600 !important;
+  letter-spacing: 0.06em !important;
+  text-transform: uppercase !important;
+  white-space: nowrap !important;
+
+  color: var(--color-dark-blue) !important;
+  background-color: rgba(240, 245, 255, 0.97) !important;
+  box-shadow: 0 4px 14px rgba(13, 59, 102, 0.14), 0 0 0 1px rgba(13, 59, 102, 0.06) !important;
+
+  animation: copyBadgePop 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}
+
+.dark .vp-doc [class*='language-'] > button.copy.copied::before,
+.dark .vp-doc [class*='language-'] > button.copy:hover.copied::before {
+  border-color: rgba(244, 211, 94, 0.5) !important;
+  border-right: 1px solid rgba(244, 211, 94, 0.5) !important;
+  color: var(--color-gold) !important;
+  background-color: rgba(12, 18, 32, 0.97) !important;
+  box-shadow: 0 4px 16px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(244, 211, 94, 0.1) !important;
+}
+
+/* ── Caret pointing down from tooltip to button ──────────── */
+.vp-doc [class*='language-'] > button.copy.copied::after,
+.vp-doc [class*='language-'] > button.copy:hover.copied::after {
+  content: '' !important;
+  position: absolute !important;
+  bottom: calc(100% + 5px) !important;
+  right: 50% !important;
+  transform: translateX(50%) !important;
+  width: 0 !important;
+  height: 0 !important;
+  border-left: 5px solid transparent !important;
+  border-right: 5px solid transparent !important;
+  border-top: 5px solid rgba(240, 245, 255, 0.97) !important;
+  background: none !important;
+  background-image: none !important;
+  animation: copyBadgePop 0.22s cubic-bezier(0.22, 1, 0.36, 1) forwards !important;
+}
+
+.dark .vp-doc [class*='language-'] > button.copy.copied::after,
+.dark .vp-doc [class*='language-'] > button.copy:hover.copied::after {
+  border-top-color: rgba(12, 18, 32, 0.97) !important;
+}
+
+@keyframes copyBadgePop {
+  from { opacity: 0; transform: translateX(50%) translateY(5px) scale(0.9); }
+  to   { opacity: 1; transform: translateX(50%) translateY(0)   scale(1);   }
+}
+
+/* Keep --vp vars in sync for the "Copied" tooltip text color */
+:root {
+  --vp-code-copy-code-active-text:  var(--vp-c-brand-1);
+  --vp-code-copy-code-hover-bg:     rgba(13, 59, 102, 0.1);
+  --vp-code-copy-code-hover-border-color: rgba(15, 77, 128, 0.6);
+}
+
+.dark {
+  --vp-code-copy-code-active-text:  var(--color-gold);
+  --vp-code-copy-code-hover-bg:     rgba(244, 211, 94, 0.15);
+  --vp-code-copy-code-hover-border-color: rgba(244, 211, 94, 0.55);
+}
+
+/* ===========================================================
+ * Code blocks — mobile horizontal margin
+ * VitePress defaults to margin: 16px -24px (full-bleed) on mobile.
+ * Override to give breathing room on small screens.
+ * =========================================================== */
+@media (max-width: 639px) {
+  .vp-doc div[class*='language-'],
+  .vp-block {
+    margin: 12px 0 !important;
+    border-radius: 10px !important;
+  }
+}
+
+/* ===========================================================
+ * Markdown lists — modern styled
+ * =========================================================== */
+
+/* ── Shared reset ─────────────────────────────────────────── */
+.vp-doc ul,
+.vp-doc ol {
+  padding-left: 0 !important;
+  margin: 1.1rem 0 !important;
+  list-style: none !important;
+}
+
+.vp-doc li + li {
+  margin-top: 0.45rem !important;
+}
+
+/* ── Unordered list items — accent chevron bullet ────────── */
+.vp-doc ul > li {
+  position: relative;
+  padding-left: 1.6rem !important;
+  line-height: 1.75;
+  color: var(--vp-c-text-1);
+}
+
+/* Chevron bullet via ::before */
+.vp-doc ul > li::before {
+  content: '';
+  position: absolute;
+  left: 0.25rem;
+  top: 0.6em;
+  width: 7px;
+  height: 7px;
+  border-right: 2px solid var(--vp-c-brand-1);
+  border-top: 2px solid var(--vp-c-brand-1);
+  transform: rotate(45deg);
+  border-radius: 1px;
+  opacity: 0.85;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+}
+
+.vp-doc ul > li:hover::before {
+  opacity: 1;
+  transform: rotate(45deg) scale(1.2);
+}
+
+/* ── Ordered list — brand-colored counter badges ─────────── */
+.vp-doc ol {
+  counter-reset: vp-ol;
+}
+
+.vp-doc ol > li {
+  position: relative;
+  padding-left: 2.2rem !important;
+  line-height: 1.75;
+  counter-increment: vp-ol;
+  color: var(--vp-c-text-1);
+}
+
+.vp-doc ol > li::before {
+  content: counter(vp-ol);
+  position: absolute;
+  left: 0;
+  top: 0.15em;
+  width: 1.45rem;
+  height: 1.45rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.7rem;
+  font-weight: 700;
+  line-height: 1;
+  border-radius: 50%;
+  background: color-mix(in srgb, var(--vp-c-brand-1) 14%, transparent);
+  color: var(--vp-c-brand-1);
+  border: 1.5px solid color-mix(in srgb, var(--vp-c-brand-1) 35%, transparent);
+  transition: background 0.2s ease, transform 0.2s ease;
+}
+
+.vp-doc ol > li:hover::before {
+  background: color-mix(in srgb, var(--vp-c-brand-1) 22%, transparent);
+  transform: scale(1.1);
+}
+
+/* ── Nested lists — slightly muted, smaller indent ──────── */
+.vp-doc li > ul,
+.vp-doc li > ol {
+  margin: 0.4rem 0 0.2rem !important;
+  padding-left: 0.5rem !important;
+}
+
+.vp-doc li > ul > li::before {
+  /* Nested bullet: smaller, muted */
+  width: 5px;
+  height: 5px;
+  opacity: 0.55;
+  border-width: 1.5px;
+}
+
+.vp-doc li > ol > li::before {
+  font-size: 0.62rem;
+  width: 1.2rem;
+  height: 1.2rem;
+  opacity: 0.8;
+}
+
+/* ── Task list checkboxes (- [ ] / - [x]) ─────────────── */
+.vp-doc ul.contains-task-list > li {
+  padding-left: 1.9rem !important;
+}
+
+.vp-doc ul.contains-task-list > li::before {
+  display: none; /* hide chevron — the checkbox replaces it */
+}
+
+.vp-doc .task-list-item input[type='checkbox'] {
+  position: absolute;
+  left: 0;
+  top: 0.3em;
+  appearance: none;
+  -webkit-appearance: none;
+  width: 1rem;
+  height: 1rem;
+  border: 1.5px solid var(--vp-c-brand-1);
+  border-radius: 4px;
+  background: transparent;
+  cursor: default;
+  transition: background 0.15s ease, border-color 0.15s ease;
+}
+
+.vp-doc .task-list-item input[type='checkbox']:checked {
+  background: var(--vp-c-brand-1);
+  border-color: var(--vp-c-brand-1);
+}
+
+.vp-doc .task-list-item input[type='checkbox']:checked::after {
+  content: '';
+  display: block;
+  width: 5px;
+  height: 9px;
+  border: 2px solid #fff;
+  border-top: none;
+  border-left: none;
+  transform: rotate(45deg) translate(1px, -1px);
+  margin: 0 auto;
+}
+
+/* ===========================================================
+ * Tables
+ * =========================================================== */
+.vp-doc table {
+  /* VitePress defaults to display:block which causes content-width sizing.
+     Reset to display:table so width:100% fills the full container. */
+  display: table !important;
+  width: 100% !important;
+  border-collapse: separate !important;
+  border-spacing: 0 !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 10px !important;
+  overflow: hidden !important;
+  backdrop-filter: blur(8px) !important;
+  -webkit-backdrop-filter: blur(8px) !important;
+}
+
+/* Remove VitePress's per-row backgrounds so glass shows through uniformly */
+.vp-doc tr {
+  background-color: transparent !important;
+}
+
+.vp-doc tr:nth-child(2n) {
+  background-color: transparent !important;
+}
+
+.vp-doc thead tr {
+  background: var(--glass-bg-hover) !important;
+}
+
+.vp-doc tbody tr:hover {
+  background: var(--glass-bg) !important;
+}
+
+.vp-doc th,
+.vp-doc td {
+  border: none !important;
+  border-bottom: 1px solid var(--glass-border) !important;
+}
+
+/* ===========================================================
+ * Badge
+ * =========================================================== */
+.VPBadge {
+  backdrop-filter: blur(6px) !important;
+  -webkit-backdrop-filter: blur(6px) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 6px !important;
+}
+
+/* ===========================================================
+ * Team member cards
+ * =========================================================== */
+.VPTeamMembersItem .profile {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--glass-shadow) !important;
+  transition:
+    background 0.3s ease,
+    border-color 0.35s ease,
+    box-shadow 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.VPTeamMembersItem .profile:hover {
+  background: var(--glass-bg-hover) !important;
+  border-color: var(--glass-border-hover) !important;
+  box-shadow: var(--glass-shadow-hover) !important;
+  transform: scale(1.03) !important;
+}
+
+/* ===========================================================
+ * Doc footer — prev / next page navigation pills
+ * =========================================================== */
+.VPDocFooter .pager-link {
+  background: var(--glass-bg) !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 12px !important;
+  box-shadow: var(--glass-shadow) !important;
+  transition:
+    background 0.3s ease,
+    border-color 0.3s ease,
+    box-shadow 0.3s ease,
+    transform 0.3s cubic-bezier(0.22, 1, 0.36, 1) !important;
+}
+
+.VPDocFooter .pager-link:hover {
+  background: var(--glass-bg-hover) !important;
+  border-color: var(--glass-border-hover) !important;
+  box-shadow: var(--glass-shadow-hover) !important;
+  transform: scale(1.02) !important;
+}
+
+/* ===========================================================
+ * Last updated & edit link
+ * =========================================================== */
+.VPLastUpdated {
+  color: var(--vp-c-text-3);
+  font-size: 0.82rem;
+}
+
+.VPDocFooter .edit-link-button {
+  background: var(--glass-bg);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+  border: 1px solid var(--glass-border);
+  border-radius: 8px;
+  padding: 4px 12px;
+  transition: background 0.2s ease, border-color 0.2s ease, transform 0.2s ease;
+}
+
+.VPDocFooter .edit-link-button:hover {
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  transform: scale(1.04);
+}
+
+/* ===========================================================
+ * Local search modal — glass
+ * =========================================================== */
+.VPLocalSearchBox {
+  --vp-local-search-result-bg: var(--glass-bg);
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+}
+
+.VPLocalSearchBox .shell {
+  background: var(--glass-bg) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border: 1px solid var(--glass-border) !important;
+  border-radius: 16px !important;
+  box-shadow: var(--glass-shadow-hover) !important;
+}
+
+.VPLocalSearchBox .search-input {
+  background: var(--glass-bg-hover) !important;
+  border-radius: 8px !important;
+  border: 1px solid var(--glass-border) !important;
+}
+
+.VPLocalSearchBox .result-link {
+  border-radius: 8px;
+  transition: background 0.2s ease;
+}
+
+.VPLocalSearchBox .result-link:hover,
+.VPLocalSearchBox .result-link.selected {
+  background: var(--glass-bg-hover) !important;
+  border: 1px solid var(--glass-border-hover);
+}
+
+/* ===========================================================
+ * VPFooter — hidden (replaced by SiteFooter in layout-bottom)
+ * =========================================================== */
+.VPFooter {
+  display: none !important;
+}
+
+/* ===========================================================
+ * Doc headings — subtle left-border accent
+ * =========================================================== */
+.vp-doc h2 {
+  border-top: 1px solid var(--glass-border) !important;
+  padding-top: 1.5rem;
+}
+
+.vp-doc h2::after {
+  content: '';
+  display: block;
+  width: 3rem;
+  height: 2px;
+  background: linear-gradient(90deg, var(--color-gold), transparent);
+  margin-top: 0.5rem;
+  border-radius: 2px;
+}
+
+/* ===========================================================
+ * Overview page — GitHub repo button
+ * =========================================================== */
 .vp-repo-link {
   display: inline-block;
   margin: 12px 0;
   padding: 8px 20px;
-  background: var(--vp-button-brand-bg);
-  color: var(--vp-button-brand-text) !important;
+  background: var(--glass-bg);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  /* Readable in both themes: dark-blue on light, white on dark */
+  color: var(--color-dark-blue) !important;
+  border: 1px solid var(--glass-border);
   border-radius: 20px;
   font-weight: 600;
   font-size: 0.9rem;
   text-decoration: none !important;
-  transition: background 0.2s, box-shadow 0.2s, transform 0.2s;
+  transition: background 0.25s, border-color 0.25s, box-shadow 0.25s, transform 0.25s;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.15);
 }
 
+.dark .vp-repo-link {
+  color: var(--vp-c-text-1) !important;
+}
+
 .vp-repo-link:hover {
-  background: var(--vp-button-brand-hover-bg);
-  color: var(--vp-button-brand-hover-text) !important;
-  box-shadow: 0 6px 16px var(--color-gold-soft);
-  transform: translateY(-2px);
+  background: var(--glass-bg-hover);
+  border-color: var(--glass-border-hover);
+  color: var(--color-gold-text) !important;
+  box-shadow: 0 4px 16px var(--color-gold-soft);
+  transform: scale(1.04);
+}
+
+.dark .vp-repo-link:hover {
+  color: var(--color-gold) !important;
+}
+
+/* ===========================================================
+ * Responsive audit — improvements across all breakpoints
+ * Breakpoints (VitePress standard):
+ *   xs: < 640px   (mobile)
+ *   sm: 640–959px (tablet)
+ *   md: 960–1279px (desktop)
+ *   lg: ≥ 1280px  (wide)
+ * =========================================================== */
+
+/* ── Mobile (< 640px) ─────────────────────────────────── */
+@media (max-width: 639px) {
+  /* Hero: tighten vertical spacing, smaller name */
+  .VPHero .name {
+    font-size: 2rem !important;
+    line-height: 1.2 !important;
+  }
+
+  .VPHero .text {
+    font-size: 1.1rem !important;
+  }
+
+  .VPHero .tagline {
+    font-size: 0.9rem !important;
+  }
+
+  /* CTA actions: stack nicely, proper padding */
+  .VPHero .actions {
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0.75rem;
+    justify-content: center;
+  }
+
+  /* Feature cards: single column, tighter padding */
+  .VPFeature {
+    padding: 1rem !important;
+  }
+
+  .VPFeature .icon {
+    font-size: 1.5rem !important;
+    margin-bottom: 0.5rem;
+  }
+
+  .VPFeature .title {
+    font-size: 0.9rem !important;
+  }
+
+  .VPFeature .details {
+    font-size: 0.8rem !important;
+  }
+
+  /* Doc content: ensure full width use with proper side padding */
+  .vp-doc {
+    padding: 0 1rem !important;
+  }
+
+  /* Tables: full width, no overflow issues on mobile */
+  .vp-doc table {
+    font-size: 0.8rem !important;
+  }
+
+  .vp-doc th,
+  .vp-doc td {
+    padding: 6px 10px !important;
+  }
+
+  /* Footer: stack message + copyright vertically */
+  .VPFooter .container {
+    flex-direction: column;
+    gap: 0.2rem;
+    padding: 0.5rem 1rem !important;
+  }
+
+  /* Mobile nav links: bigger tap targets */
+  .VPNavScreenMenuLink,
+  .VPNavScreenMenuGroupLink {
+    padding: 10px 12px !important;
+    font-size: 1rem !important;
+  }
+
+  /* Search box: full width */
+  .VPLocalSearchBox .shell {
+    margin: 0 1rem !important;
+  }
+}
+
+/* ── Tablet (640–959px) ───────────────────────────────── */
+@media (min-width: 640px) and (max-width: 959px) {
+  .VPHero .name {
+    font-size: 2.8rem !important;
+  }
+
+  .VPFeature {
+    padding: 1.1rem !important;
+  }
+}
+
+/* ── Desktop+ (≥ 960px) — ensure consistent spacing ──── */
+@media (min-width: 960px) {
+  /* Wider content column gets more comfortable feature padding */
+  .VPFeature {
+    padding: 1.25rem !important;
+  }
+
+  /* Doc aside: glass treatment already applied; ensure z-index */
+  .VPDocAside {
+    z-index: 1;
+  }
+}
+
+/* ── Custom cursor — hide native cursor on precise-pointer devices ── */
+@media (hover: hover) and (pointer: fine) {
+  *, *::before, *::after {
+    cursor: none !important;
+  }
 }

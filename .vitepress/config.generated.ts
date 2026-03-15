@@ -10,20 +10,29 @@ export const generatedNav: DefaultTheme.NavItem[] = [
     "link": "/"
   },
   {
-    "text": "Notes",
-    "link": "/notes/"
-  },
-  {
-    "text": "Dotfiles",
-    "link": "/dotfiles/"
-  },
-  {
-    "text": "GitHub Workflows",
-    "link": "/github-workflows/"
-  },
-  {
-    "text": "Tools",
-    "link": "/tools/"
+    "text": "Projects",
+    "items": [
+      {
+        "text": "📚 Notes",
+        "link": "/notes/"
+      },
+      {
+        "text": "🍎 Dotfiles",
+        "link": "/dotfiles/"
+      },
+      {
+        "text": "⚙️ GitHub Workflows",
+        "link": "/github-workflows/"
+      },
+      {
+        "text": "🛠️ Tools",
+        "link": "/tools/"
+      },
+      {
+        "text": "☸️ k3s-lab",
+        "link": "/k3s-lab/"
+      }
+    ]
   }
 ]
 
@@ -241,9 +250,51 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
       "link": "/github-workflows/"
     },
     {
+      "text": "Getting Started",
+      "link": "/github-workflows/getting-started"
+    },
+    {
+      "text": "Actions",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Action — actionlint",
+          "link": "/github-workflows/actions/actionlint"
+        },
+        {
+          "text": "Action — bats",
+          "link": "/github-workflows/actions/bats"
+        },
+        {
+          "text": "Action — detect-changes",
+          "link": "/github-workflows/actions/detect-changes"
+        },
+        {
+          "text": "Action — kubeconform",
+          "link": "/github-workflows/actions/kubeconform"
+        },
+        {
+          "text": "Action — setup-node",
+          "link": "/github-workflows/actions/setup-node"
+        },
+        {
+          "text": "Action — setup-python",
+          "link": "/github-workflows/actions/setup-python"
+        },
+        {
+          "text": "Action — shellcheck",
+          "link": "/github-workflows/actions/shellcheck"
+        }
+      ]
+    },
+    {
       "text": "Workflows",
       "collapsed": true,
       "items": [
+        {
+          "text": "`check-bot-commits` workflow",
+          "link": "/github-workflows/workflows/check-bot-commits"
+        },
         {
           "text": "CI — Node.js",
           "link": "/github-workflows/workflows/ci-node"
@@ -255,6 +306,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
         {
           "text": "CI — Shell",
           "link": "/github-workflows/workflows/ci-shell"
+        },
+        {
+          "text": "`dependabot-automerge` workflow",
+          "link": "/github-workflows/workflows/dependabot-automerge"
         },
         {
           "text": "Deploy — Docker",
@@ -338,6 +393,64 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
         }
       ]
     }
+  ],
+  "/k3s-lab/": [
+    {
+      "text": "Overview",
+      "link": "/k3s-lab/"
+    },
+    {
+      "text": "Configuration Reference",
+      "link": "/k3s-lab/configuration"
+    },
+    {
+      "text": "Getting Started",
+      "link": "/k3s-lab/getting-started"
+    },
+    {
+      "text": "Using k3s-lab with a Private Infra Repo",
+      "link": "/k3s-lab/using-with-infra"
+    },
+    {
+      "text": "Operations",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "Local Testing",
+          "link": "/k3s-lab/operations/local-testing"
+        },
+        {
+          "text": "Make Targets Reference",
+          "link": "/k3s-lab/operations/make-targets"
+        },
+        {
+          "text": "Troubleshooting",
+          "link": "/k3s-lab/operations/troubleshooting"
+        }
+      ]
+    },
+    {
+      "text": "Stack",
+      "collapsed": true,
+      "items": [
+        {
+          "text": "cert-manager — Automatic TLS",
+          "link": "/k3s-lab/stack/cert-manager"
+        },
+        {
+          "text": "k3s — Lightweight Kubernetes",
+          "link": "/k3s-lab/stack/k3s"
+        },
+        {
+          "text": "Monitoring & Observability",
+          "link": "/k3s-lab/stack/monitoring"
+        },
+        {
+          "text": "Traefik — Ingress Controller",
+          "link": "/k3s-lab/stack/traefik"
+        }
+      ]
+    }
   ]
 }
 
@@ -357,6 +470,10 @@ export function generatedEditLinkPattern({ filePath }: { filePath: string }): st
   if (filePath.startsWith('tools/')) {
     if (filePath === 'tools/index.md') return 'https://github.com/KevinDeBenedetti/tools/tree/main/docs'
     return 'https://github.com/KevinDeBenedetti/tools/edit/main/docs/' + filePath.slice(6)
+  }
+  if (filePath.startsWith('k3s-lab/')) {
+    if (filePath === 'k3s-lab/index.md') return 'https://github.com/KevinDeBenedetti/k3s-lab/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/k3s-lab/edit/main/docs/' + filePath.slice(8)
   }
   return 'https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/edit/main/' + filePath
 }

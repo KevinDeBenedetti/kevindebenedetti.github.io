@@ -150,7 +150,7 @@ onUnmounted(() => {
   width:  3px;
   height: 3px;
   border-radius: 50%;
-  background: var(--color-gold);
+  background: var(--cursor-dot-color);
   will-change: transform;
   transition: opacity 0.15s ease;
 }
@@ -175,12 +175,12 @@ onUnmounted(() => {
   /* Center around the position anchor */
   margin: -10px 0 0 -10px;
 
-  background: rgba(255, 255, 255, 0.05);
+  background: var(--cursor-ring-bg);
   backdrop-filter: blur(4px) saturate(160%);
   -webkit-backdrop-filter: blur(4px) saturate(160%);
-  border: 1.5px solid rgba(244, 211, 94, 0.3);
+  border: 1.5px solid var(--cursor-ring-border);
   box-shadow:
-    0 0 6px rgba(244, 211, 94, 0.06),
+    0 0 6px rgba(0, 0, 0, 0.04),
     inset 0 1px 0 rgba(255, 255, 255, 0.1);
 
   display: flex;
@@ -201,10 +201,10 @@ onUnmounted(() => {
   width:  27px;
   height: 27px;
   margin: -13.5px 0 0 -13.5px;
-  border-color: var(--color-gold);
-  background: rgba(244, 211, 94, 0.08);
+  border-color: var(--cursor-dot-color);
+  background: var(--cursor-ring-bg);
   box-shadow:
-    0 0 12px rgba(244, 211, 94, 0.14),
+    0 0 12px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
@@ -213,10 +213,10 @@ onUnmounted(() => {
   width:  27px;
   height: 27px;
   margin: -13.5px 0 0 -13.5px;
-  border-color: rgba(13, 59, 102, 0.55);
-  background: rgba(13, 59, 102, 0.08);
+  border-color: var(--cursor-ring-border);
+  background: var(--cursor-ring-bg);
   box-shadow:
-    0 0 10px rgba(13, 59, 102, 0.1),
+    0 0 10px rgba(0, 0, 0, 0.06),
     inset 0 1px 0 rgba(255, 255, 255, 0.12);
 }
 
@@ -226,7 +226,7 @@ onUnmounted(() => {
   height: 12px;
   border-radius: 6px;
   margin: -6px 0 0 -12px;
-  border-color: rgba(244, 211, 94, 0.45);
+  border-color: var(--cursor-ring-border);
 }
 
 /* ── Click pulse ──────────────────────────────────────── */
@@ -244,7 +244,7 @@ onUnmounted(() => {
 .cc__hint {
   font-size: 8px;
   font-weight: 700;
-  color: var(--color-gold);
+  color: var(--cursor-hint-color);
   opacity: 0;
   transform: scale(0.6);
   transition:

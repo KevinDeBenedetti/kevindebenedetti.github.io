@@ -7,3 +7,4 @@
 
 # Synced project docs (raw clones) — rebuilt by CI, never commit
 synced/
+.vitepress/config.generated.ts

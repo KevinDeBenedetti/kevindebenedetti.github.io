@@ -13,6 +13,10 @@ export const generatedNav: DefaultTheme.NavItem[] = [
     "text": "Projects",
     "items": [
       {
+        "text": "Docs Generator",
+        "link": "/docs/"
+      },
+      {
         "text": "Dotfiles",
         "link": "/dotfiles/"
       },
@@ -37,6 +41,24 @@ export const generatedNav: DefaultTheme.NavItem[] = [
 ]
 
 export const generatedSidebar: DefaultTheme.SidebarMulti = {
+  "/docs/": [
+    {
+      "text": "Overview",
+      "link": "/docs/"
+    },
+    {
+      "text": "Architecture",
+      "link": "/docs/architecture"
+    },
+    {
+      "text": "Configuration",
+      "link": "/docs/configuration"
+    },
+    {
+      "text": "Development",
+      "link": "/docs/development"
+    }
+  ],
   "/dotfiles/": [
     {
       "text": "Overview",
@@ -455,6 +477,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
 }
 
 export function generatedEditLinkPattern({ filePath }: { filePath: string }): string {
+  if (filePath.startsWith('ocs/docs/')) {
+    if (filePath === 'ocs/docs/index.md') return 'https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/tree/main/docs'
+    return 'https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/edit/main/docs/' + filePath.slice(9)
+  }
   if (filePath.startsWith('ynced/dotfiles/')) {
     if (filePath === 'ynced/dotfiles/index.md') return 'https://github.com/KevinDeBenedetti/dotfiles/tree/main/docs'
     return 'https://github.com/KevinDeBenedetti/dotfiles/edit/main/docs/' + filePath.slice(15)

@@ -13,9 +13,13 @@ hero:
   actions:
     - theme: brand
       text: Browse projects
-      link: /dotfiles/
+      link: /docs/
 
 features:
+  - title: "Docs Generator"
+    details: Documentation for this documentation hub — sync, generation, and contribution guides.
+    link: /docs/
+    linkText: View docs
   - title: "Dotfiles"
     details: Dotfiles and setup scripts for fast environment provisioning.
     link: /dotfiles/

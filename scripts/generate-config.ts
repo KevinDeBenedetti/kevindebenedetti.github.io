@@ -113,7 +113,7 @@ function getLocalProjects(syncedSlugs: Set<string>): Project[] {
       icon: meta.icon,
       order: meta.order,
       dir: projectDir,
-      hasSourceIndex: true,
+      hasSourceIndex: false,  // always regenerate via writeProjectIndex
     })
   }
 
@@ -292,8 +292,14 @@ function writeProjectIndex(project: Project): void {
 
   const tree = buildDocTree(projectDir)
 
+  const frontmatterLines = ['title: Overview']
+  if (project.description) frontmatterLines.push(`description: ${project.description}`)
+  frontmatterLines.push(`repo: ${project.repo}`)
+  if (project.icon) frontmatterLines.push(`icon: "${project.icon}"`)
+  if (project.order !== undefined) frontmatterLines.push(`order: ${project.order}`)
+
   const md = `---
-title: Overview
+${frontmatterLines.join('\n')}
 ---
 
 # ${project.title}
@@ -391,7 +397,6 @@ function writeIndexMd(projects: Project[]): void {
   const features = projects
     .map((p) => {
       const lines = [`  - title: "${p.title}"`]
-      if (p.icon) lines.push(`    icon: "${p.icon}"`)
       lines.push(`    details: ${p.description}`)
       lines.push(`    link: /${p.slug}/`)
       lines.push(`    linkText: View docs`)

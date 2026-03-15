@@ -7,41 +7,47 @@
  * Brand Palette Tokens
  *
  * Two main brand colors:
- *   --color-dark-blue : #0d3b66  (primary)
- *   --color-gold      : #f4d35e  (accent)
+ *   --color-dark-blue : #5ba4d6  (light sky blue — primary)
+ *   --color-gold      : #edc642  (warm gold — accent)
  * =========================================================== */
 
 :root {
-  /* Dark blue — 3 shades (light → dark) + soft tint */
-  --color-dark-blue:      #0d3b66;
-  --color-dark-blue-2:    #0f4d80;
-  --color-dark-blue-3:    #185c9c;
-  --color-dark-blue-soft: rgba(13, 59, 102, 0.14);
+  /* Sky blue — 3 shades (mid → lighter) + soft tint */
+  --color-dark-blue:      #5ba4d6;
+  --color-dark-blue-2:    #4a95cb;
+  --color-dark-blue-3:    #72bcec;
+  --color-dark-blue-soft: rgba(91, 164, 214, 0.14);
 
-  /* Gold — main accent + muted variant + soft tint */
-  --color-gold:      #f4d35e;
-  --color-gold-2:    #e8c040;
-  --color-gold-soft: rgba(244, 211, 94, 0.18);
+  /* Gold — warm accent + muted variant + soft tint */
+  --color-gold:      #edc642;
+  --color-gold-2:    #ddb230;
+  --color-gold-soft: rgba(237, 198, 66, 0.16);
 
   /* Gold safe for TEXT on light backgrounds (WCAG AA) */
-  --color-gold-text: #7a6000;
+  --color-gold-text: #7a5400;
 
   /* Glass effect tokens — light mode */
-  --glass-bg:           rgba(240, 245, 255, 0.65);
-  --glass-bg-hover:     rgba(230, 238, 255, 0.82);
-  --glass-border:       rgba(13, 59, 102, 0.12);
-  --glass-border-hover: rgba(244, 211, 94, 0.55);
-  --glass-shadow:       0 4px 24px rgba(13, 59, 102, 0.1);
-  --glass-shadow-hover: 0 8px 36px rgba(13, 59, 102, 0.18);
-  --glass-blur:         blur(16px) saturate(180%);
+  --glass-bg:           rgba(255, 255, 255, 0.65);
+  --glass-bg-hover:     rgba(255, 255, 255, 0.88);
+  --glass-border:       rgba(91, 164, 214, 0.18);
+  --glass-border-hover: rgba(237, 198, 66, 0.55);
+  --glass-shadow:       0 4px 24px rgba(91, 164, 214, 0.08);
+  --glass-shadow-hover: 0 8px 36px rgba(91, 164, 214, 0.16);
+  --glass-blur:         blur(16px) saturate(160%);
+
+  /* Custom cursor colors */
+  --cursor-dot-color:    #2c4a6b;
+  --cursor-ring-border:  rgba(44, 74, 107, 0.45);
+  --cursor-ring-bg:      rgba(44, 74, 107, 0.06);
+  --cursor-hint-color:   #2c4a6b;
 }
 
 /* In dark mode expose lighter blues so text stays readable */
 .dark {
-  --color-dark-blue:      #4d9de0;
-  --color-dark-blue-2:    #3a8fd1;
-  --color-dark-blue-3:    #2a7dc0;
-  --color-dark-blue-soft: rgba(77, 157, 224, 0.16);
+  --color-dark-blue:      #7dd3f8;
+  --color-dark-blue-2:    #6bc4f0;
+  --color-dark-blue-3:    #90deff;
+  --color-dark-blue-soft: rgba(125, 211, 248, 0.16);
 
   /* Gold is readable on dark backgrounds — keep as-is */
   --color-gold-text: var(--color-gold);
@@ -49,10 +55,16 @@
   /* Dark glass tokens */
   --glass-bg:           rgba(8, 16, 34, 0.68);
   --glass-bg-hover:     rgba(8, 16, 34, 0.85);
-  --glass-border:       rgba(77, 157, 224, 0.16);
-  --glass-border-hover: rgba(244, 211, 94, 0.55);
+  --glass-border:       rgba(125, 211, 248, 0.16);
+  --glass-border-hover: rgba(237, 198, 66, 0.55);
   --glass-shadow:       0 4px 24px rgba(0, 0, 0, 0.45);
   --glass-shadow-hover: 0 8px 40px rgba(0, 0, 0, 0.65);
+
+  /* Cursor — gold on dark backgrounds */
+  --cursor-dot-color:   var(--color-gold);
+  --cursor-ring-border: rgba(237, 198, 66, 0.35);
+  --cursor-ring-bg:     rgba(237, 198, 66, 0.06);
+  --cursor-hint-color:  var(--color-gold);
 }
 
 /* ===========================================================
@@ -124,14 +136,15 @@
   --vp-home-hero-name-color: transparent;
   --vp-home-hero-name-background: -webkit-linear-gradient(
     120deg,
-    var(--color-gold),
-    var(--color-dark-blue) 60%
+    var(--color-gold) 10%,
+    var(--color-dark-blue) 55%,
+    var(--color-dark-blue-3) 90%
   );
 
   --vp-home-hero-image-background-image: linear-gradient(
     -45deg,
-    var(--color-gold) 30%,
-    var(--color-dark-blue) 70%
+    var(--color-gold-soft) 20%,
+    var(--color-dark-blue-soft) 80%
   );
   --vp-home-hero-image-filter: blur(44px);
 }
@@ -185,25 +198,30 @@ html {
  * Applied to .VPContent.is-home so it covers VPHome + Earth slot,
  * eliminating the hard cut at the VPHome div boundary.
  * @property allows the % positions to be animated smoothly.
+ * Three gradient blobs drift independently for a mesh effect.
  * =========================================================== */
-@property --bg-x1 { syntax: '<percentage>'; inherits: false; initial-value: 20%; }
-@property --bg-y1 { syntax: '<percentage>'; inherits: false; initial-value: 10%; }
-@property --bg-x2 { syntax: '<percentage>'; inherits: false; initial-value: 80%; }
-@property --bg-y2 { syntax: '<percentage>'; inherits: false; initial-value: 90%; }
+@property --bg-x1 { syntax: '<percentage>'; inherits: false; initial-value: 18%; }
+@property --bg-y1 { syntax: '<percentage>'; inherits: false; initial-value: 12%; }
+@property --bg-x2 { syntax: '<percentage>'; inherits: false; initial-value: 82%; }
+@property --bg-y2 { syntax: '<percentage>'; inherits: false; initial-value: 88%; }
+@property --bg-x3 { syntax: '<percentage>'; inherits: false; initial-value: 50%; }
+@property --bg-y3 { syntax: '<percentage>'; inherits: false; initial-value: 50%; }
 
 @keyframes bgDrift {
-  0%,  100% { --bg-x1: 20%; --bg-y1: 10%; --bg-x2: 80%; --bg-y2: 90%; }
-  25%        { --bg-x1: 26%; --bg-y1: 18%; --bg-x2: 74%; --bg-y2: 82%; }
-  50%        { --bg-x1: 14%; --bg-y1: 22%; --bg-x2: 86%; --bg-y2: 78%; }
-  75%        { --bg-x1: 23%; --bg-y1:  7%; --bg-x2: 77%; --bg-y2: 93%; }
+  0%,  100% { --bg-x1: 18%; --bg-y1: 12%; --bg-x2: 82%; --bg-y2: 88%; --bg-x3: 50%; --bg-y3: 48%; }
+  20%        { --bg-x1: 28%; --bg-y1: 22%; --bg-x2: 72%; --bg-y2: 78%; --bg-x3: 58%; --bg-y3: 38%; }
+  40%        { --bg-x1: 12%; --bg-y1: 32%; --bg-x2: 88%; --bg-y2: 68%; --bg-x3: 44%; --bg-y3: 60%; }
+  60%        { --bg-x1: 24%; --bg-y1:  8%; --bg-x2: 76%; --bg-y2: 92%; --bg-x3: 62%; --bg-y3: 54%; }
+  80%        { --bg-x1: 14%; --bg-y1: 26%; --bg-x2: 86%; --bg-y2: 74%; --bg-x3: 40%; --bg-y3: 42%; }
 }
 
 /* The entire homepage content area (VPHome + Earth + empty space) */
 .VPContent.is-home {
   background:
-    radial-gradient(ellipse 80% 50% at var(--bg-x1) var(--bg-y1), var(--color-dark-blue-soft) 0%, transparent 65%),
-    radial-gradient(ellipse 60% 40% at var(--bg-x2) var(--bg-y2), var(--color-gold-soft) 0%, transparent 60%);
-  animation: bgDrift 18s ease-in-out infinite;
+    radial-gradient(ellipse 85% 55% at var(--bg-x1) var(--bg-y1), rgba(91, 164, 214, 0.22) 0%, transparent 70%),
+    radial-gradient(ellipse 65% 45% at var(--bg-x2) var(--bg-y2), rgba(237, 198, 66, 0.18) 0%, transparent 65%),
+    radial-gradient(ellipse 55% 40% at var(--bg-x3) var(--bg-y3), rgba(114, 188, 236, 0.16) 0%, transparent 60%);
+  animation: bgDrift 22s ease-in-out infinite;
 }
 
 /* VPHome itself must be transparent so the gradient shows through */
@@ -236,21 +254,27 @@ html {
 
 /* Homepage feature cards: more transparent so Earth shows through */
 .VPHome .VPFeature {
-  background: rgba(240, 245, 255, 0.45) !important;
-  backdrop-filter: blur(18px) saturate(180%) !important;
-  -webkit-backdrop-filter: blur(18px) saturate(180%) !important;
+  background: rgba(255, 255, 255, 0.52) !important;
+  backdrop-filter: blur(18px) saturate(160%) !important;
+  -webkit-backdrop-filter: blur(18px) saturate(160%) !important;
+  border: 1px solid rgba(91, 164, 214, 0.14) !important;
+  transition: background 0.25s ease, border-color 0.25s ease, box-shadow 0.25s ease !important;
 }
 
 .VPHome .VPFeature:hover {
-  background: rgba(230, 238, 255, 0.65) !important;
+  background: rgba(255, 255, 255, 0.80) !important;
+  border-color: rgba(237, 198, 66, 0.40) !important;
+  box-shadow: 0 8px 32px rgba(91, 164, 214, 0.12) !important;
 }
 
 .dark .VPHome .VPFeature {
-  background: rgba(14, 20, 36, 0.45) !important;
+  background: rgba(8, 18, 38, 0.48) !important;
+  border: 1px solid rgba(125, 211, 248, 0.10) !important;
 }
 
 .dark .VPHome .VPFeature:hover {
-  background: rgba(14, 20, 36, 0.65) !important;
+  background: rgba(8, 18, 38, 0.68) !important;
+  border-color: rgba(237, 198, 66, 0.35) !important;
 }
 
 /* ===========================================================
@@ -264,16 +288,16 @@ html {
  * invisible. Apply blur only to VPNavBar (sibling of VPNavScreen).
  * =========================================================== */
 .VPNavBar {
-  background: rgba(248, 250, 255, 0.82) !important;
+  background: rgba(255, 255, 255, 0.85) !important;
   backdrop-filter: var(--glass-blur) !important;
   -webkit-backdrop-filter: var(--glass-blur) !important;
-  border-bottom: 1px solid var(--glass-border) !important;
+  border-bottom: 1px solid rgba(91, 164, 214, 0.14) !important;
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .dark .VPNavBar {
   background: rgba(27, 27, 31, 0.92) !important;
-  border-bottom-color: rgba(255, 255, 255, 0.08) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
 }
 
 /* VPNav wrapper: must have NO backdrop-filter or transform */
@@ -397,7 +421,7 @@ html {
  * z-index:50 ensures it renders above the nav's backdrop-filter layer.
  * =========================================================== */
 .VPNavScreen {
-  background-color: rgba(248, 250, 255, 0.98) !important;
+  background-color: rgba(255, 255, 255, 0.98) !important;
   z-index: 50 !important;
   /* Make the screen a flex column so the container can use margin:auto */
   display: flex !important;
@@ -406,7 +430,7 @@ html {
 }
 
 .dark .VPNavScreen {
-  background-color: rgba(24, 24, 28, 0.98) !important;
+  background-color: rgba(12, 16, 28, 0.98) !important;
 }
 
 /* Container: margin:auto on a flex child = true vertical + horizontal center */
@@ -554,6 +578,20 @@ html {
 /* ===========================================================
  * Sidebar — frosted glass
  * =========================================================== */
+
+/* Local nav bar (breadcrumb/page-title bar in doc layout) — match navbar */
+.VPLocalNav {
+  background: rgba(255, 255, 255, 0.85) !important;
+  backdrop-filter: var(--glass-blur) !important;
+  -webkit-backdrop-filter: var(--glass-blur) !important;
+  border-bottom: 1px solid rgba(91, 164, 214, 0.12) !important;
+}
+
+.dark .VPLocalNav {
+  background: rgba(27, 27, 31, 0.92) !important;
+  border-bottom-color: rgba(255, 255, 255, 0.07) !important;
+}
+
 .VPSidebar {
   background: rgba(248, 250, 255, 0.88) !important;
   backdrop-filter: var(--glass-blur) !important;

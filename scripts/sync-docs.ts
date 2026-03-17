@@ -77,7 +77,7 @@ function runGit(args: string[]): void {
 }
 
 /** Folders inside docs/ that must never be deleted during a sync reset. */
-const PRESERVED_DIRS = new Set(['docs'])
+const PRESERVED_DIRS = new Set(['docs', 'about', 'projects'])
 
 function resetDocsDir(): void {
   // Remove only synced symlinks and generated files from docs/ — leave committed dirs intact.

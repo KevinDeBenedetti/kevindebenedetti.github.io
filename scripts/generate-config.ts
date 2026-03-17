@@ -277,28 +277,76 @@ ${pageLinks || '- No additional pages found.'}
 
 // ── Write config.generated.ts ──────────────────────────────────────────────
 function writeGeneratedConfig(projects: Project[]): void {
-  const projectItems = projects.map((p) => ({
-    text: p.title,
-    link: `/${p.slug}/`,
-  }))
-
+  // Simplified nav: only Home and About
   const nav = [
     { text: 'Home', link: '/' },
-    ...(projectItems.length > 0
-      ? [{ text: 'Projects', items: projectItems }]
-      : []),
+    { text: 'About', link: '/about/' },
   ]
 
   const sidebar: Record<string, SidebarItem[]> = {}
+
+  // Build sidebar for all project paths
+  // Each project path gets: Projects link + all other projects as collapsible groups + current project's pages
   for (const p of projects) {
-    const items = buildSidebarItems(p.dir, `/${p.slug}/`)
-    if (items.length > 0) {
-      sidebar[`/${p.slug}/`] = items
-    } else {
-      // Fallback: at least one "Overview" item
-      sidebar[`/${p.slug}/`] = [{ text: 'Overview', link: `/${p.slug}/` }]
+    // Start with Projects link
+    const sidebarItems: SidebarItem[] = [
+      { text: 'Projects', link: '/projects/' },
+    ]
+
+    // Add each project as a collapsible section
+    for (const proj of projects) {
+      const projectPages = buildSidebarItems(proj.dir, `/${proj.slug}/`)
+      const pageItems = projectPages.length > 0
+        ? projectPages
+        : [{ text: 'Overview', link: `/${proj.slug}/` }]
+
+      // Use collapsed: false for current project, true for others
+      const isCurrentProject = proj.slug === p.slug
+      sidebarItems.push({
+        text: proj.title,
+        collapsed: !isCurrentProject,
+        items: pageItems,
+      })
     }
+
+    sidebar[`/${p.slug}/`] = sidebarItems
   }
+
+  // Also create sidebar for /projects/ page showing all projects at top level
+  const projectsSidebar: SidebarItem[] = [
+    { text: 'Projects', link: '/projects/' },
+  ]
+  for (const p of projects) {
+    const projectPages = buildSidebarItems(p.dir, `/${p.slug}/`)
+    const pageItems = projectPages.length > 0
+      ? projectPages
+      : [{ text: 'Overview', link: `/${p.slug}/` }]
+
+    projectsSidebar.push({
+      text: p.title,
+      collapsed: true,
+      items: pageItems,
+    })
+  }
+  sidebar['/projects/'] = projectsSidebar
+
+  // Create sidebar for /about/ page showing all projects
+  const aboutSidebar: SidebarItem[] = [
+    { text: 'Projects', link: '/projects/' },
+  ]
+  for (const p of projects) {
+    const projectPages = buildSidebarItems(p.dir, `/${p.slug}/`)
+    const pageItems = projectPages.length > 0
+      ? projectPages
+      : [{ text: 'Overview', link: `/${p.slug}/` }]
+
+    aboutSidebar.push({
+      text: p.title,
+      collapsed: true,
+      items: pageItems,
+    })
+  }
+  sidebar['/about/'] = aboutSidebar
 
   // Build editLink function body.
   // filePath is the pre-rewrite source path relative to srcDir (repo root),

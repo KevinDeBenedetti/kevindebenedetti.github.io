@@ -26,6 +26,10 @@
   /* Gold safe for TEXT on light backgrounds (WCAG AA) */
   --color-gold-text: #7a5400;
 
+  /* Layout background colors — light mode */
+  --color-sidebar-bg:  #f5f9fc;
+  --color-content-bg:  #ffffff;
+
   /* Glass effect tokens — light mode */
   --glass-bg:           rgba(255, 255, 255, 0.65);
   --glass-bg-hover:     rgba(255, 255, 255, 0.88);
@@ -51,6 +55,10 @@
 
   /* Gold is readable on dark backgrounds — keep as-is */
   --color-gold-text: var(--color-gold);
+
+  /* Layout background colors — dark mode */
+  --color-sidebar-bg:  #1a2a3a;
+  --color-content-bg:  #0f1419;
 
   /* Dark glass tokens */
   --glass-bg:           rgba(8, 16, 34, 0.68);
@@ -110,6 +118,23 @@
   --vp-c-tip-2: var(--vp-c-brand-2);
   --vp-c-tip-3: var(--vp-c-brand-3);
   --vp-c-tip-soft: var(--vp-c-brand-soft);
+}
+
+/* Layout background colors */
+:root {
+  --vp-sidebar-bg-color: var(--color-sidebar-bg);
+  --vp-c-bg: var(--color-content-bg);
+  --vp-c-bg-alt: var(--color-content-bg);
+  --vp-c-bg-elv: var(--color-content-bg);
+  --vp-c-bg-soft: var(--color-content-bg);
+}
+
+.dark {
+  --vp-sidebar-bg-color: var(--color-sidebar-bg);
+  --vp-c-bg: var(--color-content-bg);
+  --vp-c-bg-alt: var(--color-content-bg);
+  --vp-c-bg-elv: var(--color-content-bg);
+  --vp-c-bg-soft: var(--color-content-bg);
 }
 
 /**
@@ -194,7 +219,7 @@ html {
 ::-webkit-scrollbar-thumb:hover { background: var(--glass-border-hover); }
 
 /* ===========================================================
- * Animated ambient background — homepage only
+ * Animated ambient background — homepage and about page
  * Applied to .VPContent.is-home so it covers VPHome + Earth slot,
  * eliminating the hard cut at the VPHome div boundary.
  * @property allows the % positions to be animated smoothly.
@@ -286,15 +311,15 @@ html {
  * invisible. Apply blur only to VPNavBar (sibling of VPNavScreen).
  * =========================================================== */
 .VPNavBar {
-  background: rgba(255, 255, 255, 0.85) !important;
+  background: var(--color-content-bg) !important;
   backdrop-filter: var(--glass-blur) !important;
   -webkit-backdrop-filter: var(--glass-blur) !important;
-  border-bottom: 1px solid rgba(91, 164, 214, 0.14) !important;
+  border-bottom: 1px solid var(--glass-border) !important;
   transition: background 0.3s ease, border-color 0.3s ease;
 }
 
 .dark .VPNavBar {
-  background: rgba(27, 27, 31, 0.92) !important;
+  background: var(--color-content-bg) !important;
   border-bottom-color: rgba(255, 255, 255, 0.07) !important;
 }
 
@@ -591,7 +616,7 @@ html {
 }
 
 .VPSidebar {
-  background: rgba(248, 250, 255, 0.88) !important;
+  background: var(--color-sidebar-bg) !important;
   backdrop-filter: var(--glass-blur) !important;
   -webkit-backdrop-filter: var(--glass-blur) !important;
   border-right: 1px solid var(--glass-border) !important;
@@ -603,9 +628,9 @@ html {
   display: none !important;
 }
 
-/* Dark mode: match VitePress dark-grey — no blue tint */
+/* Dark mode: use dark sidebar bg from CSS variable */
 .dark .VPSidebar {
-  background: rgba(24, 24, 28, 0.95) !important;
+  background: var(--color-sidebar-bg) !important;
   border-right-color: rgba(255, 255, 255, 0.07) !important;
 }
 

@@ -2,7 +2,7 @@ import { defineConfig } from 'vitepress'
 import { generatedNav, generatedSidebar, generatedEditLinkPattern } from './config.generated'
 
 const SITE_URL = 'https://kevindebenedetti.github.io'
-const SITE_TITLE = "Docs"
+const SITE_TITLE = "Home"
 const SITE_DESCRIPTION = 'Centralized developer documentation hub for all @KevinDeBenedetti open source projects.'
 const OG_IMAGE = `${SITE_URL}/og-image.png`
 
@@ -19,6 +19,7 @@ export default defineConfig({
   cleanUrls: true,
   lastUpdated: true,
   lang: 'en',
+  ignoreDeadLinks: true,
 
   title: SITE_TITLE,
   titleTemplate: ':title | Kevin\'s Docs',

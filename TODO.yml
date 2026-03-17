@@ -1,0 +1,18 @@
+issues:
+  - github_id: ~
+    type: feat
+    title: Audit SEO
+    status: backlog
+    priority: medium
+    assignees:
+      - KevinDeBenedetti
+    body: |
+      ## Goal
+      Audit the SEO of the website and identify areas for improvement. This may include optimizing meta tags, improving page load times, and ensuring that the website is mobile-friendly.
+
+      ## Acceptance criteria
+      - [ ] Conduct a thorough SEO audit of the website using tools such as Google Search Console, SEMrush, or Ahrefs.
+      - [ ] Identify specific issues and areas for improvement in the website's SEO.
+      - [ ] Provide actionable recommendations for improving the website's SEO, including optimizing meta tags
+        and improving page load times.
+      - [ ] Prioritize the identified issues based on their potential impact on search engine rankings

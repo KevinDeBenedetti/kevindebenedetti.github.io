@@ -71,29 +71,8 @@ jobs:
     name: Pages
     needs: [shell, node]
     if: github.event_name != 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/deploy-pages.yml@main
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/cd-pages.yml@main
     with:
       node-version: '22'
       build-command: bun run build
       output-directory: .vitepress/dist
-
-  todo-sync:
-    name: TODO sync
-    if: github.event_name == 'push' || github.event_name == 'issues' || github.event_name == 'workflow_dispatch'
-    permissions:
-      contents: write
-      issues: write
-      pull-requests: write
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/todo-sync.yml@main
-    with:
-      issue-number: ${{ github.event.issue.number || 0 }}
-    secrets: inherit
-
-  label-sync:
-    name: Label sync
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    permissions:
-      contents: read
-      issues: write
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/label-sync.yml@main
-    secrets: inherit

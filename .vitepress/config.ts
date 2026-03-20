@@ -1,3 +1,6 @@
+import { existsSync, readdirSync } from 'node:fs'
+import { join } from 'node:path'
+import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
 import { generatedNav, generatedSidebar, generatedEditLinkPattern } from './config.generated'
 
@@ -6,11 +9,25 @@ const SITE_TITLE = "Home"
 const SITE_DESCRIPTION = 'Centralized developer documentation hub for all @KevinDeBenedetti open source projects.'
 const OG_IMAGE = `${SITE_URL}/og-image.png`
 
+// Root of the repository (parent of .vitepress/)
+const ROOT = fileURLToPath(new URL('..', import.meta.url))
+const SYNCED_DIR = join(ROOT, 'synced')
+
+// Exclude any root-level folder that matches a synced repo name.
+// sync-docs.ts populates synced/ before vitepress build runs; without this guard
+// a root-level folder committed by an old cd-docs.yml run would produce duplicate
+// URLs alongside synced/:slug/* rewrites and crash MiniSearch (duplicate IDs).
+const syncedRepoExcludes = existsSync(SYNCED_DIR)
+  ? readdirSync(SYNCED_DIR, { withFileTypes: true })
+      .filter(d => d.isDirectory())
+      .map(d => `${d.name}/**`)
+  : []
+
 // https://vitepress.dev/reference/site-config
 // Static base config — nav/sidebar/editLink are in config.generated.ts (auto-generated)
 export default defineConfig({
   srcDir: '.',
-  srcExclude: ['README.md', 'TODO.md'],
+  srcExclude: ['README.md', 'TODO.md', ...syncedRepoExcludes],
   rewrites: {
     'docs/index.md': 'index.md',
     'docs/:slug/:rest*': ':slug/:rest*',

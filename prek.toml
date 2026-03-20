@@ -54,7 +54,8 @@ pass_filenames = true
 # ─── Docs link safety ────────────────────────────────────────────────────────
 [[repos]]
 repo = "https://github.com/KevinDeBenedetti/github-workflows"
-rev = "c91bedb2d28c23f8e4e42f49393ad5d2857b76c0"
+rev = "v0.3.0"
 hooks = [
   { id = "check-docs-links" },
+  { id = "check-vitepress-md" },
 ]

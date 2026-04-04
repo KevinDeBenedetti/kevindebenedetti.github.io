@@ -41,6 +41,8 @@ jobs:
       run-test: false
       run-build: true
       run-link-check: false
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}
 
   # ── Security ───────────────────────────────────────────────────────────────
   security:
@@ -76,3 +78,5 @@ jobs:
       node-version: '22'
       build-command: bun run build
       output-directory: .vitepress/dist
+    secrets:
+      github-token: ${{ secrets.GITHUB_TOKEN }}

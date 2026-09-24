@@ -6,6 +6,13 @@ updates:
       interval: weekly
     labels:
       - dependencies
+    ignore:
+      # TypeScript 7 dropped the `typescript/lib/tsc` subpath from its
+      # package exports map, which vue-tsc still requires internally —
+      # bumping past 6.x breaks `bun run typecheck`. Re-allow once vue-tsc
+      # ships TS7 support.
+      - dependency-name: typescript
+        versions: ['>=7.0.0']
 
   - package-ecosystem: github-actions
     directory: /

@@ -77,6 +77,33 @@ function runGit(args: string[]): void {
   }
 }
 
+const CLONE_RETRIES = 3
+const CLONE_RETRY_DELAY_MS = 1000
+
+function sleepSync(ms: number): void {
+  Atomics.wait(new Int32Array(new SharedArrayBuffer(4)), 0, 0, ms)
+}
+
+/**
+ * Sparse shallow clones occasionally race on directory creation
+ * (e.g. "Unable to create '.../.git/shallow.lock': No such file or
+ * directory") — a transient filesystem hiccup, not a real failure.
+ * Retry a few times with a clean slate before giving up.
+ */
+function cloneWithRetry(cloneUrl: string, cloneDir: string): void {
+  for (let attempt = 1; attempt <= CLONE_RETRIES; attempt += 1) {
+    rmSync(cloneDir, { recursive: true, force: true })
+    try {
+      runGit(['clone', '--depth=1', '--filter=blob:none', '--sparse', cloneUrl, cloneDir])
+      return
+    } catch (err) {
+      if (attempt === CLONE_RETRIES) throw err
+      console.log(`  ⚠ clone failed (attempt ${attempt}/${CLONE_RETRIES}), retrying…`)
+      sleepSync(CLONE_RETRY_DELAY_MS)
+    }
+  }
+}
+
 /** Folders inside docs/ that must never be deleted during a sync reset. */
 const PRESERVED_DIRS = new Set(['docs', 'about', 'projects'])
 
@@ -100,7 +127,7 @@ function syncRepoDocs(repo: GitHubRepo): boolean {
   const cloneDir = join(TMP_DIR, repo.name)
   const sourceDocsDir = join(cloneDir, 'docs')
 
-  runGit(['clone', '--depth=1', '--filter=blob:none', '--sparse', repo.clone_url, cloneDir])
+  cloneWithRetry(repo.clone_url, cloneDir)
   runGit(['-C', cloneDir, 'sparse-checkout', 'set', 'docs'])
 
   if (!existsSync(sourceDocsDir)) {
@@ -128,7 +155,13 @@ async function main(): Promise<void> {
       continue
     }
     console.log(`-> ${repo.name}`)
-    const hasDocs = syncRepoDocs(repo)
+    let hasDocs: boolean
+    try {
+      hasDocs = syncRepoDocs(repo)
+    } catch (err) {
+      console.log(`  ⚠ ${repo.name} failed after ${CLONE_RETRIES} attempts, skipping: ${(err as Error).message}`)
+      continue
+    }
     if (hasDocs) {
       synced.push({
         slug: repo.name,

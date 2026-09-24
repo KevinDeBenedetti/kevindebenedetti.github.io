@@ -38,6 +38,16 @@ export default defineConfig({
   lang: 'en',
   ignoreDeadLinks: true,
 
+  markdown: {
+    // 'env' fences use Shiki's 'dotenv' grammar under a different name.
+    // (No mapping exists for 'gitignore' or 'logql' — Shiki ships no grammar
+    // for either, and aliasing them to a special lang like 'txt' breaks the
+    // build; they keep falling back to plain text with a harmless warning.)
+    languageAlias: {
+      env: 'dotenv',
+    },
+  },
+
   title: SITE_TITLE,
   titleTemplate: ':title | Kevin\'s Docs',
 

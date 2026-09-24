@@ -16,6 +16,7 @@ interface GitHubRepo {
   description: string | null
   archived: boolean
   disabled: boolean
+  fork: boolean
 }
 
 export interface RepoMetadata {
@@ -61,7 +62,7 @@ async function fetchPublicRepos(owner: string): Promise<GitHubRepo[]> {
     if (data.length < 100) break
   }
 
-  return repos.filter((repo) => !repo.archived && !repo.disabled)
+  return repos.filter((repo) => !repo.archived && !repo.disabled && !repo.fork)
 }
 
 function runGit(args: string[]): void {

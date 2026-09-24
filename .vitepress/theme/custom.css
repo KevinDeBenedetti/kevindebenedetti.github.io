@@ -78,6 +78,25 @@
 }
 
 /* ===========================================================
+ * Readable text on the always-dark surfaces
+ *
+ * --color-sidebar-bg and --color-header-bg are the SAME dark navy
+ * in both :root and .dark — sidebar/nav/local-nav stay dark even in
+ * light mode. But their text (links, captions, carets) falls back
+ * to VitePress's light-mode --vp-c-text-* vars (near-black), meant
+ * for a white background, making it barely readable in light mode.
+ * Re-declare those vars locally with the dark-mode (light) values so
+ * every descendant component reads correctly, regardless of theme.
+ * =========================================================== */
+.VPSidebar,
+.VPNavBar,
+.VPLocalNav {
+  --vp-c-text-1: #dfdfd6;
+  --vp-c-text-2: #98989f;
+  --vp-c-text-3: #6a6a71;
+}
+
+/* ===========================================================
  * VitePress semantic color overrides
  * =========================================================== */
 

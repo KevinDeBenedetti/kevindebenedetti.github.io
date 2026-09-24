@@ -40,4 +40,8 @@ features:
     details: A collection of reusable tools to initialize, configure, and automate projects.
     link: /tools/
     linkText: View docs
+  - title: "Web Check"
+    details: A comprehensive, Docker-based security scanning toolkit for web applications. Run multiple industry-standard security tools with a single command.
+    link: /web-check/
+    linkText: View docs
 ---

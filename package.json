@@ -13,7 +13,7 @@
     "vitepress": "^1.6.4",
     "vitest": "^5.0.1",
     "vue-tsc": "^3.3.11",
-    "yaml": "^2.8.1"
+    "yaml": "^2.9.1"
   },
   "scripts": {
     "postinstall": "codesign --force --sign - node_modules/@esbuild/darwin-arm64/bin/esbuild 2>/dev/null || true",

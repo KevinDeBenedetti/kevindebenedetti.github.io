@@ -10,7 +10,7 @@ Live site: **https://kevindebenedetti.github.io**
 
 - Auto-discovers opted-in repos via the GitHub API and sparse-clones their `docs/` directory
 - Regenerates VitePress nav, sidebar, and homepage cards from each project's `docs/.vitepressrc.json`
-- Listens for `repository_dispatch` (`docs-updated`) — source repos trigger a re-sync automatically on push
+- Polls source repos every 12 hours and redeploys only when a project's `docs/` changed — no GitHub App or secret needed
 - Custom Vue 3 theme with TypeScript scripts, tested with Vitest
 - Fast linting with oxlint via prek; type-checked with vue-tsc
 - Built with [Bun](https://bun.sh) as runtime, package manager, and test runner

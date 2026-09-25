@@ -36,7 +36,8 @@ GitHub repos (public)
 2. For each repository, performs a `git clone --depth=1 --filter=blob:none --sparse` and checks out only the `docs/` directory (sparse checkout).
 3. If a `docs/` directory exists, copies it to `synced/<repo-name>/`.
 4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo }` records for every successfully synced project.
-5. Deletes the temporary clone directory.
+5. Writes `public/sync-state.json` — the git tree SHA of each project's `docs/` plus its description. It ships with the site at `/sync-state.json` and lets the scheduled poll know what the live site was built from.
+6. Deletes the temporary clone directory.
 
 The `public/` directory and `docs/docs/` are **never deleted** during a sync reset — they hold content committed directly to this repository.
 
@@ -88,6 +89,17 @@ Defined in `.github/workflows/ci-cd.yml`:
 - **On pull requests:** runs `actionlint`, `bun run typecheck`, and `bun run build` (no Pages deploy).
 - **On push to `main`:** same checks, then deploys `.vitepress/dist/` to GitHub Pages via the `actions/deploy-pages` action.
 
+### Picking up upstream changes
+
+Source repositories do not notify the hub. Instead, `.github/workflows/docs-poll.yml` runs every 12 hours (and on demand via **Run workflow**):
+
+1. `scripts/check-docs-changes.ts` reads the `docs/` tree SHA of every public repository through the GitHub API and compares it with the live `/sync-state.json`.
+2. If anything differs — updated docs, a new or removed project, a changed description — it triggers `ci-cd.yml` with `workflow_dispatch`, which re-syncs and redeploys.
+
+Only public data is read and `GITHUB_TOKEN` is allowed to trigger `workflow_dispatch`, so no GitHub App or secret is needed. Upstream changes show up within 12 hours; run **CI/CD** manually to publish sooner.
+
+GitHub disables scheduled workflows in public repositories after 60 days without activity. If the poll stops running, re-enable it from the Actions tab.
+
 Synced content (`synced/`) is **gitignored** — it is rebuilt from source on every CI run, never committed. The `docs/docs/` directory and `public/` are committed directly to this repository.
 
 ## Adding a new project
@@ -97,6 +109,6 @@ A repository is automatically included when it:
 1. Is public and owned by `@KevinDeBenedetti`.
 2. Contains a `docs/` directory at the repository root.
 
-No configuration change is required in this hub. The next CI run picks it up automatically.
+No configuration change is required in this hub. The next scheduled poll picks it up automatically.
 
 To customise the display title or description, those values are derived from the repository name and GitHub API description automatically. No configuration change is required in this hub.

@@ -84,7 +84,7 @@ Synced project directories (`docs/<project>/`) are gitignored. To preview docume
 2. Run `bun run dev` — the dev server hot-reloads on save.
 3. Commit the changes in the **source repository** (e.g. `KevinDeBenedetti/dotfiles`), not here.
 
-The next CI run on `main` will re-sync and pick up the upstream changes.
+The scheduled docs poll (every 12 hours) re-syncs and picks up upstream changes; run the **CI/CD** workflow manually to publish sooner.
 
 ## Contributing
 

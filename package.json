@@ -2,7 +2,7 @@
   "author": "Kevin De Benedetti",
   "type": "module",
   "devDependencies": {
-    "@j178/prek": "^0.5.3",
+    "@j178/prek": "^0.5.4",
     "@types/bun": "^1.4.2",
     "@types/node": "^26.6.2",
     "@vitejs/plugin-vue": "^6.0.9",

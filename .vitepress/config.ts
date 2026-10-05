@@ -79,7 +79,11 @@ export default defineConfig({
   },
 
   head: [
-    ['link', { rel: 'icon', href: '/favicon.ico' }],
+    ['link', { rel: 'icon', href: '/favicon.ico', sizes: '48x48' }],
+    ['link', { rel: 'apple-touch-icon', href: '/apple-touch-icon.png' }],
+    // Browser UI color — matches --c-bg in custom.css
+    ['meta', { name: 'theme-color', media: '(prefers-color-scheme: light)', content: '#f7f8fa' }],
+    ['meta', { name: 'theme-color', media: '(prefers-color-scheme: dark)',  content: '#0f141a' }],
     ['meta', { name: 'author', content: 'Kevin De Benedetti' }],
     // Open Graph (site-level defaults; overridden per-page in transformPageData)
     ['meta', { property: 'og:type',        content: 'website' }],

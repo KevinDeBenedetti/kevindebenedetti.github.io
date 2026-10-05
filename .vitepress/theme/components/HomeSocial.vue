@@ -67,16 +67,11 @@ const links = [
   align-items: center;
   justify-content: center;
   color: var(--vp-c-text-2);
-  transition: color 0.2s ease, transform 0.2s ease;
+  transition: color 0.15s ease;
 }
 
 .home-social__link:hover {
-  color: var(--color-dark-blue);
-  transform: scale(1.15);
-}
-
-.dark .home-social__link:hover {
-  color: var(--color-gold);
+  color: var(--c-accent);
 }
 
 .home-social__link :deep(svg) {

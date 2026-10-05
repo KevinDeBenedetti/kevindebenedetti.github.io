@@ -74,11 +74,8 @@ Custom VitePress theme lives in `.vitepress/theme/`:
 | File | Role |
 |------|------|
 | `index.ts` | Theme entry point — registers components and global CSS |
-| `custom.css` | Design tokens, layout overrides, component styles |
-| `components/CustomCursor.vue` | Gold dot + glass ring cursor for pointer devices |
-| `components/Earth.vue` | Animated starfield background on the home page |
+| `custom.css` | Design tokens (`--c-*`, light/dark), VitePress variable mapping, component styles |
 | `components/HomeAvatar.vue` | Avatar image shown in the hero section |
-| `components/LoaderInvader.vue` | Space-invader loading animation |
 | `components/ScrollTop.vue` | Floating scroll-to-top button |
 | `components/SiteFooter.vue` | Footer rendered on every page |
 

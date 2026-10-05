@@ -76,10 +76,8 @@ const year = new Date().getFullYear()
 
 <style scoped>
 .sf {
-  border-top: 1px solid var(--glass-border);
-  background: var(--glass-bg);
-  backdrop-filter: blur(12px) saturate(160%);
-  -webkit-backdrop-filter: blur(12px) saturate(160%);
+  border-top: 1px solid var(--c-border);
+  background: var(--c-bg-alt);
 }
 
 .sf__inner {
@@ -102,14 +100,14 @@ const year = new Date().getFullYear()
 
 .sf__proj-link {
   font-size: 0.8rem;
-  color: var(--vp-c-text-3);
+  color: var(--vp-c-text-2);
   text-decoration: none;
   transition: color 0.2s ease;
   white-space: nowrap;
 }
 
 .sf__proj-link:hover {
-  color: var(--vp-c-text-1);
+  color: var(--c-accent);
 }
 
 /* Bottom meta row */
@@ -122,7 +120,7 @@ const year = new Date().getFullYear()
 
 .sf__copy {
   font-size: 0.75rem;
-  color: var(--vp-c-text-3);
+  color: var(--vp-c-text-2);
 }
 
 .sf__copy a {

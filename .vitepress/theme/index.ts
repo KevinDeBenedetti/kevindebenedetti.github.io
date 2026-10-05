@@ -4,8 +4,6 @@ import type { Theme } from 'vitepress'
 import DefaultTheme from 'vitepress/theme'
 import './custom.css'
 
-import CustomCursor from './components/CustomCursor.vue'
-import Earth from './components/Earth.vue'
 import HomeAvatar from './components/HomeAvatar.vue'
 import HomeSocial from './components/HomeSocial.vue'
 import AboutProfile from './components/AboutProfile.vue'
@@ -20,12 +18,10 @@ export default {
     return h(DefaultTheme.Layout, null, {
       // https://vitepress.dev/guide/extending-default-theme#layout-slots
       'home-hero-image': () => h(HomeAvatar),
-      'layout-bottom': () => h(Fragment, null, [h(SiteFooter), h(ScrollTop), h(CustomCursor)]),
+      'layout-bottom': () => h(Fragment, null, [h(SiteFooter), h(ScrollTop)]),
     })
   },
   enhanceApp({ app }) {
-    app.component('CustomCursor', CustomCursor)
-    app.component('Earth', Earth)
     app.component('HomeAvatar', HomeAvatar)
     app.component('HomeSocial', HomeSocial)
     app.component('AboutProfile', AboutProfile)

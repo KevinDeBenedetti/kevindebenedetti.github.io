@@ -41,53 +41,30 @@ defineProps<Props>()
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: color 0.15s ease, border-color 0.15s ease;
   border: 1px solid transparent;
   white-space: nowrap;
 }
 
 .docs-btn {
-  color: var(--color-dark-blue);
-  background: rgba(91, 164, 214, 0.1);
-  border-color: rgba(91, 164, 214, 0.2);
-}
-
-.dark .docs-btn {
-  color: var(--color-dark-blue-3);
-  background: rgba(125, 211, 248, 0.1);
-  border-color: rgba(125, 211, 248, 0.2);
+  color: var(--c-accent);
+  background: var(--c-accent-soft);
+  border-color: color-mix(in srgb, var(--c-accent) 25%, transparent);
 }
 
 .docs-btn:hover {
-  background: rgba(91, 164, 214, 0.2);
-  border-color: rgba(91, 164, 214, 0.4);
-}
-
-.dark .docs-btn:hover {
-  background: rgba(125, 211, 248, 0.2);
-  border-color: rgba(125, 211, 248, 0.4);
+  color: var(--c-accent-hover);
+  border-color: color-mix(in srgb, var(--c-accent) 50%, transparent);
 }
 
 .github-btn {
-  color: #333;
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.dark .github-btn {
-  color: #e1e1e1;
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--c-text-1);
+  background: var(--c-surface-2);
+  border-color: var(--c-border);
 }
 
 .github-btn:hover {
-  background: rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-.dark .github-btn:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--c-text-3);
 }
 
 svg {

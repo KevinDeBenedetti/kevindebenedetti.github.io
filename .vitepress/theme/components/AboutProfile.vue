@@ -40,7 +40,7 @@ const links = [
   <div class="about-profile">
     <!-- Top: Avatar -->
     <div class="avatar-wrapper">
-      <img src="/avatar.png" alt="Kevin De Benedetti" class="avatar" />
+      <img src="/avatar.webp" alt="Kevin De Benedetti" class="avatar" width="256" height="256" decoding="async" />
     </div>
 
     <!-- Header: Title, Job, Description -->
@@ -88,29 +88,19 @@ const links = [
   display: flex;
   justify-content: center;
   align-items: center;
+  padding: 3px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--c-accent), var(--c-gold));
+  box-shadow: var(--c-shadow-md);
 }
 
 .avatar {
+  display: block;
   width: 120px;
   height: 120px;
   border-radius: 50%;
+  border: 3px solid var(--c-bg);
   object-fit: cover;
-  border: 3px solid var(--color-dark-blue);
-  box-shadow: 0 4px 16px rgba(91, 164, 214, 0.4);
-  transition: box-shadow 0.3s ease;
-}
-
-.dark .avatar {
-  border-color: var(--color-dark-blue-3);
-  box-shadow: 0 4px 16px rgba(125, 211, 248, 0.4);
-}
-
-.avatar:hover {
-  box-shadow: 0 4px 24px rgba(91, 164, 214, 0.6);
-}
-
-.dark .avatar:hover {
-  box-shadow: 0 4px 24px rgba(125, 211, 248, 0.6);
 }
 
 .about-header {
@@ -124,24 +114,16 @@ const links = [
   font-size: 2.8rem;
   font-weight: 700;
   line-height: 1.2;
+  letter-spacing: -0.02em;
 }
 
 .about-title .first-name {
-  color: var(--color-dark-blue);
+  color: var(--c-text-1);
   display: block;
 }
 
-.dark .about-title .first-name {
-  color: var(--color-dark-blue-3);
-}
-
 .about-title .last-name {
-  background: -webkit-linear-gradient(
-    120deg,
-    var(--color-gold) 10%,
-    var(--color-dark-blue) 55%,
-    var(--color-dark-blue-3) 90%
-  );
+  background: linear-gradient(120deg, var(--c-accent) 30%, var(--c-gold));
   -webkit-background-clip: text;
   -webkit-text-fill-color: transparent;
   background-clip: text;
@@ -150,19 +132,17 @@ const links = [
 
 .about-job {
   margin: 0.75rem 0 0;
-  font-size: 1.3rem;
+  font-size: 1.2rem;
   font-weight: 600;
-  color: var(--color-gold-text);
+  color: var(--c-gold);
 }
 
 .about-description {
-  margin: 1.5rem 0 0;
+  margin: 1.5rem auto 0;
   font-size: 1.05rem;
-  line-height: 1.7;
-  color: var(--vp-c-text-2);
+  line-height: 1.75;
+  color: var(--c-text-2);
   max-width: 600px;
-  margin-left: auto;
-  margin-right: auto;
 }
 
 .about-footer {
@@ -174,49 +154,36 @@ const links = [
 .profile-links {
   display: flex;
   justify-content: center;
-  gap: 1.2rem;
+  gap: 1rem;
   flex-wrap: wrap;
 }
 
 .profile-link {
   display: flex;
   align-items: center;
-  gap: 0.75rem;
-  padding: 0.8rem 1.2rem;
-  border-radius: 8px;
-  background: rgba(91, 164, 214, 0.1);
-  border: 1px solid var(--glass-border);
-  color: var(--color-dark-blue);
+  gap: 0.6rem;
+  padding: 0.7rem 1.1rem;
+  border-radius: 10px;
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  color: var(--c-text-1);
   text-decoration: none;
   font-size: 0.95rem;
   font-weight: 500;
-  transition: all 0.2s ease;
-}
-
-.dark .profile-link {
-  background: rgba(125, 211, 248, 0.08);
-  color: var(--color-dark-blue-3);
+  box-shadow: var(--c-shadow-sm);
+  transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
 .profile-link:hover {
-  background: rgba(91, 164, 214, 0.2);
-  border-color: var(--color-dark-blue);
+  color: var(--c-accent);
+  border-color: var(--c-accent);
   transform: translateY(-2px);
 }
 
-.dark .profile-link:hover {
-  background: rgba(125, 211, 248, 0.15);
-  border-color: var(--color-dark-blue-3);
-}
-
 .profile-link :deep(svg) {
-  width: 1.3rem;
-  height: 1.3rem;
+  width: 1.2rem;
+  height: 1.2rem;
   flex-shrink: 0;
-}
-
-.link-label {
-  font-weight: 500;
 }
 
 @media (max-width: 640px) {
@@ -230,55 +197,15 @@ const links = [
   }
 
   .about-job {
-    font-size: 1.1rem;
+    font-size: 1.05rem;
   }
 
   .about-description {
     font-size: 0.95rem;
   }
 
-  .about-center {
-    height: 300px;
-  }
-
-  .orbit-container {
-    width: 320px;
-    height: 320px;
-    margin-top: -160px;
-    margin-left: -160px;
-  }
-
-  .orbit-container::before {
-    width: 320px;
-    height: 320px;
-  }
-
-  .orbit-container::after {
-    width: 220px;
-    height: 220px;
-  }
-
-  .avatar-orbit {
-    width: 70px;
-    height: 70px;
-  }
-
-  @keyframes orbit {
-    0% {
-      transform: rotate(0deg) translateX(130px);
-    }
-    100% {
-      transform: rotate(360deg) translateX(130px);
-    }
-  }
-
-  .avatar-planet {
-    width: 70px;
-    height: 70px;
-  }
-
   .profile-links {
-    gap: 0.8rem;
+    gap: 0.75rem;
   }
 
   .profile-link {

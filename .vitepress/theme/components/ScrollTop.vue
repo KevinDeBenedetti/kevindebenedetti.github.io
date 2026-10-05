@@ -4,10 +4,11 @@ import { onMounted, onUnmounted, ref } from 'vue'
 const showButton = ref(false)
 
 function scrollToTop() {
+  const reduceMotion = window.matchMedia?.('(prefers-reduced-motion: reduce)').matches
   window.scrollTo({
     top: 0,
-    behavior: 'smooth',
-  });
+    behavior: reduceMotion ? 'auto' : 'smooth',
+  })
 }
 
 function handleScroll() {
@@ -15,7 +16,7 @@ function handleScroll() {
 }
 
 onMounted(() => {
-  window.addEventListener('scroll', handleScroll)
+  window.addEventListener('scroll', handleScroll, { passive: true })
 })
 
 onUnmounted(() => {
@@ -24,142 +25,55 @@ onUnmounted(() => {
 </script>
 
 <template>
-  <button v-if="showButton" class="button" @click="scrollToTop">
-    <p class="button__text">
-      <span style="--index: 0;">S</span>
-      <span style="--index: 1;">C</span>
-      <span style="--index: 2;">R</span>
-      <span style="--index: 3;">O</span>
-      <span style="--index: 4;">L</span>
-      <span style="--index: 5;">L</span>
-      <span style="--index: 6;"> </span>
-      <span style="--index: 7;">T</span>
-      <span style="--index: 8;">O</span>
-      <span style="--index: 9;"> </span>
-      <span style="--index: 10;">T</span>
-      <span style="--index: 11;">O</span>
-      <span style="--index: 12;">P</span>
-    </p>
-
-    <div class="button__circle">
-      <svg
-        viewBox="0 0 14 15"
-        fill="none"
-        xmlns="http://www.w3.org/2000/svg"
-        class="button__icon"
-        width="14"
-      >
-        <path
-          d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-          fill="currentColor"
-        ></path>
+  <Transition name="scroll-top">
+    <button
+      v-if="showButton"
+      class="scroll-top"
+      type="button"
+      aria-label="Scroll to top"
+      @click="scrollToTop"
+    >
+      <svg viewBox="0 0 24 24" width="18" height="18" fill="none" stroke="currentColor"
+        stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+        <path d="M12 19V5M5 12l7-7 7 7" />
       </svg>
-
-      <svg
-        viewBox="0 0 14 15"
-        fill="none"
-        width="14"
-        xmlns="http://www.w3.org/2000/svg"
-        class="button__icon button__icon--copy"
-      >
-        <path
-          d="M13.376 11.552l-.264-10.44-10.44-.24.024 2.28 6.96-.048L.2 12.56l1.488 1.488 9.432-9.432-.048 6.912 2.304.024z"
-          fill="currentColor"
-        ></path>
-      </svg>
-    </div>
-  </button>
+    </button>
+  </Transition>
 </template>
 
 <style scoped>
-.button {
-  cursor: pointer;
-  border: none;
-  background: var(--vp-button-brand-bg);
-  color: white;
-  width: 55px;
-  height: 55px;
-  border-radius: 50%;
-  overflow: hidden;
+.scroll-top {
   position: fixed;
   z-index: 100;
-  bottom: 1rem;
   right: 1rem;
+  bottom: 1rem;
   display: grid;
-  place-content: center;
-  transition:
-    background 300ms,
-    transform 200ms;
-  font-weight: 600;
-  opacity: 0.6;
-}
-
-.button__text {
-  font-size: 6px;
-  position: absolute;
-  inset: 0;
-  animation: text-rotation 8s linear infinite reverse;
-
-  > span {
-    position: absolute;
-    transform: rotate(calc(19deg * var(--index)));
-    inset: -7px;
-  }
-}
-
-.button__icon {
-  transform: rotate(-45deg);
-}
-
-.button__circle {
-  position: relative;
-  width: 35px;
-  height: 35px;
-  overflow: hidden;
-  background: var(--vp-c-white);
-  color: var(--vp-button-brand-bg);
+  place-items: center;
+  width: 44px;
+  height: 44px;
   border-radius: 50%;
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border: 1px solid var(--c-border);
+  background: var(--c-surface);
+  color: var(--c-text-2);
+  box-shadow: var(--c-shadow-md);
+  cursor: pointer;
+  transition: color 0.15s ease, border-color 0.15s ease, transform 0.15s ease;
 }
 
-.button__icon--copy {
-  position: absolute;
-  transform: rotate(-45deg) translate(-150%, 150%);
+.scroll-top:hover {
+  color: var(--c-accent);
+  border-color: var(--c-accent);
+  transform: translateY(-2px);
 }
 
-.button:hover {
-  background: var(--color-dark-blue-3);
-  transform: scale(1.05);
+.scroll-top-enter-active,
+.scroll-top-leave-active {
+  transition: opacity 0.2s ease, transform 0.2s ease;
 }
 
-.button:hover .button__icon {
-  color: var(--color-gold);
-}
-
-.button:hover .button__text {
-  color: var(--color-gold);
-}
-
-.button:hover .button__circle {
-  background: var(--vp-button-brand-bg);
-  color: var(--vp-button-brand-hover-text);
-}
-
-.button:hover .button__icon:first-child {
-  transition: transform 0.3s ease-in-out;
-  transform: rotate(-45deg) translate(150%, -150%);
-}
-
-.button:hover .button__icon--copy {
-  transition: transform 0.3s ease-in-out 0.1s;
-  transform: rotate(-45deg) translate(0);
-}
-
-@keyframes text-rotation {
-  to {
-    rotate: 360deg;
-  }
+.scroll-top-enter-from,
+.scroll-top-leave-to {
+  opacity: 0;
+  transform: translateY(8px);
 }
 </style>

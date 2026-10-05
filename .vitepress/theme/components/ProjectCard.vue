@@ -24,19 +24,17 @@ withDefaults(defineProps<Props>(), {})
   flex-direction: column;
   padding: 1.5rem;
   border-radius: 12px;
-  background: var(--glass-bg);
-  border: 1px solid var(--glass-border);
-  box-shadow: var(--glass-shadow);
-  backdrop-filter: var(--glass-blur);
+  background: var(--c-surface);
+  border: 1px solid var(--c-border);
+  box-shadow: var(--c-shadow-sm);
   text-decoration: none;
-  transition: all 0.3s ease;
+  transition: border-color 0.15s ease, box-shadow 0.15s ease, transform 0.15s ease;
 }
 
 .project-card:hover {
-  background: var(--glass-bg-hover);
-  border-color: var(--glass-border-hover);
-  box-shadow: var(--glass-shadow-hover);
-  transform: translateY(-4px);
+  border-color: color-mix(in srgb, var(--c-accent) 45%, var(--c-border));
+  box-shadow: var(--c-shadow-md);
+  transform: translateY(-2px);
 }
 
 .card-content {
@@ -63,19 +61,14 @@ withDefaults(defineProps<Props>(), {})
 .card-link {
   display: inline-flex;
   align-items: center;
-  color: var(--color-dark-blue);
+  color: var(--c-accent);
   font-weight: 500;
   font-size: 0.9rem;
-  transition: all 0.2s ease;
-}
-
-.dark .card-link {
-  color: var(--color-dark-blue-3);
+  transition: color 0.15s ease;
 }
 
 .project-card:hover .card-link {
-  color: var(--color-gold);
-  transform: translateX(2px);
+  color: var(--c-accent-hover);
 }
 
 @media (max-width: 640px) {

@@ -8,7 +8,7 @@ hero:
   text: "Centralized documentation hub"
   tagline: All @KevinDeBenedetti open source project docs in one place.
   image:
-    src: /avatar.png
+    src: /avatar.webp
     alt: Kevin De Benedetti
   actions:
     - theme: brand
@@ -19,6 +19,10 @@ features:
   - title: "Docs Generator"
     details: Documentation for this documentation hub — sync, generation, and contribution guides.
     link: /docs/
+    linkText: View docs
+  - title: "Dataset Generator"
+    details: Automated web-scraping to LLM-powered question-answer dataset generator with duplicate detection and optional Langfuse export.
+    link: /dataset-generator/
     linkText: View docs
   - title: "Dotfiles"
     details: Dotfiles and setup scripts for fast environment provisioning.

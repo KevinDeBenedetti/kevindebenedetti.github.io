@@ -102,23 +102,15 @@ const getGitHubLink = (repo: string) => `https://github.com/${repo}`
 .projects-table {
   width: 100%;
   border-collapse: collapse;
-  background: var(--vp-c-bg-soft);
+  background: var(--c-surface);
   border-radius: 12px;
   overflow: hidden;
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
-}
-
-.dark .projects-table {
-  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.3);
+  box-shadow: var(--c-shadow-sm);
 }
 
 thead {
-  background: var(--color-dark-blue);
-  color: white;
-}
-
-.dark thead {
-  background: var(--color-dark-blue-3);
+  background: var(--c-surface-2);
+  color: var(--c-text-1);
 }
 
 th {
@@ -136,11 +128,7 @@ tbody tr {
 }
 
 tbody tr:hover {
-  background: var(--vp-c-bg-mute);
-}
-
-.dark tbody tr:hover {
-  background: rgba(125, 211, 248, 0.05);
+  background: var(--c-surface-2);
 }
 
 td {
@@ -190,55 +178,30 @@ td {
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
-  transition: all 0.2s ease;
+  transition: color 0.15s ease, border-color 0.15s ease;
   border: 1px solid transparent;
   white-space: nowrap;
 }
 
 .docs-link {
-  color: var(--color-dark-blue);
-  background: rgba(91, 164, 214, 0.1);
-  border-color: rgba(91, 164, 214, 0.2);
-}
-
-.dark .docs-link {
-  color: var(--color-dark-blue-3);
-  background: rgba(125, 211, 248, 0.1);
-  border-color: rgba(125, 211, 248, 0.2);
+  color: var(--c-accent);
+  background: var(--c-accent-soft);
+  border-color: color-mix(in srgb, var(--c-accent) 25%, transparent);
 }
 
 .docs-link:hover {
-  background: rgba(91, 164, 214, 0.2);
-  border-color: rgba(91, 164, 214, 0.4);
-  color: var(--color-dark-blue);
-}
-
-.dark .docs-link:hover {
-  background: rgba(125, 211, 248, 0.2);
-  border-color: rgba(125, 211, 248, 0.4);
-  color: var(--color-dark-blue-3);
+  color: var(--c-accent-hover);
+  border-color: color-mix(in srgb, var(--c-accent) 50%, transparent);
 }
 
 .github-link {
-  color: #333;
-  background: rgba(0, 0, 0, 0.05);
-  border-color: rgba(0, 0, 0, 0.1);
-}
-
-.dark .github-link {
-  color: #e1e1e1;
-  background: rgba(255, 255, 255, 0.05);
-  border-color: rgba(255, 255, 255, 0.1);
+  color: var(--c-text-1);
+  background: var(--c-surface-2);
+  border-color: var(--c-border);
 }
 
 .github-link:hover {
-  background: rgba(0, 0, 0, 0.1);
-  border-color: rgba(0, 0, 0, 0.2);
-}
-
-.dark .github-link:hover {
-  background: rgba(255, 255, 255, 0.1);
-  border-color: rgba(255, 255, 255, 0.2);
+  border-color: var(--c-text-3);
 }
 
 svg {

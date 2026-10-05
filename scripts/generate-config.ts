@@ -410,7 +410,7 @@ hero:
   text: "Centralized documentation hub"
   tagline: All @KevinDeBenedetti open source project docs in one place.
   image:
-    src: /avatar.png
+    src: /avatar.webp
     alt: Kevin De Benedetti
   actions:
     - theme: brand

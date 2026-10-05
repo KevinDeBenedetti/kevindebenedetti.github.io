@@ -53,7 +53,7 @@ kevindebenedetti.github.io/
 │   └── theme/
 │       ├── index.ts           # Theme entry point
 │       ├── custom.css         # Design tokens and global styles
-│       └── components/        # Vue components (cursor, earth, footer…)
+│       └── components/        # Vue components (avatar, footer, scroll-top…)
 ├── docs/
 │   ├── public/                # Static assets (avatar, favicons) — committed
 │   ├── index.md               # ⚠️ Generated homepage — do not edit

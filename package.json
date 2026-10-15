@@ -4,7 +4,7 @@
   "devDependencies": {
     "@j178/prek": "^0.5.5",
     "@types/bun": "^1.4.2",
-    "@types/node": "^26.6.4",
+    "@types/node": "^26.6.5",
     "@vitejs/plugin-vue": "^6.0.9",
     "@vue/test-utils": "^2.5.1",
     "jsdom": "^30.1.1",

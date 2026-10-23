@@ -20,32 +20,4 @@ features:
     details: Documentation for this documentation hub — sync, generation, and contribution guides.
     link: /docs/
     linkText: View docs
-  - title: "Dataset Generator"
-    details: Automated web-scraping to LLM-powered question-answer dataset generator with duplicate detection and optional Langfuse export.
-    link: /dataset-generator/
-    linkText: View docs
-  - title: "Dotfiles"
-    details: Dotfiles and setup scripts for fast environment provisioning.
-    link: /dotfiles/
-    linkText: View docs
-  - title: "Github Workflows"
-    details: Collection of reusable GitHub Actions workflows for automating CI/CD and repository tasks.
-    link: /github-workflows/
-    linkText: View docs
-  - title: "K3s Lab"
-    details: k3s-lab — Reproducible, lightweight k3s clusters for experiments, demos, and CI
-    link: /k3s-lab/
-    linkText: View docs
-  - title: "Notes"
-    details: Personal dev notes & references in Markdown.
-    link: /notes/
-    linkText: View docs
-  - title: "Tools"
-    details: A collection of reusable tools to initialize, configure, and automate projects.
-    link: /tools/
-    linkText: View docs
-  - title: "Web Check"
-    details: A comprehensive, Docker-based security scanning toolkit for web applications. Run multiple industry-standard security tools with a single command.
-    link: /web-check/
-    linkText: View docs
 ---

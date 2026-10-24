@@ -14,6 +14,8 @@ Live site: **https://kevindebenedetti.github.io**
 - Custom Vue 3 theme with TypeScript scripts, tested with Vitest
 - Fast linting with oxlint via prek; type-checked with vue-tsc
 - Built with [Bun](https://bun.sh) as runtime, package manager, and test runner
+- Versioned with [release-please](https://github.com/googleapis/release-please): `CHANGELOG.md`, `vX.Y.Z` tags and GitHub Releases
+- Weekly SEO crawl (broken links, missing tags) and Lighthouse audit of the live site
 
 ## Prerequisites
 

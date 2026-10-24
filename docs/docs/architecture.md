@@ -81,10 +81,18 @@ Custom VitePress theme lives in `.vitepress/theme/`:
 
 ## CI/CD
 
-Defined in `.github/workflows/ci-cd.yml`:
+Defined in `.github/workflows/ci-cd.yml`, built on the shared workflows of [github-workflows](https://github.com/KevinDeBenedetti/github-workflows), pinned to a release:
 
-- **On pull requests:** runs `actionlint`, `bun run typecheck`, and `bun run build` (no Pages deploy).
-- **On push to `main`:** same checks, then deploys `.vitepress/dist/` to GitHub Pages via the `actions/deploy-pages` action.
+- **On pull requests:** runs `actionlint`, the prek hooks, `bun run lint`, `typecheck`, `test`, and `build`, plus a dependency audit, a secret scan, and a bot-commit guard (no Pages deploy).
+- **On push to `main`:** same build checks, then deploys `.vitepress/dist/` to GitHub Pages via the `actions/deploy-pages` action and runs release-please.
+
+### Releases
+
+[release-please](https://github.com/googleapis/release-please) (config in `.github/release/`) keeps a release PR open with the next version and its `CHANGELOG.md` entries. Merging it tags `vX.Y.Z` and publishes a GitHub Release. Only commits that land in the changelog (`feat`, `fix`, `perf`, `revert`) open a release PR; `chore`, `docs`, `ci`, and `deps` commits ship with the next one.
+
+### Site audit
+
+`.github/workflows/site-audit.yml` checks the live site every Monday (and on demand via **Run workflow**): an SEO crawl for broken links and missing or duplicate tags, and a Lighthouse audit of every page. A failing check fails the run, which sends GitHub's failure email.
 
 ### Picking up upstream changes
 

@@ -17,26 +17,40 @@ permissions:
   pages: write
   id-token: write
 
+# Shared workflows are pinned to a github-workflows release, not to @main: the
+# Pages and release jobs hold write tokens, and a change pushed to that repo's
+# main would otherwise reach them unreviewed. Dependabot (github-actions
+# ecosystem) proposes the bumps.
 jobs:
   # ── Workflow validation ────────────────────────────────────────────────────
   shell:
     name: Workflow CI
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@main
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@v0.27.0
     with:
       run-shellcheck: false
       run-actionlint: true
       actionlint-paths: .github/workflows/
       run-bats: false
 
-  # ── TypeScript typecheck + build ───────────────────────────────────────────
+  # ── prek hooks (server-side) ───────────────────────────────────────────────
+  # Re-runs prek.toml for changes that never went through the local hooks
+  # (Dependabot PRs, web edits, --no-verify pushes): file hygiene, oxlint and
+  # the docs link / Vue interpolation checks.
+  prek:
+    name: prek
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-prek.yml@v0.27.0
+    permissions:
+      contents: read
+
+  # ── TypeScript lint + typecheck + test + build ─────────────────────────────
   node:
     name: Node CI
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-node.yml@main
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-node.yml@v0.27.0
     with:
       node-version: '22'
       run-lint: true
       run-typecheck: true
-      run-test: false
+      run-test: true
       run-build: true
       run-link-check: false
     secrets:
@@ -46,7 +60,7 @@ jobs:
   security:
     name: Security
     if: github.event_name == 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/security.yml@main
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/security.yml@v0.27.0
     with:
       run-node-audit: true
       run-python-audit: false
@@ -61,9 +75,10 @@ jobs:
   bot-check:
     name: Bot check
     if: github.event_name == 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/check-bot-commits.yml@main
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/check-bot-commits.yml@v0.27.0
     with:
-      allowed-bots: '["dependabot[bot]"]'
+      # release-please-global[bot] authors the release PR's commits.
+      allowed-bots: '["dependabot[bot]", "release-please-global[bot]"]'
     permissions:
       contents: read
       pull-requests: read
@@ -73,10 +88,30 @@ jobs:
     name: Pages
     needs: [shell, node]
     if: github.event_name != 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/cd-pages.yml@main
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/cd-pages.yml@v0.27.0
     with:
       node-version: '22'
       build-command: bun run build
       output-directory: .vitepress/dist
     secrets:
       github-token: ${{ secrets.GITHUB_TOKEN }}
+
+  # ── Release ────────────────────────────────────────────────────────────────
+  # release-please (config in .github/release/): on each push to main it opens
+  # or updates the release PR; merging that PR tags vX.Y.Z and publishes the
+  # GitHub Release and CHANGELOG.md. Only commits that land in the changelog
+  # (feat, fix, perf, revert) open one.
+  # Runs on GITHUB_TOKEN alone (no App, no PAT): the release PR is authored by
+  # github-actions[bot]; its CI runs wait for "Approve workflows to run".
+  release:
+    name: Release
+    needs: [shell, prek, node]
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/release.yml@v0.27.0
+    permissions:
+      contents: write
+      issues: write
+      pull-requests: write
+    # No token secret: release-please runs on GITHUB_TOKEN (needs "Allow GitHub
+    # Actions to create and approve pull requests"; CI on the release PR waits
+    # for "Approve workflows to run").

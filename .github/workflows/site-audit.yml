@@ -1,0 +1,40 @@
+name: Site audit
+
+# Weekly checks of the live site, from GitHub-hosted runners (what visitors and
+# search engines see):
+#   seo        : broken links and redirects; missing or duplicate title,
+#                description, h1 and canonical tags
+#   lighthouse : Lighthouse on every page (performance, accessibility, best
+#                practices, SEO)
+# A failing check fails the run, so GitHub's failure email is the alert.
+# Reports are kept as run artifacts.
+
+on:
+  schedule:
+    - cron: '11 6 * * 1' # Monday
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  seo:
+    name: SEO crawl
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/seo-crawl.yml@v0.27.0
+    permissions:
+      contents: read
+    with:
+      site: https://kevindebenedetti.github.io
+      # Most outbound links point to github.com, which answers a crawl with
+      # 429s; linkinator does not retry, so they would be reported as broken.
+      skip: '^https://github\.com/'
+
+  lighthouse:
+    name: Lighthouse
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/perf-unlighthouse.yml@v0.27.0
+    permissions:
+      contents: read
+    with:
+      site: https://kevindebenedetti.github.io
+      # Loose start; raise it once a few runs have shown the real scores.
+      budget: 75

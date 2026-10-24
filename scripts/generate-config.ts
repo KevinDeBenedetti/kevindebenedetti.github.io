@@ -1,6 +1,6 @@
 /**
  * Reads synced/.repos-metadata.json (written by sync-docs.ts) and discovers
- * locally-managed projects from docs/<slug>/.vitepressrc.json, then generates:
+ * locally-managed projects from docs/<slug>/index.md frontmatter (`repo:`), then generates:
  *   - .vitepress/config.generated.ts  (nav, sidebar, editLink)
  *   - docs/index.md                   (homepage with feature cards)
  *

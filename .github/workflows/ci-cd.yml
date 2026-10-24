@@ -77,8 +77,8 @@ jobs:
     if: github.event_name == 'pull_request'
     uses: KevinDeBenedetti/github-workflows/.github/workflows/check-bot-commits.yml@v0.27.0
     with:
-      # release-please-global[bot] authors the release PR's commits.
-      allowed-bots: '["dependabot[bot]", "release-please-global[bot]"]'
+      # github-actions[bot] authors the release PR's commits (GITHUB_TOKEN).
+      allowed-bots: '["dependabot[bot]", "github-actions[bot]"]'
     permissions:
       contents: read
       pull-requests: read
@@ -112,6 +112,9 @@ jobs:
       contents: write
       issues: write
       pull-requests: write
-    # No token secret: release-please runs on GITHUB_TOKEN (needs "Allow GitHub
-    # Actions to create and approve pull requests"; CI on the release PR waits
-    # for "Approve workflows to run").
+    # Needs "Allow GitHub Actions to create and approve pull requests". The
+    # alias tags (v0, v0.<minor>) are also made as github-actions[bot], set
+    # here so the GIT_USER_NAME / GIT_USER_EMAIL repo variables are never read.
+    with:
+      git-user-name: github-actions[bot]
+      git-user-email: 41898282+github-actions[bot]@users.noreply.github.com

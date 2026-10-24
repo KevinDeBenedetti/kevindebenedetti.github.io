@@ -64,6 +64,7 @@ Key settings:
 | `themeConfig.nav`      | Imported from `generatedNav`                                                        |
 | `themeConfig.sidebar`  | Imported from `generatedSidebar`                                                    |
 | `themeConfig.editLink` | Uses `generatedEditLinkPattern` to link each page back to its source file on GitHub |
+| `markdown`             | `languageAlias` (`env` → `dotenv`), Shiki grammars from `.vitepress/shiki/` (LogQL) |
 
 ## `.vitepress/config.generated.ts`
 

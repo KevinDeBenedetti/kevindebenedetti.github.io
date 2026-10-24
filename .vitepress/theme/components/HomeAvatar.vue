@@ -21,7 +21,7 @@
   border-radius: 50%;
   background: linear-gradient(135deg, var(--c-accent), var(--c-gold));
   box-shadow: var(--c-shadow-md);
-  animation: avatarIn 0.6s cubic-bezier(0.22, 1, 0.36, 1) both;
+  animation: avatarIn 0.6s var(--motion-ease-out) both;
 }
 
 .home-avatar__img {

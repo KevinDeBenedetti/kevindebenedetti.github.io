@@ -7,6 +7,9 @@
  *     which is what made Firefox/Safari sluggish.
  *   - No infinite animations; transitions only on opacity, transform,
  *     color and border-color.
+ *   - Entrances are one-shot keyframes (opacity/transform) or View
+ *     Transitions snapshots: once a page has settled, nothing animates.
+ *   - Every entrance shares --motion-ease-out so the site moves as one.
  */
 
 /* ===========================================================
@@ -42,6 +45,9 @@
   --c-shadow-sm:    0 1px 2px rgb(16 24 40 / 0.05);
   --c-shadow-md:    0 4px 16px rgb(16 24 40 / 0.08);
   --c-shadow-lg:    0 12px 32px rgb(16 24 40 / 0.14);
+
+  /* Motion — a decelerating ease for entrances and lifts */
+  --motion-ease-out: cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .dark {
@@ -221,6 +227,37 @@ html {
   letter-spacing: -0.01em;
 }
 
+/* Top nav links: an underline grows from the left on hover and stays on
+   the active item (transform only — no layout). The flyout's .text box is
+   nav-height tall, like the links, so one bottom offset fits both. */
+.VPNavBarMenuLink,
+.VPFlyout > .button .text {
+  position: relative;
+}
+
+.VPNavBarMenuLink::after,
+.VPFlyout > .button .text::after {
+  content: '';
+  position: absolute;
+  bottom: 20px;
+  height: 2px;
+  border-radius: 2px;
+  background: var(--c-accent);
+  transform: scaleX(0);
+  transform-origin: left;
+  transition: transform 0.25s var(--motion-ease-out);
+}
+
+.VPNavBarMenuLink::after { left: 12px; right: 12px; }
+.VPFlyout > .button .text::after { left: 0; right: 0; }
+
+.VPNavBarMenuLink:hover::after,
+.VPNavBarMenuLink.active::after,
+.VPFlyout:hover > .button .text::after,
+.VPFlyout.active > .button .text::after {
+  transform: scaleX(1);
+}
+
 /* Nav dropdown panel */
 .VPFlyout .VPMenu {
   border: 1px solid var(--c-border) !important;
@@ -380,6 +417,19 @@ html {
   text-align: center !important;
 }
 
+/* Menu entries fade up one after another each time the screen opens
+   (VPNavScreen is v-if'd, so this replays on every open). */
+.VPNavScreenMenu > * {
+  animation: vp-fade-up 0.35s var(--motion-ease-out) both;
+}
+
+.VPNavScreenMenu > :nth-child(1) { animation-delay: 40ms; }
+.VPNavScreenMenu > :nth-child(2) { animation-delay: 80ms; }
+.VPNavScreenMenu > :nth-child(3) { animation-delay: 120ms; }
+.VPNavScreenMenu > :nth-child(4) { animation-delay: 160ms; }
+.VPNavScreenMenu > :nth-child(5) { animation-delay: 200ms; }
+.VPNavScreenMenu > :nth-child(n + 6) { animation-delay: 240ms; }
+
 .VPNavScreenAppearance {
   border-top: 1px solid var(--c-border) !important;
   padding-top: 0.75rem;
@@ -433,6 +483,22 @@ html {
   width: 100% !important;
   padding: 0 !important;
 }
+
+/* Cards enter after the hero, 45ms apart. Capped at the 8th card so a
+   long project list never keeps the visitor waiting. */
+.VPFeatures .item {
+  animation: vp-fade-up 0.5s var(--motion-ease-out) both;
+  animation-delay: calc(260ms + var(--i) * 45ms);
+}
+
+.VPFeatures .item:nth-child(1) { --i: 0; }
+.VPFeatures .item:nth-child(2) { --i: 1; }
+.VPFeatures .item:nth-child(3) { --i: 2; }
+.VPFeatures .item:nth-child(4) { --i: 3; }
+.VPFeatures .item:nth-child(5) { --i: 4; }
+.VPFeatures .item:nth-child(6) { --i: 5; }
+.VPFeatures .item:nth-child(7) { --i: 6; }
+.VPFeatures .item:nth-child(n + 8) { --i: 7; }
 
 .VPFeature {
   height: 100%;
@@ -560,15 +626,26 @@ html {
   transform: scaleX(1);
 }
 
-/* One-shot entrance — opacity/transform only */
-@keyframes ctaEntrance {
+/* One-shot entrance — opacity/transform only. Shared by the hero, the
+   feature cards and the mobile menu. */
+@keyframes vp-fade-up {
   from { opacity: 0; transform: translateY(10px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
+/* Hero: name → text → tagline → CTA, 60ms apart. The name has no delay so
+   the LCP element paints on the first frame. (.heading is a flex column,
+   so the spans are blockified and transform applies.) */
+.VPHero .name,
+.VPHero .text,
+.VPHero .tagline,
 .VPHero .actions {
-  animation: ctaEntrance 0.6s cubic-bezier(0.22, 1, 0.36, 1) 0.3s both;
+  animation: vp-fade-up 0.55s var(--motion-ease-out) both;
 }
+
+.VPHero .text    { animation-delay: 60ms; }
+.VPHero .tagline { animation-delay: 120ms; }
+.VPHero .actions { animation-delay: 200ms; }
 
 /* ===========================================================
  * Doc content — reading comfort
@@ -830,6 +907,15 @@ html {
   background: var(--c-surface);
   border-radius: 10px !important;
   box-shadow: var(--c-shadow-sm);
+  transition:
+    border-color 0.25s,
+    transform 0.2s var(--motion-ease-out),
+    box-shadow 0.2s ease !important;
+}
+
+.VPDocFooter .pager-link:hover {
+  transform: translateY(-2px);
+  box-shadow: var(--c-shadow-md);
 }
 
 /* ===========================================================
@@ -853,27 +939,156 @@ html {
 }
 
 /* ===========================================================
- * Overview pages — "View on GitHub" pill
- * (markup emitted by scripts/generate-config.ts)
+ * Overview pages — source card (repository + docs/ folder)
+ * Markup: sourceCard() in scripts/generate-config.ts and docs/docs/index.md
  * =========================================================== */
-.vp-doc .vp-repo-link {
-  display: inline-block;
-  margin: 12px 0;
-  padding: 8px 18px;
+.vp-doc .vp-source {
+  margin: 16px 0;
+  border: 1px solid var(--c-border);
+  border-radius: 12px;
   background: var(--c-surface);
-  color: var(--c-accent);
-  border: 1px solid var(--c-border-strong);
-  border-radius: 999px;
-  font-weight: 600;
-  font-size: 0.9rem;
-  text-decoration: none;
   box-shadow: var(--c-shadow-sm);
-  transition: color 0.15s ease, border-color 0.15s ease;
+  overflow: hidden;
 }
 
-.vp-doc .vp-repo-link:hover {
-  color: var(--c-accent-hover);
-  border-color: var(--c-accent);
+.vp-doc .vp-source__row {
+  display: flex;
+  align-items: center;
+  gap: 0.9rem;
+  padding: 0.8rem 1rem;
+  color: var(--c-text-1);
+  font-weight: 500;
+  text-decoration: none;
+  transition: background-color 0.15s ease, color 0.15s ease;
+}
+
+.vp-doc .vp-source__row + .vp-source__row {
+  border-top: 1px solid var(--c-border);
+}
+
+.vp-doc .vp-source__row:hover {
+  background: var(--c-surface-2);
+  color: var(--c-accent);
+}
+
+.vp-doc .vp-source__icon {
+  flex-shrink: 0;
+  width: 20px;
+  height: 20px;
+  color: var(--c-text-3);
+  transition: color 0.15s ease;
+}
+
+.vp-doc .vp-source__row:hover .vp-source__icon {
+  color: var(--c-accent);
+}
+
+.vp-doc .vp-source__text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.vp-doc .vp-source__label {
+  font-size: 0.7rem;
+  font-weight: 700;
+  letter-spacing: 0.07em;
+  text-transform: uppercase;
+  color: var(--c-text-3);
+}
+
+.vp-doc .vp-source__value {
+  font-size: 0.925rem;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.vp-doc .vp-source__value code {
+  font-size: 0.85em;
+}
+
+/* Arrow nudges right on hover — transform only */
+.vp-doc .vp-source__arrow {
+  margin-left: auto;
+  color: var(--c-text-3);
+  transition: transform 0.2s var(--motion-ease-out), color 0.15s ease;
+}
+
+.vp-doc .vp-source__row:hover .vp-source__arrow {
+  color: var(--c-accent);
+  transform: translateX(3px);
+}
+
+/* ===========================================================
+ * View Transitions — progressive, one snapshot pair, then nothing
+ * (theme/page-transition.ts and theme/Layout.vue start them).
+ * Two transitions share the API; each is scoped by a class on <html>
+ * so their rules never mix:
+ *   .vp-routing   — client-side navigation: only .VPContent gets its own
+ *                   snapshot pair; nav and sidebar stay put.
+ *   .vp-switching — appearance toggle: circular wipe from the switch.
+ * =========================================================== */
+.vp-routing .VPContent {
+  view-transition-name: content;
+}
+
+.vp-routing::view-transition-old(root),
+.vp-routing::view-transition-new(root) {
+  animation-duration: 0.2s;
+}
+
+.vp-routing::view-transition-old(content) {
+  animation: vp-vt-out 0.12s ease-in both;
+}
+
+.vp-routing::view-transition-new(content) {
+  animation: vp-vt-in 0.26s var(--motion-ease-out) both;
+}
+
+@keyframes vp-vt-out {
+  to { opacity: 0; }
+}
+
+@keyframes vp-vt-in {
+  from { opacity: 0; transform: translateY(8px); }
+}
+
+/* Appearance wipe — VitePress's own example, scoped to .vp-switching.
+   .dark here is the *new* state: going dark, the old (light) snapshot
+   shrinks away on top; going light, the new snapshot grows in. */
+.vp-switching::view-transition-old(root),
+.vp-switching::view-transition-new(root) {
+  animation: none;
+  mix-blend-mode: normal;
+}
+
+.vp-switching::view-transition-new(root) {
+  animation: vp-switch-appearance 300ms ease-in;
+}
+
+.vp-switching.dark::view-transition-new(root) {
+  animation: none;
+}
+
+.vp-switching.dark::view-transition-old(root) {
+  animation: vp-switch-appearance 300ms ease-in reverse forwards;
+  z-index: 1;
+}
+
+@keyframes vp-switch-appearance {
+  from { clip-path: circle(0 at var(--switch-x) var(--switch-y)); }
+  to   { clip-path: circle(var(--switch-r) at var(--switch-x) var(--switch-y)); }
+}
+
+/* The knob's slide would be caught mid-way in the snapshot: show the
+   icon-only switch instead (as in the VitePress example). */
+.VPSwitchAppearance {
+  width: 1.375rem !important;
+}
+
+.VPSwitchAppearance .check {
+  transform: none !important;
 }
 
 /* ===========================================================
@@ -955,5 +1170,13 @@ html {
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     scroll-behavior: auto !important;
+  }
+
+  /* The scripts already skip View Transitions under reduced motion;
+     this covers any transition started elsewhere. */
+  ::view-transition-group(*),
+  ::view-transition-old(*),
+  ::view-transition-new(*) {
+    animation: none !important;
   }
 }

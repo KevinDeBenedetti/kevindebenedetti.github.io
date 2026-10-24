@@ -3,6 +3,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
 import { generatedNav, generatedSidebar, generatedEditLinkPattern } from './config.generated'
+import { logql } from './shiki/logql'
 
 const SITE_URL = 'https://kevindebenedetti.github.io'
 const SITE_TITLE = "Home"
@@ -40,12 +41,12 @@ export default defineConfig({
 
   markdown: {
     // 'env' fences use Shiki's 'dotenv' grammar under a different name.
-    // (No mapping exists for 'gitignore' or 'logql' — Shiki ships no grammar
-    // for either, and aliasing them to a special lang like 'txt' breaks the
-    // build; they keep falling back to plain text with a harmless warning.)
     languageAlias: {
       env: 'dotenv',
     },
+    // Grammars Shiki does not ship. A fence language with no grammar falls
+    // back to plain text and logs "The language 'x' is not loaded" at build.
+    languages: [logql],
   },
 
   title: SITE_TITLE,

@@ -54,9 +54,12 @@ kevindebenedetti.github.io/
 ├── .vitepress/
 │   ├── config.ts              # Static VitePress config (imports generated values)
 │   ├── config.generated.ts    # ⚠️ Generated — do not edit
+│   ├── shiki/                 # Extra Shiki grammars (LogQL)
 │   └── theme/
-│       ├── index.ts           # Theme entry point
-│       ├── custom.css         # Design tokens and global styles
+│       ├── index.ts           # Theme entry point (components, page transitions)
+│       ├── Layout.vue         # Default layout + slots + appearance-toggle wipe
+│       ├── page-transition.ts # View Transitions on client-side navigation
+│       ├── custom.css         # Design tokens, motion rules and global styles
 │       └── components/        # Vue components + __tests__/
 ├── docs/
 │   ├── index.md               # ⚠️ Generated homepage — do not edit

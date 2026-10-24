@@ -41,9 +41,13 @@ defineProps<Props>()
   text-decoration: none;
   font-size: 0.85rem;
   font-weight: 500;
-  transition: color 0.15s ease, border-color 0.15s ease;
+  transition: color 0.15s ease, border-color 0.15s ease, transform 0.2s var(--motion-ease-out);
   border: 1px solid transparent;
   white-space: nowrap;
+}
+
+.project-link:hover {
+  transform: translateY(-1px);
 }
 
 .docs-btn {

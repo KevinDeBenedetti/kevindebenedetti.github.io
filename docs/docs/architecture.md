@@ -65,7 +65,7 @@ The VitePress home page, generated with a `layout: home` frontmatter block, a he
 
 ### `synced/<project>/index.md`
 
-Created **only** if the source repository does not already ship its own `index.md`. The auto-generated stub includes a link to GitHub, a file tree, and an auto-linked table of contents.
+Created **only** if the source repository does not already ship its own `index.md`. The auto-generated stub includes a source card (repository and `docs/` folder on GitHub) and an auto-linked table of contents.
 
 ## Theme
 
@@ -73,7 +73,9 @@ Custom VitePress theme lives in `.vitepress/theme/`:
 
 | File | Role |
 |------|------|
-| `index.ts` | Theme entry point — loads the global CSS, fills the `home-hero-image` and `layout-bottom` layout slots, and registers the components globally |
+| `index.ts` | Theme entry point — loads the global CSS, registers the components globally and installs the page transitions on the router |
+| `Layout.vue` | Default layout with the `home-hero-image` and `layout-bottom` slots filled, plus the appearance-toggle wipe |
+| `page-transition.ts` | View Transitions on client-side navigation (progressive, reduced-motion aware) |
 | `custom.css` | Design tokens (`--c-*`, light/dark), VitePress variable mapping, component styles |
 | `components/HomeAvatar.vue` | Avatar image shown in the hero section |
 | `components/HomeSocial.vue` | GitHub and website links (registered, not used by any page yet) |
@@ -82,6 +84,15 @@ Custom VitePress theme lives in `.vitepress/theme/`:
 | `components/ProjectLinks.vue` | Docs and GitHub links in the Projects table |
 | `components/ScrollTop.vue` | Floating scroll-to-top button |
 | `components/SiteFooter.vue` | Footer rendered on every page |
+
+### Motion
+
+Motion is used to orient, never to decorate, and it must cost nothing once a page has settled:
+
+- Only `opacity` and `transform` (plus colors) are animated — never layout properties, and never with `backdrop-filter`.
+- Entrances (hero, feature cards, mobile menu) are one-shot CSS keyframes sharing the `--motion-ease-out` token.
+- Navigation and the appearance toggle use the [View Transitions API](https://developer.chrome.com/docs/web-platform/view-transitions/): one snapshot pair animated on the compositor. Browsers without the API get the previous instant behaviour.
+- `prefers-reduced-motion: reduce` disables all of it, in CSS and in the scripts.
 
 ## CI/CD
 

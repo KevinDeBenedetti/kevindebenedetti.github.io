@@ -60,7 +60,7 @@ Key settings:
 | `base`                 | `/`                                                                                 |
 | `srcDir`               | `.` (repo root)                                                                     |
 | `rewrites`             | Maps `synced/:slug/*` and `docs/:slug/*` → `/:slug/*`                               |
-| `title`                | Docs                                                                                |
+| `title`                | `Home` (pages use the `:title \| Kevin's Docs` template)                            |
 | `themeConfig.nav`      | Imported from `generatedNav`                                                        |
 | `themeConfig.sidebar`  | Imported from `generatedSidebar`                                                    |
 | `themeConfig.editLink` | Uses `generatedEditLinkPattern` to link each page back to its source file on GitHub |

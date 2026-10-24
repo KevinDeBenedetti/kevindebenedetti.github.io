@@ -32,20 +32,20 @@ GitHub repos (public)
 
 **Entry point:** `scripts/sync-docs.ts`
 
-1. Calls the GitHub REST API (`/users/KevinDeBenedetti/repos`) to list all non-archived public repositories.
+1. Calls the GitHub REST API (`/users/KevinDeBenedetti/repos?type=public`) and keeps the repositories that are not archived, disabled, or forks. This repository itself is skipped.
 2. For each repository, performs a `git clone --depth=1 --filter=blob:none --sparse` and checks out only the `docs/` directory (sparse checkout).
 3. If a `docs/` directory exists, copies it to `synced/<repo-name>/`.
 4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo }` records for every successfully synced project.
 5. Writes `public/sync-state.json` — the git tree SHA of each project's `docs/` plus its description. It ships with the site at `/sync-state.json` and lets the scheduled poll know what the live site was built from.
 6. Deletes the temporary clone directory.
 
-The `public/` directory and `docs/docs/` are **never deleted** during a sync reset — they hold content committed directly to this repository.
+A sync reset empties `synced/` but **never deletes** `docs/about/`, `docs/docs/`, and `docs/projects/` — they hold content committed directly to this repository.
 
 ## Generate step
 
 **Entry point:** `scripts/generate-config.ts`
 
-Reads `synced/.repos-metadata.json` and discovers locally managed projects from `docs/` subdirectories, then produces three outputs:
+Reads `synced/.repos-metadata.json` and discovers locally managed projects from `docs/` subdirectories whose `index.md` frontmatter has a `repo:` field (see [Configuration](./configuration.md#local-project-metadata)), then produces three outputs:
 
 ### `.vitepress/config.generated.ts`
 
@@ -73,9 +73,13 @@ Custom VitePress theme lives in `.vitepress/theme/`:
 
 | File | Role |
 |------|------|
-| `index.ts` | Theme entry point — registers components and global CSS |
+| `index.ts` | Theme entry point — loads the global CSS, fills the `home-hero-image` and `layout-bottom` layout slots, and registers the components globally |
 | `custom.css` | Design tokens (`--c-*`, light/dark), VitePress variable mapping, component styles |
 | `components/HomeAvatar.vue` | Avatar image shown in the hero section |
+| `components/HomeSocial.vue` | GitHub and website links (registered, not used by any page yet) |
+| `components/AboutProfile.vue` | Profile rendered by the About page |
+| `components/ProjectCard.vue` | Linked project card (registered, not used by any page yet) |
+| `components/ProjectLinks.vue` | Docs and GitHub links in the Projects table |
 | `components/ScrollTop.vue` | Floating scroll-to-top button |
 | `components/SiteFooter.vue` | Footer rendered on every page |
 
@@ -89,6 +93,8 @@ Defined in `.github/workflows/ci-cd.yml`, built on the shared workflows of [gith
 ### Releases
 
 [release-please](https://github.com/googleapis/release-please) (config in `.github/release/`) keeps a release PR open with the next version and its `CHANGELOG.md` entries. Merging it tags `vX.Y.Z` and publishes a GitHub Release. Only commits that land in the changelog (`feat`, `fix`, `perf`, `revert`) open a release PR; `chore`, `docs`, `ci`, and `deps` commits ship with the next one.
+
+release-please runs on `GITHUB_TOKEN` only, so the release PR, its commits, and the tags are authored by `github-actions[bot]`. GitHub does not start CI on a PR opened with that token: click **Approve workflows to run** on the release PR to get its checks.
 
 ### Site audit
 
@@ -114,6 +120,6 @@ A repository is automatically included when it:
 1. Is public and owned by `@KevinDeBenedetti`.
 2. Contains a `docs/` directory at the repository root.
 
-No configuration change is required in this hub. The next scheduled poll picks it up automatically.
+No configuration change is required in this hub: the next scheduled poll (within 12 hours) picks it up. The display title comes from the repository name and the card description from its GitHub description.
 
-To customise the display title or description, those values are derived from the repository name and GitHub API description automatically. No configuration change is required in this hub.
+The [Projects](../projects/index.md) table is maintained by hand in `docs/projects/index.md`: add a row there for a new project.

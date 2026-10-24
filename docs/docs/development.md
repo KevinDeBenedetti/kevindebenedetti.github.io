@@ -45,8 +45,11 @@ bun install
 ```
 kevindebenedetti.github.io/
 ├── .github/
+│   ├── release/               # release-please config + manifest
 │   └── workflows/
-│       └── ci-cd.yml          # CI checks + GitHub Pages deploy
+│       ├── ci-cd.yml          # CI checks + GitHub Pages deploy + release
+│       ├── docs-poll.yml      # Redeploys when a project's docs/ changed
+│       └── site-audit.yml     # Weekly SEO crawl + Lighthouse audit
 ├── .vitepress/
 │   ├── config.ts              # Static VitePress config (imports generated values)
 │   ├── config.generated.ts    # ⚠️ Generated — do not edit

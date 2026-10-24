@@ -11,7 +11,8 @@
 - `scripts/generate-config.ts`: reads each `docs/<project>/.vitepressrc.json` and generates `.vitepress/config.generated.ts`, `docs/index.md`, and missing project `index.md` files.
 - `.vitepress/config.ts`: static VitePress config that imports generated nav, sidebar, and edit-link data.
 - `.vitepress/theme/`: custom Vue theme components and tests.
-- `.github/workflows/ci-cd.yml`: CI runs actionlint, `bun run typecheck`, and `bun run build`; Pages deploy happens outside pull requests.
+- `.github/workflows/ci-cd.yml`: CI runs actionlint, the prek hooks, `bun run lint`, `typecheck`, `test`, and `build`; Pages deploy happens outside pull requests, and release-please (config in `.github/release/`) cuts releases on push to `main`.
+- `.github/workflows/site-audit.yml`: weekly SEO crawl and Lighthouse audit of the live site.
 
 ## Generated and synced content
 

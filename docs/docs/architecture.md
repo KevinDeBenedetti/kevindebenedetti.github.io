@@ -101,6 +101,10 @@ Defined in `.github/workflows/ci-cd.yml`, built on the shared workflows of [gith
 - **On pull requests:** runs `actionlint`, the prek hooks, `bun run lint`, `typecheck`, `test`, and `build`, plus a dependency audit, a secret scan, and a bot-commit guard (no Pages deploy).
 - **On push to `main`:** same build checks, then deploys `.vitepress/dist/` to GitHub Pages via the `actions/deploy-pages` action and runs release-please.
 
+::: warning Pages source must be GitHub Actions
+In **Settings → Pages → Build and deployment**, the source must be **GitHub Actions**. With **Deploy from a branch**, GitHub also runs its own *pages build and deployment* on every push: it publishes a Jekyll render of the raw repository, which replaces the site until the VitePress deploy lands — and stays online if that deploy fails.
+:::
+
 ### Releases
 
 [release-please](https://github.com/googleapis/release-please) (config in `.github/release/`) keeps a release PR open with the next version and its `CHANGELOG.md` entries. Merging it tags `vX.Y.Z` and publishes a GitHub Release. Only commits that land in the changelog (`feat`, `fix`, `perf`, `revert`) open a release PR; `chore`, `docs`, `ci`, and `deps` commits ship with the next one.

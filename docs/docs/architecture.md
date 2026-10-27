@@ -115,6 +115,8 @@ release-please runs on `GITHUB_TOKEN` only, so the release PR, its commits, and 
 
 `.github/workflows/site-audit.yml` checks the live site every Monday (and on demand via **Run workflow**): an SEO crawl for broken links and missing or duplicate tags, and a Lighthouse audit of every page. A failing check fails the run, which sends GitHub's failure email.
 
+The link check skips what a crawler cannot judge from a runner: `github.com` (rate-limited), `medium.com` (403 for any non-browser client), and `localhost` dev-server URLs. Every other broken link fails the run; the run summary lists each one with the page it was found on. A dead link in a synced page is fixed in its source repository, and the next sync publishes the fix.
+
 ### Picking up upstream changes
 
 Source repositories do not notify the hub. Instead, `.github/workflows/docs-poll.yml` runs every 12 hours (and on demand via **Run workflow**):

@@ -25,9 +25,12 @@ jobs:
       contents: read
     with:
       site: https://kevindebenedetti.github.io
-      # Most outbound links point to github.com, which answers a crawl with
-      # 429s; linkinator does not retry, so they would be reported as broken.
-      skip: '^https://github\.com/'
+      # Links a crawler cannot judge, comma-separated:
+      #   github.com : most outbound links; answers a crawl with 429s, and
+      #                linkinator does not retry
+      #   medium.com : answers any non-browser client with a 403
+      #   localhost  : dev-server URLs in the docs, never reachable
+      skip: '^https://github\.com/,^https://medium\.com/,^https?://(localhost|127\.0\.0\.1)[:/]'
 
   lighthouse:
     name: Lighthouse

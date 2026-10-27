@@ -117,6 +117,8 @@ release-please runs on `GITHUB_TOKEN` only, so the release PR, its commits, and 
 
 The link check skips what a crawler cannot judge from a runner: `github.com` (rate-limited), `medium.com` (403 for any non-browser client), and `localhost` dev-server URLs. Every other broken link fails the run; the run summary lists each one with the page it was found on. A dead link in a synced page is fixed in its source repository, and the next sync publishes the fix.
 
+Source repositories check their links earlier: their docs CI ([github-workflows](https://github.com/KevinDeBenedetti/github-workflows)' `cd-docs.yml`, or `ci-shell.yml` with `run-docs-external-link-check`) runs lychee on the pages a push changes, `github.com` links included, so a link that is already dead when written fails right after the push. The weekly audit remains the only check for links that rot later.
+
 ### Picking up upstream changes
 
 Source repositories do not notify the hub. Instead, `.github/workflows/docs-poll.yml` runs every 12 hours (and on demand via **Run workflow**):

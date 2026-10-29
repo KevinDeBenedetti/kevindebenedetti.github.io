@@ -25,7 +25,7 @@ jobs:
   # ── Workflow validation ────────────────────────────────────────────────────
   shell:
     name: Workflow CI
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@v0.27.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@v0.29.0
     with:
       run-shellcheck: false
       run-actionlint: true

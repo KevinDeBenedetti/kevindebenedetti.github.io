@@ -34,7 +34,7 @@ jobs:
 
   lighthouse:
     name: Lighthouse
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/perf-unlighthouse.yml@v0.27.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/perf-unlighthouse.yml@v0.29.0
     permissions:
       contents: read
     with:

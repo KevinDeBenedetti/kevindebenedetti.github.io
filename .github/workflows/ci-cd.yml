@@ -60,7 +60,7 @@ jobs:
   security:
     name: Security
     if: github.event_name == 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/security.yml@v0.27.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/security.yml@v0.29.0
     with:
       run-node-audit: true
       run-python-audit: false

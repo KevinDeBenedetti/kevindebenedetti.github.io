@@ -102,6 +102,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -156,12 +160,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -172,12 +184,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -198,7 +230,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -208,10 +240,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -262,12 +290,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -733,6 +785,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -787,12 +843,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -803,12 +867,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -829,7 +913,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -839,10 +923,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -893,12 +973,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -1364,6 +1468,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -1418,12 +1526,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -1434,12 +1550,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -1460,7 +1596,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -1470,10 +1606,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -1524,12 +1656,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -1995,6 +2151,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -2049,12 +2209,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -2065,12 +2233,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -2091,7 +2279,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -2101,10 +2289,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -2155,12 +2339,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -2626,6 +2834,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -2680,12 +2892,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -2696,12 +2916,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -2722,7 +2962,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -2732,10 +2972,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -2786,12 +3022,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -3257,6 +3517,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -3311,12 +3575,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -3327,12 +3599,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -3353,7 +3645,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -3363,10 +3655,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -3417,12 +3705,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -3888,6 +4200,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -3942,12 +4258,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -3958,12 +4282,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -3984,7 +4328,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -3994,10 +4338,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -4048,12 +4388,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -4519,6 +4883,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -4573,12 +4941,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -4589,12 +4965,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -4615,7 +5011,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -4625,10 +5021,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -4679,12 +5071,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -5150,6 +5566,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -5204,12 +5624,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -5220,12 +5648,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -5246,7 +5694,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -5256,10 +5704,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -5310,12 +5754,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",
@@ -5781,6 +6249,10 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/dotfiles/config/ssh"
             },
             {
+              "text": "TODO Workflow",
+              "link": "/dotfiles/config/todo-workflow"
+            },
+            {
               "text": "VS Code",
               "link": "/dotfiles/config/vscode"
             },
@@ -5835,12 +6307,20 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/check-commit-msg"
             },
             {
+              "text": "Action — check-docs-external-links",
+              "link": "/github-workflows/actions/check-docs-external-links"
+            },
+            {
               "text": "Action — check-docs-links",
               "link": "/github-workflows/actions/check-docs-links"
             },
             {
               "text": "Action — check-vitepress-md",
               "link": "/github-workflows/actions/check-vitepress-md"
+            },
+            {
+              "text": "Action — cleanup-runs",
+              "link": "/github-workflows/actions/cleanup-runs"
             },
             {
               "text": "Action — detect-changes",
@@ -5851,12 +6331,32 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/actions/kubeconform"
             },
             {
+              "text": "Action — lighthouse-results",
+              "link": "/github-workflows/actions/lighthouse-results"
+            },
+            {
               "text": "notify-deployment",
               "link": "/github-workflows/actions/notify-deployment"
             },
             {
+              "text": "Action — pr-description",
+              "link": "/github-workflows/actions/pr-description"
+            },
+            {
+              "text": "Action — prerelease",
+              "link": "/github-workflows/actions/prerelease"
+            },
+            {
+              "text": "Action — propagate-release",
+              "link": "/github-workflows/actions/propagate-release"
+            },
+            {
               "text": "Action — setup-ansible",
               "link": "/github-workflows/actions/setup-ansible"
+            },
+            {
+              "text": "Action — setup-claude-code",
+              "link": "/github-workflows/actions/setup-claude-code"
             },
             {
               "text": "Action — setup-node",
@@ -5877,7 +6377,7 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
           "collapsed": true,
           "items": [
             {
-              "text": "CD — BuildKit rootless",
+              "text": "CD — BuildKit",
               "link": "/github-workflows/workflows/cd-buildkit"
             },
             {
@@ -5887,10 +6387,6 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
             {
               "text": "Deploy — Docs to Central Repo",
               "link": "/github-workflows/workflows/cd-docs"
-            },
-            {
-              "text": "CD — Kaniko",
-              "link": "/github-workflows/workflows/cd-kaniko"
             },
             {
               "text": "Deploy — GitHub Pages",
@@ -5941,12 +6437,36 @@ export const generatedSidebar: DefaultTheme.SidebarMulti = {
               "link": "/github-workflows/workflows/ci-terraform"
             },
             {
+              "text": "`cleanup-ghcr` workflow",
+              "link": "/github-workflows/workflows/cleanup-ghcr"
+            },
+            {
+              "text": "`cleanup-runs` workflow",
+              "link": "/github-workflows/workflows/cleanup-runs"
+            },
+            {
+              "text": "Perf — Lighthouse CI",
+              "link": "/github-workflows/workflows/perf-lighthouse"
+            },
+            {
               "text": "Perf — sitespeed.io",
               "link": "/github-workflows/workflows/perf-sitespeed"
             },
             {
               "text": "Perf — Unlighthouse",
               "link": "/github-workflows/workflows/perf-unlighthouse"
+            },
+            {
+              "text": "`pr-description` workflow",
+              "link": "/github-workflows/workflows/pr-description"
+            },
+            {
+              "text": "Pre-release",
+              "link": "/github-workflows/workflows/prerelease"
+            },
+            {
+              "text": "`propagate-release` workflow",
+              "link": "/github-workflows/workflows/propagate-release"
             },
             {
               "text": "Release",

@@ -18,6 +18,10 @@ updates:
     directory: /
     schedule:
       interval: weekly
+    # github-workflows bumps come with each of its releases, as a pull request
+    # its propagate-release job opens: Dependabot would only duplicate them.
+    ignore:
+      - dependency-name: "KevinDeBenedetti/github-workflows*"
     labels:
       - dependencies
       - github-actions

@@ -98,7 +98,7 @@ Motion is used to orient, never to decorate, and it must cost nothing once a pag
 
 Defined in `.github/workflows/ci-cd.yml`, built on the shared workflows of [github-workflows](https://github.com/KevinDeBenedetti/github-workflows), pinned to a release:
 
-- **On pull requests:** runs `actionlint`, the prek hooks, `bun run lint`, `typecheck`, `test`, and `build`, plus a dependency audit, a secret scan, and a bot-commit guard (no Pages deploy).
+- **On pull requests:** runs `actionlint`, the prek hooks, `bun run lint`, `typecheck`, `test`, and `build`, plus a dependency audit and a secret scan (no Pages deploy).
 - **On push to `main`:** same build checks, then deploys `.vitepress/dist/` to GitHub Pages via the `actions/deploy-pages` action and runs release-please.
 
 ::: warning Pages source must be GitHub Actions

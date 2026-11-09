@@ -19,8 +19,9 @@ permissions:
 
 # Shared workflows are pinned to a github-workflows release, not to @main: the
 # Pages and release jobs hold write tokens, and a change pushed to that repo's
-# main would otherwise reach them unreviewed. Dependabot (github-actions
-# ecosystem) proposes the bumps.
+# main would otherwise reach them unreviewed. Each github-workflows release
+# opens the bump PR here (its propagate-release workflow); Dependabot ignores
+# these pins.
 jobs:
   # ── Workflow validation ────────────────────────────────────────────────────
   shell:
@@ -69,17 +70,6 @@ jobs:
     permissions:
       security-events: write
       actions: read
-      contents: read
-      pull-requests: read
-
-  bot-check:
-    name: Bot check
-    if: github.event_name == 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/check-bot-commits.yml@v0.40.0
-    with:
-      # github-actions[bot] authors the release PR's commits (GITHUB_TOKEN).
-      allowed-bots: '["dependabot[bot]", "github-actions[bot]"]'
-    permissions:
       contents: read
       pull-requests: read
 

@@ -20,7 +20,7 @@ permissions:
 jobs:
   seo:
     name: SEO crawl
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/seo-crawl.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/seo-crawl.yml@v0.45.0
     permissions:
       contents: read
     with:
@@ -34,7 +34,7 @@ jobs:
 
   lighthouse:
     name: Lighthouse
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/perf-unlighthouse.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/perf-unlighthouse.yml@v0.45.0
     permissions:
       contents: read
     with:

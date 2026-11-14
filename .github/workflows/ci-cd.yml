@@ -26,7 +26,7 @@ jobs:
   # ── Workflow validation ────────────────────────────────────────────────────
   shell:
     name: Workflow CI
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-shell.yml@v0.45.0
     with:
       run-shellcheck: false
       run-actionlint: true
@@ -39,14 +39,14 @@ jobs:
   # the docs link / Vue interpolation checks.
   prek:
     name: prek
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-prek.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-prek.yml@v0.45.0
     permissions:
       contents: read
 
   # ── TypeScript lint + typecheck + test + build ─────────────────────────────
   node:
     name: Node CI
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-node.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/ci-node.yml@v0.45.0
     with:
       node-version: '22'
       run-lint: true
@@ -61,7 +61,7 @@ jobs:
   security:
     name: Security
     if: github.event_name == 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/security.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/security.yml@v0.45.0
     with:
       run-node-audit: true
       run-python-audit: false
@@ -78,7 +78,7 @@ jobs:
     name: Pages
     needs: [shell, node]
     if: github.event_name != 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/cd-pages.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/cd-pages.yml@v0.45.0
     with:
       node-version: '22'
       build-command: bun run build
@@ -97,7 +97,7 @@ jobs:
     name: Release
     needs: [shell, prek, node]
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/release.yml@v0.40.0
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/release.yml@v0.45.0
     permissions:
       contents: write
       issues: write

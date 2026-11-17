@@ -13,7 +13,6 @@ Live site: **https://kevindebenedetti.github.io**
 - Polls source repos every 12 hours and redeploys only when a project's `docs/` changed — no GitHub App or secret needed
 - Custom Vue 3 theme, tested with Vitest; linted with oxlint via prek and type-checked with vue-tsc
 - Versioned with [release-please](https://github.com/googleapis/release-please): `CHANGELOG.md`, `vX.Y.Z` tags and GitHub Releases
-- Weekly SEO crawl (broken links, missing tags) and Lighthouse audit of the live site
 
 ## Prerequisites
 

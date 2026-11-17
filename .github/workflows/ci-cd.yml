@@ -12,10 +12,9 @@ concurrency:
   cancel-in-progress: ${{ github.event_name == 'pull_request' }}
 
 # ── Permissions ───────────────────────────────────────────────────────────────
+# Read-only default; the pages and release jobs grant their own write scopes.
 permissions:
   contents: read
-  pages: write
-  id-token: write
 
 # Shared workflows are pinned to a github-workflows release, not to @main: the
 # Pages and release jobs hold write tokens, and a change pushed to that repo's
@@ -74,17 +73,57 @@ jobs:
       pull-requests: read
 
   # ── GitHub Pages deploy ────────────────────────────────────────────────────
-  pages:
-    name: Pages
+  # Defined here: github-workflows dropped its cd-pages workflow in v0.46.0.
+  pages-build:
+    name: Pages build
     needs: [shell, node]
     if: github.event_name != 'pull_request'
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/cd-pages.yml@v0.48.0
-    with:
-      node-version: '22'
-      build-command: bun run build
-      output-directory: .vitepress/dist
-    secrets:
-      github-token: ${{ secrets.GITHUB_TOKEN }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    # The build runs the project's install and build scripts: read-only token.
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Setup Node.js
+        uses: KevinDeBenedetti/github-workflows/.github/actions/setup-node@v0.48.0
+        with:
+          node-version: '22'
+
+      - name: Build
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: bun run build
+
+      - name: Upload Pages artifact
+        uses: actions/upload-pages-artifact@fc324d3547104276b827a68afc52ff2a11cc49c9 # v5.0.0
+        with:
+          path: .vitepress/dist
+
+  pages:
+    name: Pages
+    needs: pages-build
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    # One deployment at a time, never cancelled: deploy-pages would leave a
+    # half-published site.
+    concurrency:
+      group: pages-deploy
+      cancel-in-progress: false
+    environment:
+      name: github-pages
+      url: ${{ steps.deploy.outputs.page_url }}
+    permissions:
+      pages: write # publish the Pages deployment
+      id-token: write # OIDC token deploy-pages uses to authenticate
+    steps:
+      - name: Deploy to GitHub Pages
+        id: deploy
+        uses: actions/deploy-pages@368f82528645a54fb793d4d04e342629a3f51346 # v5.0.1
 
   # ── Release ────────────────────────────────────────────────────────────────
   # release-please (config in .github/release/): on each push to main it opens

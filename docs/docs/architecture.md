@@ -99,7 +99,7 @@ Motion is used to orient, never to decorate, and it must cost nothing once a pag
 Defined in `.github/workflows/ci-cd.yml`, built on the shared workflows of [github-workflows](https://github.com/KevinDeBenedetti/github-workflows), pinned to a release:
 
 - **On pull requests:** runs `actionlint`, the prek hooks, `bun run lint`, `typecheck`, `test`, and `build`, plus a dependency audit and a secret scan (no Pages deploy).
-- **On push to `main`:** same build checks, then deploys `.vitepress/dist/` to GitHub Pages via the `actions/deploy-pages` action and runs release-please.
+- **On push to `main`:** same build checks, then deploys `.vitepress/dist/` to GitHub Pages via the `actions/deploy-pages` action and runs release-please. The Pages build and deploy jobs are defined in `ci-cd.yml` itself, not in a shared workflow.
 
 ::: warning Pages source must be GitHub Actions
 In **Settings → Pages → Build and deployment**, the source must be **GitHub Actions**. With **Deploy from a branch**, GitHub also runs its own *pages build and deployment* on every push: it publishes a Jekyll render of the raw repository, which replaces the site until the VitePress deploy lands — and stays online if that deploy fails.
@@ -111,13 +111,9 @@ In **Settings → Pages → Build and deployment**, the source must be **GitHub 
 
 release-please runs on `GITHUB_TOKEN` only, so the release PR, its commits, and the tags are authored by `github-actions[bot]`. GitHub does not start CI on a PR opened with that token: click **Approve workflows to run** on the release PR to get its checks.
 
-### Site audit
+### Link checks
 
-`.github/workflows/site-audit.yml` checks the live site every Monday (and on demand via **Run workflow**): an SEO crawl for broken links and missing or duplicate tags, and a Lighthouse audit of every page. A failing check fails the run, which sends GitHub's failure email.
-
-The link check skips what a crawler cannot judge from a runner: `github.com` (rate-limited), `medium.com` (403 for any non-browser client), and `localhost` dev-server URLs. Every other broken link fails the run; the run summary lists each one with the page it was found on. A dead link in a synced page is fixed in its source repository, and the next sync publishes the fix.
-
-Source repositories check their links earlier: their docs CI ([github-workflows](https://github.com/KevinDeBenedetti/github-workflows)' `cd-docs.yml`, or `ci-shell.yml` with `run-docs-external-link-check`) runs lychee on the pages a push changes, `github.com` links included, so a link that is already dead when written fails right after the push. The weekly audit remains the only check for links that rot later.
+Source repositories check their links: their docs CI ([github-workflows](https://github.com/KevinDeBenedetti/github-workflows)' `cd-docs.yml`, or `ci-shell.yml` with `run-docs-external-link-check`) runs lychee on the pages a push changes, `github.com` links included, so a link that is already dead when written fails right after the push. A link that rots later is not re-checked: nothing crawls the live site.
 
 ### Picking up upstream changes
 

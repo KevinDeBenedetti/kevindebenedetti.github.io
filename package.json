@@ -8,7 +8,7 @@
     "@vitejs/plugin-vue": "^6.0.10",
     "@vue/test-utils": "^2.5.1",
     "jsdom": "^31.0.0",
-    "oxlint": "^1.93.0",
+    "oxlint": "^1.94.0",
     "typescript": "^6.0.3",
     "vitepress": "^1.6.4",
     "vitest": "^5.1.0",

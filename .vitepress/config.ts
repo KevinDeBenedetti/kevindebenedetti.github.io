@@ -1,6 +1,6 @@
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
-import { buildSiteNavigation, editLinkPattern } from '../scripts/site-navigation'
+import { buildSiteNavigation, editLinkPattern, pageDescription } from '../scripts/site-navigation'
 import { logql } from './shiki/logql'
 
 const SITE_URL = 'https://kevindebenedetti.github.io'
@@ -21,8 +21,8 @@ const { projects, nav, sidebar } = buildSiteNavigation(ROOT)
 export default defineConfig({
   srcDir: '.',
   // CLAUDE.md, GLOSSARY.md and docs/adr/ are agent material for this repo,
-  // not hub pages (see .agents/domain.md).
-  srcExclude: ['README.md', 'TODO.md', 'CLAUDE.md', 'GLOSSARY.md', 'docs/adr/**'],
+  // not hub pages (see .agents/domain.md); CHANGELOG.md is release-please's.
+  srcExclude: ['README.md', 'TODO.md', 'CHANGELOG.md', 'CLAUDE.md', 'GLOSSARY.md', 'docs/adr/**'],
   rewrites: {
     'docs/index.md': 'index.md',
     'docs/:slug/:rest*': ':slug/:rest*',
@@ -33,7 +33,11 @@ export default defineConfig({
   // would date every local page from the latest commit.
   lastUpdated: false,
   lang: 'en',
-  ignoreDeadLinks: true,
+  // A link to a missing page fails the build, synced pages included: a page
+  // renamed in a source repo would otherwise leave dead links here. The live
+  // site stays on the previous deploy until the link is fixed. Links to a
+  // local dev server (http://localhost:…) are examples, not pages.
+  ignoreDeadLinks: 'localhostLinks',
 
   markdown: {
     // 'env' fences use Shiki's 'dotenv' grammar under a different name.
@@ -104,7 +108,10 @@ export default defineConfig({
 
     const isHome = pageData.frontmatter.layout === 'home'
     const pageTitle = pageData.title ? `${pageData.title} | ${SITE_NAME}` : SITE_NAME
-    const pageDescription = pageData.description || SITE_DESCRIPTION
+    const description =
+      pageDescription(projects, pageData.relativePath, pageData.title, pageData.description) ?? SITE_DESCRIPTION
+    // VitePress writes <meta name="description"> from pageData.description.
+    pageData.description = description
 
     pageData.frontmatter.head ??= []
 
@@ -114,9 +121,9 @@ export default defineConfig({
       ['meta', { property: 'og:type',        content: isHome ? 'website' : 'article' }],
       ['meta', { property: 'og:url',         content: canonicalUrl }],
       ['meta', { property: 'og:title',       content: pageTitle }],
-      ['meta', { property: 'og:description', content: pageDescription }],
+      ['meta', { property: 'og:description', content: description }],
       ['meta', { name: 'twitter:title',      content: pageTitle }],
-      ['meta', { name: 'twitter:description',content: pageDescription }],
+      ['meta', { name: 'twitter:description',content: description }],
     )
 
     // JSON-LD structured data
@@ -138,7 +145,7 @@ export default defineConfig({
           '@context': 'https://schema.org',
           '@type': 'TechArticle',
           headline: pageData.title || SITE_NAME,
-          description: pageDescription,
+          description,
           url: canonicalUrl,
           author: {
             '@type': 'Person',

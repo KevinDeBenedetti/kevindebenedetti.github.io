@@ -125,7 +125,9 @@ release-please runs on `GITHUB_TOKEN` only, so the release PR, its commits, and 
 
 ### Link checks
 
-Source repositories check their links: their docs CI ([github-workflows](https://github.com/KevinDeBenedetti/github-workflows)' `cd-docs.yml`, or `ci-shell.yml` with `run-docs-external-link-check`) runs lychee on the pages a push changes, `github.com` links included, so a link that is already dead when written fails right after the push. A link that rots later is not re-checked: nothing crawls the live site.
+Source repositories check their links: their docs CI ([github-workflows](https://github.com/KevinDeBenedetti/github-workflows)' `cd-docs.yml`, or `ci-shell.yml` with `run-docs-external-link-check`) runs lychee on the pages a push changes, `github.com` links included, so a link that is already dead when written fails right after the push. An external link that rots later is not re-checked: nothing crawls the live site.
+
+Internal links are checked by every hub build: `vitepress build` fails on a link to a page that does not exist, on a local page or a synced one (`ignoreDeadLinks: 'localhostLinks'` only skips `http://localhost` examples). A page renamed in a source repository therefore fails the next hub build, and the live site stays on the previous deploy until the link is fixed in that repository.
 
 ### Picking up upstream changes
 

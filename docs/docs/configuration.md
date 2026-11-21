@@ -34,7 +34,7 @@ Locally managed projects (under `docs/<slug>/`) are discovered automatically whe
 | ------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
 | `repo`        | `string` | Yes      | Full `owner/name` slug. Presence of this field marks the directory as a local project. Used for the source card and the Projects page link. |
 | `description` | `string` | No       | One-line summary shown on the homepage feature card and the Projects page.                                                                  |
-| `icon`        | `string` | No       | Kept in the regenerated frontmatter. Not displayed anywhere yet.                                                                            |
+| `icon`        | `string` | No       | Emoji or short text shown above the title on the project's homepage feature card.                                                           |
 | `order`       | `number` | No       | Sort position in the sidebar, the homepage cards and the Projects page. Lower numbers appear first; projects without one follow, by slug.   |
 
 Example (`docs/docs/index.md` frontmatter):
@@ -61,13 +61,16 @@ Key settings:
 | ---------------------- | ----------------------------------------------------------------------------------- |
 | `base`                 | `/`                                                                                 |
 | `srcDir`               | `.` (repo root)                                                                     |
-| `srcExclude`           | `README.md`, `TODO.md`, `CLAUDE.md`, `GLOSSARY.md`, `docs/adr/**`                   |
+| `srcExclude`           | `README.md`, `TODO.md`, `CHANGELOG.md`, `CLAUDE.md`, `GLOSSARY.md`, `docs/adr/**`   |
 | `rewrites`             | Maps `synced/:slug/*` and `docs/:slug/*` → `/:slug/*`                               |
 | `title`                | `Home` (pages use the `:title \| Kevin's Docs` template)                            |
 | `themeConfig.nav`      | `nav` from `buildSiteNavigation`                                                    |
 | `themeConfig.sidebar`  | `sidebar` from `buildSiteNavigation`                                                |
 | `themeConfig.editLink` | `editLinkPattern(projects)`: links each page back to its source file on GitHub      |
 | `markdown`             | `languageAlias` (`env` → `dotenv`), Shiki grammars from `.vitepress/shiki/` (LogQL) |
+| `transformPageData`    | Canonical URL, Open Graph, Twitter and JSON-LD tags per page                        |
+
+A page's meta description is its frontmatter `description:`. A project page that sets none gets `<page title>, in the <project> documentation: <project description>` (`pageDescription` in `scripts/site-navigation.ts`), so search results do not repeat the site description for every page.
 
 ## Environment variables
 

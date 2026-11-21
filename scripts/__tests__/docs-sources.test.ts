@@ -10,6 +10,7 @@ import {
 
 afterEach(() => {
   vi.unstubAllGlobals()
+  vi.unstubAllEnvs()
 })
 
 function apiRepo(name: string, overrides: Record<string, unknown> = {}) {
@@ -80,6 +81,45 @@ describe('docs sources', () => {
     stubGitHub({ '/users/owner/repos': [apiRepo('tools')], '/repos/owner/tools/contents': 503 })
 
     await expect(listDocsSources('owner')).rejects.toThrow(/owner\/tools.*503/)
+  })
+
+  describe('when the rate limit is spent', () => {
+    /** The repository list answers; the per-repo call hits the limit. */
+    function stubRateLimited(status: number, headers: Record<string, string> = {}): void {
+      const reset = Date.UTC(2026, 0, 1, 12, 30) / 1000
+      vi.stubGlobal('fetch', async (input: string | URL) => {
+        if (new URL(String(input)).pathname === '/users/owner/repos') return Response.json([apiRepo('tools')])
+        return new Response('', {
+          status,
+          headers: { 'x-ratelimit-remaining': '0', 'x-ratelimit-reset': String(reset), ...headers },
+        })
+      })
+    }
+
+    it.each([403, 429])('says when it resets and to set GITHUB_TOKEN (%i)', async (status) => {
+      vi.stubEnv('GITHUB_TOKEN', '')
+      stubRateLimited(status)
+
+      const error = listDocsSources('owner')
+      await expect(error).rejects.toThrow(/owner\/tools.*rate limit.*2026-01-01T12:30:00/)
+      await expect(error).rejects.toThrow(/set GITHUB_TOKEN/)
+    })
+
+    it('does not suggest a token when one is already set', async () => {
+      vi.stubEnv('GITHUB_TOKEN', 'test-token')
+      stubRateLimited(403)
+
+      const error = listDocsSources('owner')
+      await expect(error).rejects.toThrow(/rate limit/)
+      await expect(error).rejects.not.toThrow(/set GITHUB_TOKEN/)
+    })
+
+    it('recognizes the secondary limit, a 403 with retry-after', async () => {
+      vi.stubEnv('GITHUB_TOKEN', '')
+      stubRateLimited(403, { 'x-ratelimit-remaining': '42', 'retry-after': '60' })
+
+      await expect(listDocsSources('owner')).rejects.toThrow(/rate limit spent.*set GITHUB_TOKEN/)
+    })
   })
 })
 

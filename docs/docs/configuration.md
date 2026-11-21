@@ -28,30 +28,32 @@ Written by `scripts/sync-docs.ts` after each sync. **Do not edit manually** — 
 
 ## Local project metadata
 
-Locally managed projects (under `docs/<slug>/`) are discovered automatically when their `index.md` contains a `repo:` frontmatter field. Additional fields can be set to control display:
+Locally managed projects (under `docs/<slug>/`) are discovered automatically when their `index.md` contains a `repo:` frontmatter field and an H1, which is the project title. The page is then regenerated on every build from these fields, so edit the frontmatter and the H1, not the body:
 
-| Field         | Type     | Required | Description                                                                                                                     |
-| ------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------- |
-| `repo`        | `string` | Yes      | Full `owner/name` slug. Presence of this field marks the directory as a local project. Also used to build edit-on-GitHub links. |
-| `description` | `string` | No       | One-line summary shown on the homepage feature card.                                                                            |
-| `icon`        | `string` | No       | Emoji prepended to the project title in navigation.                                                                             |
-| `order`       | `number` | No       | Sort position in the nav dropdown and homepage cards. Lower numbers appear first.                                               |
+| Field         | Type     | Required | Description                                                                                                                                 |
+| ------------- | -------- | -------- | ------------------------------------------------------------------------------------------------------------------------------------------- |
+| `repo`        | `string` | Yes      | Full `owner/name` slug. Presence of this field marks the directory as a local project. Used for the source card and the Projects page link. |
+| `description` | `string` | No       | One-line summary shown on the homepage feature card and the Projects page.                                                                  |
+| `icon`        | `string` | No       | Kept in the regenerated frontmatter. Not displayed anywhere yet.                                                                            |
+| `order`       | `number` | No       | Sort position in the sidebar, the homepage cards and the Projects page. Lower numbers appear first; projects without one follow, by slug.   |
 
 Example (`docs/docs/index.md` frontmatter):
 
 ```yaml
 ---
-title: Overview
-description: Documentation for this documentation hub.
+title: "Docs Generator"
+description: "Documentation for this documentation hub — sync, generation, and contribution guides."
 repo: KevinDeBenedetti/kevindebenedetti.github.io
-icon: "📖"
 order: 0
+generated: true
 ---
 ```
 
+`title` and `generated` are written by the generator: `title` repeats the H1, and `generated: true` marks the page as rebuilt on every run.
+
 ## `.vitepress/config.ts`
 
-Static VitePress configuration. Imports generated values from `.vitepress/config.generated.ts`.
+Static VitePress configuration. Builds nav, sidebar and edit links at load time with `scripts/site-navigation.ts`, from the projects found on disk.
 
 Key settings:
 
@@ -59,24 +61,13 @@ Key settings:
 | ---------------------- | ----------------------------------------------------------------------------------- |
 | `base`                 | `/`                                                                                 |
 | `srcDir`               | `.` (repo root)                                                                     |
+| `srcExclude`           | `README.md`, `TODO.md`, `CLAUDE.md`, `GLOSSARY.md`, `docs/adr/**`                   |
 | `rewrites`             | Maps `synced/:slug/*` and `docs/:slug/*` → `/:slug/*`                               |
 | `title`                | `Home` (pages use the `:title \| Kevin's Docs` template)                            |
-| `themeConfig.nav`      | Imported from `generatedNav`                                                        |
-| `themeConfig.sidebar`  | Imported from `generatedSidebar`                                                    |
-| `themeConfig.editLink` | Uses `generatedEditLinkPattern` to link each page back to its source file on GitHub |
+| `themeConfig.nav`      | `nav` from `buildSiteNavigation`                                                    |
+| `themeConfig.sidebar`  | `sidebar` from `buildSiteNavigation`                                                |
+| `themeConfig.editLink` | `editLinkPattern(projects)`: links each page back to its source file on GitHub      |
 | `markdown`             | `languageAlias` (`env` → `dotenv`), Shiki grammars from `.vitepress/shiki/` (LogQL) |
-
-## `.vitepress/config.generated.ts`
-
-Auto-generated on every build. **Do not edit manually.**
-
-Exports:
-
-| Export                     | Type                        | Description                                         |
-| -------------------------- | --------------------------- | --------------------------------------------------- |
-| `generatedNav`             | `DefaultTheme.NavItem[]`    | Top navigation items                                |
-| `generatedSidebar`         | `DefaultTheme.SidebarMulti` | Sidebar trees keyed by `/<slug>/`                   |
-| `generatedEditLinkPattern` | `({ filePath }) => string`  | Maps a page's source path to its edit URL on GitHub |
 
 ## Environment variables
 

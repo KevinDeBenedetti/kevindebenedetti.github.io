@@ -45,14 +45,14 @@ bun install
 
 ```text
 kevindebenedetti.github.io/
+├── .agents/                   # Agent skill config (issue tracker, labels, domain docs)
 ├── .github/
 │   ├── release/               # release-please config + manifest
 │   └── workflows/
 │       ├── ci-cd.yml          # CI checks + GitHub Pages deploy + release
 │       └── docs-poll.yml      # Redeploys when a project's docs/ changed
 ├── .vitepress/
-│   ├── config.ts              # Static VitePress config (imports generated values)
-│   ├── config.generated.ts    # ⚠️ Generated — do not edit
+│   ├── config.ts              # VitePress config (nav, sidebar, edit links built at load)
 │   ├── shiki/                 # Extra Shiki grammars (LogQL)
 │   └── theme/
 │       ├── index.ts           # Theme entry point (components, page transitions)
@@ -64,14 +64,18 @@ kevindebenedetti.github.io/
 │   ├── index.md               # ⚠️ Generated homepage — do not edit
 │   ├── about/                 # About page — committed
 │   ├── docs/                  # This hub's own docs — committed
-│   └── projects/              # Projects table — committed
+│   └── projects/              # ⚠️ Generated Projects table — do not edit
 ├── public/                    # Static assets (avatar, favicons, robots.txt)
 ├── scripts/
 │   ├── github.ts              # GitHub API client shared by the scripts
+│   ├── docs-sources.ts        # Repositories that publish docs, and the state of their docs/
 │   ├── sync-docs.ts           # Fetches + clones project docs
-│   ├── generate-config.ts     # Generates config and index files
+│   ├── site-navigation.ts     # Projects, nav, sidebar, edit links, generated pages
+│   ├── generate-config.ts     # Writes the generated index pages and homepage
 │   └── check-docs-changes.ts  # Used by docs-poll.yml to detect changes
 ├── synced/                    # Synced project docs — gitignored, rebuilt on CI
+├── CLAUDE.md                  # Agent instructions — excluded from the site
+├── GLOSSARY.md                # Domain vocabulary — excluded from the site
 ├── package.json
 ├── prek.toml                  # Git hooks (also run in CI)
 ├── tsconfig.json
@@ -80,7 +84,7 @@ kevindebenedetti.github.io/
 
 ## Testing
 
-Unit tests use [Vitest](https://vitest.dev) with `@vue/test-utils` and the `jsdom` environment. Tests live next to the components they cover in `.vitepress/theme/components/__tests__/`.
+Unit tests use [Vitest](https://vitest.dev) with `@vue/test-utils` and the `jsdom` environment. Tests live next to the components they cover in `.vitepress/theme/components/__tests__/`. The site navigation rules (project discovery, sidebar, edit links, generated pages) are tested in `scripts/__tests__/`, against temporary folders of Markdown files. The sync and the change detection are tested there too, with a stand-in for the git clone and for the GitHub API.
 
 ```sh
 bun run test   # run once

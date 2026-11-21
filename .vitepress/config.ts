@@ -1,41 +1,37 @@
-import { existsSync, readdirSync } from 'node:fs'
-import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { defineConfig } from 'vitepress'
-import { generatedNav, generatedSidebar, generatedEditLinkPattern } from './config.generated'
+import { buildSiteNavigation, editLinkPattern } from '../scripts/site-navigation'
 import { logql } from './shiki/logql'
 
 const SITE_URL = 'https://kevindebenedetti.github.io'
+// Title of the homepage; every other page is "<page> | <SITE_NAME>".
 const SITE_TITLE = "Home"
+const SITE_NAME = "Kevin's Docs"
 const SITE_DESCRIPTION = 'Centralized developer documentation hub for all @KevinDeBenedetti open source projects.'
 const OG_IMAGE = `${SITE_URL}/og-image.png`
 
 // Root of the repository (parent of .vitepress/)
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const SYNCED_DIR = join(ROOT, 'synced')
 
-// Exclude any root-level folder that matches a synced repo name.
-// sync-docs.ts populates synced/ before vitepress build runs; without this guard
-// a root-level folder committed by an old cd-docs.yml run would produce duplicate
-// URLs alongside synced/:slug/* rewrites and crash MiniSearch (duplicate IDs).
-const syncedRepoExcludes = existsSync(SYNCED_DIR)
-  ? readdirSync(SYNCED_DIR, { withFileTypes: true })
-      .filter(d => d.isDirectory())
-      .map(d => `${d.name}/**`)
-  : []
+// Nav, sidebar and edit links come from the projects found on disk: run
+// `bun run generate` first so synced/ is populated.
+const { projects, nav, sidebar } = buildSiteNavigation(ROOT)
 
 // https://vitepress.dev/reference/site-config
-// Static base config — nav/sidebar/editLink are in config.generated.ts (auto-generated)
 export default defineConfig({
   srcDir: '.',
-  srcExclude: ['README.md', 'TODO.md', ...syncedRepoExcludes],
+  // CLAUDE.md, GLOSSARY.md and docs/adr/ are agent material for this repo,
+  // not hub pages (see .agents/domain.md).
+  srcExclude: ['README.md', 'TODO.md', 'CLAUDE.md', 'GLOSSARY.md', 'docs/adr/**'],
   rewrites: {
     'docs/index.md': 'index.md',
     'docs/:slug/:rest*': ':slug/:rest*',
     'synced/:slug/:rest*': ':slug/:rest*',
   },
   cleanUrls: true,
-  lastUpdated: true,
+  // Off: synced pages have no git history here, and the shallow CI checkout
+  // would date every local page from the latest commit.
+  lastUpdated: false,
   lang: 'en',
   ignoreDeadLinks: true,
 
@@ -50,7 +46,7 @@ export default defineConfig({
   },
 
   title: SITE_TITLE,
-  titleTemplate: ':title | Kevin\'s Docs',
+  titleTemplate: `:title | ${SITE_NAME}`,
 
   description: SITE_DESCRIPTION,
 
@@ -88,11 +84,11 @@ export default defineConfig({
     ['meta', { name: 'author', content: 'Kevin De Benedetti' }],
     // Open Graph (site-level defaults; overridden per-page in transformPageData)
     ['meta', { property: 'og:type',        content: 'website' }],
-    ['meta', { property: 'og:site_name',   content: SITE_TITLE }],
+    ['meta', { property: 'og:site_name',   content: SITE_NAME }],
     ['meta', { property: 'og:image',       content: OG_IMAGE }],
     ['meta', { property: 'og:image:width', content: '1200' }],
     ['meta', { property: 'og:image:height',content: '630' }],
-    ['meta', { property: 'og:image:alt',   content: `${SITE_TITLE} social preview` }],
+    ['meta', { property: 'og:image:alt',   content: `${SITE_NAME} social preview` }],
     // Twitter Card
     ['meta', { name: 'twitter:card',       content: 'summary_large_image' }],
     ['meta', { name: 'twitter:image',      content: OG_IMAGE }],
@@ -107,7 +103,7 @@ export default defineConfig({
       .replace(/\.md$/, '')
 
     const isHome = pageData.frontmatter.layout === 'home'
-    const pageTitle = pageData.title ? `${pageData.title} | ${SITE_TITLE}` : SITE_TITLE
+    const pageTitle = pageData.title ? `${pageData.title} | ${SITE_NAME}` : SITE_NAME
     const pageDescription = pageData.description || SITE_DESCRIPTION
 
     pageData.frontmatter.head ??= []
@@ -128,7 +124,7 @@ export default defineConfig({
       ? {
           '@context': 'https://schema.org',
           '@type': 'WebSite',
-          name: SITE_TITLE,
+          name: SITE_NAME,
           description: SITE_DESCRIPTION,
           url: SITE_URL,
           author: {
@@ -141,7 +137,7 @@ export default defineConfig({
       : {
           '@context': 'https://schema.org',
           '@type': 'TechArticle',
-          headline: pageData.title || SITE_TITLE,
+          headline: pageData.title || SITE_NAME,
           description: pageDescription,
           url: canonicalUrl,
           author: {
@@ -149,7 +145,7 @@ export default defineConfig({
             name: 'Kevin De Benedetti',
             url: SITE_URL,
           },
-          isPartOf: { '@type': 'WebSite', name: SITE_TITLE, url: SITE_URL },
+          isPartOf: { '@type': 'WebSite', name: SITE_NAME, url: SITE_URL },
         }
 
     pageData.frontmatter.head.push([
@@ -160,12 +156,12 @@ export default defineConfig({
   },
 
   themeConfig: {
-    nav: generatedNav,
+    nav,
 
-    sidebar: generatedSidebar,
+    sidebar,
 
     editLink: {
-      pattern: generatedEditLinkPattern,
+      pattern: editLinkPattern(projects),
       text: 'Edit this page on GitHub',
     },
 

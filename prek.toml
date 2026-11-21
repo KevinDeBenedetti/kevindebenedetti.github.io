@@ -47,14 +47,16 @@ name = "oxlint"
 language = "node"
 entry = "oxlint"
 args = ["--tsconfig=tsconfig.json"]
-additional_dependencies = ["oxlint"]
+# Same version as package.json, so the hook and `bun run lint` agree.
+additional_dependencies = ["oxlint@1.93.0"]
 types_or = ["ts", "vue"]
 pass_filenames = true
 
 # ─── Docs link safety ────────────────────────────────────────────────────────
 [[repos]]
 repo = "https://github.com/KevinDeBenedetti/github-workflows"
-rev = "v0.40.0"
+# Same release as the workflows pinned in .github/workflows/ci-cd.yml.
+rev = "v0.50.1"
 hooks = [
   { id = "check-docs-links" },
   { id = "check-vitepress-md" },

@@ -7,7 +7,10 @@
 
 # Synced project docs (raw clones) — rebuilt by CI, never commit
 synced/
-.vitepress/config.generated.ts
+.tmp-doc-sync/
 
 # Written by scripts/sync-docs.ts, served as /sync-state.json
 public/sync-state.json
+
+# Claude Code local state (worktrees, launch config)
+.claude/

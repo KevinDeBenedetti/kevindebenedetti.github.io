@@ -18,11 +18,12 @@ GitHub repos (public)
         │  writes synced/.repos-metadata.json
         ▼
   scripts/generate-config.ts
-        │  writes .vitepress/config.generated.ts
         │  writes docs/index.md
+        │  writes docs/projects/index.md
         │  writes synced/<project>/index.md  (if missing)
         ▼
   vitepress build
+        │  .vitepress/config.ts builds nav, sidebar and edit links
         │  emits .vitepress/dist/
         ▼
   GitHub Pages
@@ -32,36 +33,47 @@ GitHub repos (public)
 
 **Entry point:** `scripts/sync-docs.ts`
 
-1. Calls the GitHub REST API (`/users/KevinDeBenedetti/repos?type=public`) and keeps the repositories that are not archived, disabled, or forks. This repository itself is skipped.
-2. For each repository, performs a `git clone --depth=1 --filter=blob:none --sparse` and checks out only the `docs/` directory (sparse checkout).
-3. If a `docs/` directory exists, copies it to `synced/<repo-name>/`.
-4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo }` records for every successfully synced project.
+1. Asks `scripts/docs-sources.ts` for the **docs sources**: the public repositories that are not archived, disabled, or forks and have a root `docs/` folder, each with the git tree SHA of that folder (read through the GitHub REST API). This repository itself is skipped.
+2. For each source, performs a `git clone --depth=1 --filter=blob:none --sparse`, checks out only the `docs/` directory, and copies it to `synced/<repo-name>/`.
+3. Stops with an error if a source cannot be cloned, before writing the files below: the build fails and the previous site stays online, instead of a deploy without that project.
+4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo }` records for every synced project.
 5. Writes `public/sync-state.json` — the git tree SHA of each project's `docs/` plus its description. It ships with the site at `/sync-state.json` and lets the scheduled poll know what the live site was built from.
 6. Deletes the temporary clone directory.
 
-A sync reset empties `synced/` but **never deletes** `docs/about/`, `docs/docs/`, and `docs/projects/` — they hold content committed directly to this repository.
+The scheduled poll gets the current state from the same `scripts/docs-sources.ts` listing, so the sync and the poll cannot disagree on what a repository's state is.
+
+A sync reset empties `synced/` and the temporary clone folder and removes the previous `public/sync-state.json`. Nothing under `docs/` is touched: it holds content committed directly to this repository.
 
 ## Generate step
 
 **Entry point:** `scripts/generate-config.ts`
 
-Reads `synced/.repos-metadata.json` and discovers locally managed projects from `docs/` subdirectories whose `index.md` frontmatter has a `repo:` field (see [Configuration](./configuration.md#local-project-metadata)), then produces three outputs:
+Both this step and `.vitepress/config.ts` get their data from one module, `scripts/site-navigation.ts`. It reads `synced/.repos-metadata.json` and discovers locally managed projects from `docs/` subdirectories whose `index.md` frontmatter has a `repo:` field (see [Configuration](./configuration.md#local-project-metadata)). It writes nothing itself; its rules are covered by `scripts/__tests__/site-navigation.test.ts`.
 
-### `.vitepress/config.generated.ts`
+### Site navigation
 
-Exports three values consumed by `.vitepress/config.ts`:
+`buildSiteNavigation(root)` returns:
 
-| Export | Purpose |
-|--------|---------|
-| `generatedNav` | Top navigation bar items (Home + Projects dropdown) |
-| `generatedSidebar` | Per-project sidebar trees, built by walking the Markdown files |
-| `generatedEditLinkPattern` | Maps each page path back to its source file on GitHub |
+| Value      | Purpose                                                              |
+| ---------- | -------------------------------------------------------------------- |
+| `projects` | Synced and local projects, sorted by `order` then slug               |
+| `nav`      | Top navigation bar items (Home, About)                               |
+| `sidebar`  | Per-project sidebar trees, built by walking the Markdown files       |
+| `pages`    | The pages to write: missing project index pages, the homepage and the Projects page |
+
+`editLinkPattern(projects)` returns the function behind "Edit this page": a synced project's page links to its file in the source repository, any other page to its file in this repository.
+
+`.vitepress/config.ts` calls both when VitePress loads, so nav, sidebar and edit links are never written to disk. The generate step writes `pages`.
 
 Sidebar items are built recursively: files and directories at the same level with matching names are merged into a collapsible group (e.g. `kubernetes.md` + `kubernetes/` → one entry with nested children).
 
 ### `docs/index.md`
 
-The VitePress home page, generated with a `layout: home` frontmatter block, a hero section, and a feature card for every synced project.
+The VitePress home page, generated with a `layout: home` frontmatter block, a hero section, and a feature card for every project, synced or local.
+
+### `docs/projects/index.md`
+
+The Projects page, generated as a table with one row per project (title, description, links to its docs and repository), in the same order as the homepage cards.
 
 ### `synced/<project>/index.md`
 
@@ -119,7 +131,7 @@ Source repositories check their links: their docs CI ([github-workflows](https:/
 
 Source repositories do not notify the hub. Instead, `.github/workflows/docs-poll.yml` runs every 12 hours (and on demand via **Run workflow**):
 
-1. `scripts/check-docs-changes.ts` reads the `docs/` tree SHA of every public repository through the GitHub API and compares it with the live `/sync-state.json`.
+1. `scripts/check-docs-changes.ts` lists the docs sources (`scripts/docs-sources.ts`) and compares their state with the live `/sync-state.json`.
 2. If anything differs — updated docs, a new or removed project, a changed description — it triggers `ci-cd.yml` with `workflow_dispatch`, which re-syncs and redeploys.
 
 Only public data is read and `GITHUB_TOKEN` is allowed to trigger `workflow_dispatch`, so no GitHub App or secret is needed. Upstream changes show up within 12 hours; run **CI/CD** manually to publish sooner.

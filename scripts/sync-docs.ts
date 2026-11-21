@@ -1,21 +1,21 @@
-import { cpSync, existsSync, mkdirSync, readdirSync, rmSync, writeFileSync } from 'node:fs'
+/**
+ * Copies the docs/ folder of every docs source into synced/<slug>/ and records
+ * what it synced:
+ *   - synced/.repos-metadata.json  (read by site-navigation.ts)
+ *   - public/sync-state.json       (served with the site, read by check-docs-changes.ts)
+ *
+ * Run: bun scripts/sync-docs.ts
+ */
+
+import { spawnSync } from 'node:child_process'
+import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
-import {
-  EXCLUDED_REPOS,
-  OWNER,
-  fetchPublicRepos,
-  serializeSyncState,
-  type GitHubRepo,
-  type SyncState,
-} from './github'
+import { listDocsSources, serializeSyncState, syncStateOf, type DocsSource } from './docs-sources'
+import { OWNER } from './github'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const DOCS_DIR = join(ROOT, 'docs')
-const SYNCED_DIR = join(ROOT, 'synced')
-const TMP_DIR = join(ROOT, '.tmp-doc-sync')
-// Served at /sync-state.json — read back by scripts/check-docs-changes.ts.
-const SYNC_STATE_PATH = join(ROOT, 'public', 'sync-state.json')
+const TMP_DIR_NAME = '.tmp-doc-sync'
 
 export interface RepoMetadata {
   slug: string
@@ -25,20 +25,13 @@ export interface RepoMetadata {
 }
 
 function formatTitle(name: string): string {
-  return name
-    .replace(/[-_]/g, ' ')
-    .replace(/\b\w/g, (c) => c.toUpperCase())
+  return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
 function runGit(args: string[]): void {
-  const proc = Bun.spawnSync(['git', ...args], {
-    cwd: ROOT,
-    stdout: 'inherit',
-    stderr: 'inherit',
-  })
-
-  if (proc.exitCode !== 0) {
-    throw new Error(`git ${args.join(' ')} failed with exit code ${proc.exitCode}`)
+  const { status } = spawnSync('git', args, { stdio: 'inherit' })
+  if (status !== 0) {
+    throw new Error(`git ${args.join(' ')} failed with exit code ${status}`)
   }
 }
 
@@ -69,98 +62,97 @@ function cloneWithRetry(cloneUrl: string, cloneDir: string): void {
   }
 }
 
-/** Folders inside docs/ that must never be deleted during a sync reset. */
-const PRESERVED_DIRS = new Set(['docs', 'about', 'projects'])
-
-function resetDocsDir(): void {
-  // Remove only synced symlinks and generated files from docs/ — leave committed dirs intact.
-  if (existsSync(DOCS_DIR)) {
-    for (const entry of readdirSync(DOCS_DIR)) {
-      if (PRESERVED_DIRS.has(entry)) continue
-      rmSync(join(DOCS_DIR, entry), { recursive: true, force: true })
-    }
+/**
+ * Empties synced/ and the temporary clone folder under `root`, and drops the
+ * state recorded by the previous sync, so a sync that fails leaves nothing a
+ * build could deploy from. Synced docs live only there: nothing under docs/
+ * is touched.
+ */
+export function resetSyncDirs(root: string): void {
+  for (const dir of [join(root, 'synced'), join(root, TMP_DIR_NAME)]) {
+    rmSync(dir, { recursive: true, force: true })
+    mkdirSync(dir, { recursive: true })
   }
-  // Clear and recreate synced/ and tmp/
-  rmSync(SYNCED_DIR, { recursive: true, force: true })
-  rmSync(TMP_DIR, { recursive: true, force: true })
-  mkdirSync(DOCS_DIR, { recursive: true })
-  mkdirSync(SYNCED_DIR, { recursive: true })
-  mkdirSync(TMP_DIR, { recursive: true })
+  rmSync(join(root, 'public', 'sync-state.json'), { force: true })
 }
 
-/** Returns the docs/ tree SHA, or null when the repo has no docs/ folder. */
-function syncRepoDocs(repo: GitHubRepo): string | null {
-  const cloneDir = join(TMP_DIR, repo.name)
-  const sourceDocsDir = join(cloneDir, 'docs')
+/** Puts the docs/ folder of `source` at `dest`. Throws when it cannot. */
+export type CloneDocs = (source: DocsSource, dest: string) => void
 
-  cloneWithRetry(repo.clone_url, cloneDir)
-  runGit(['-C', cloneDir, 'sparse-checkout', 'set', 'docs'])
+function cloneDocsWithGit(tmpDir: string): CloneDocs {
+  return (source, dest) => {
+    const cloneDir = join(tmpDir, source.slug)
+    try {
+      cloneWithRetry(source.cloneUrl, cloneDir)
+      runGit(['-C', cloneDir, 'sparse-checkout', 'set', 'docs'])
+      if (!existsSync(join(cloneDir, 'docs'))) {
+        throw new Error(`no docs/ folder in the clone of ${source.repo}`)
+      }
+      cpSync(join(cloneDir, 'docs'), dest, { recursive: true })
+    } finally {
+      rmSync(cloneDir, { recursive: true, force: true })
+    }
+  }
+}
 
-  if (!existsSync(sourceDocsDir)) {
-    rmSync(cloneDir, { recursive: true, force: true })
-    return null
+/**
+ * Syncs the docs of `sources` into `root`/synced/ and records the result
+ * (synced/.repos-metadata.json, public/sync-state.json).
+ *
+ * Throws when a source cannot be cloned, before recording anything: a build
+ * that went on would deploy the site without that project.
+ */
+export function syncDocs(
+  root: string,
+  sources: DocsSource[],
+  cloneDocs: CloneDocs = cloneDocsWithGit(join(root, TMP_DIR_NAME)),
+): RepoMetadata[] {
+  const failed: string[] = []
+
+  for (const source of sources) {
+    console.log(`-> ${source.slug}`)
+    try {
+      cloneDocs(source, join(root, 'synced', source.slug))
+      console.log(`✓ synced ${source.slug}`)
+    } catch (err) {
+      console.log(`  ✗ ${source.slug} failed: ${(err as Error).message}`)
+      failed.push(source.slug)
+    }
   }
 
-  const treeSha = Bun.spawnSync(['git', '-C', cloneDir, 'rev-parse', 'HEAD:docs'])
-  if (treeSha.exitCode !== 0) {
-    throw new Error(`git rev-parse HEAD:docs failed for ${repo.name}`)
+  if (failed.length > 0) {
+    throw new Error(`Could not sync ${failed.join(', ')}: stopping so the site is not deployed without them.`)
   }
 
-  // Copy content into synced/<repo>/ (separate from committed docs/)
-  cpSync(sourceDocsDir, join(SYNCED_DIR, repo.name), { recursive: true })
-  rmSync(cloneDir, { recursive: true, force: true })
+  const synced = sources
+    .map((source) => ({
+      slug: source.slug,
+      title: formatTitle(source.slug),
+      description: source.description,
+      repo: source.repo,
+    }))
+    .sort((a, b) => a.slug.localeCompare(b.slug))
 
-  return treeSha.stdout.toString().trim()
+  mkdirSync(join(root, 'synced'), { recursive: true })
+  mkdirSync(join(root, 'public'), { recursive: true })
+  writeFileSync(join(root, 'synced', '.repos-metadata.json'), JSON.stringify(synced, null, 2), 'utf-8')
+  writeFileSync(join(root, 'public', 'sync-state.json'), serializeSyncState(syncStateOf(sources)), 'utf-8')
+
+  return synced
 }
 
 async function main(): Promise<void> {
   console.log(`Syncing docs for public repos owned by ${OWNER}`)
-  resetDocsDir()
+  resetSyncDirs(ROOT)
 
-  const repos = await fetchPublicRepos(OWNER)
-  const synced: RepoMetadata[] = []
-  const state: SyncState = {}
-
-  for (const repo of repos) {
-    if (EXCLUDED_REPOS.has(repo.name)) {
-      console.log(`· skipped ${repo.name} (locally managed)`)
-      continue
-    }
-    console.log(`-> ${repo.name}`)
-    let docsSha: string | null
-    try {
-      docsSha = syncRepoDocs(repo)
-    } catch (err) {
-      console.log(`  ⚠ ${repo.name} failed after ${CLONE_RETRIES} attempts, skipping: ${(err as Error).message}`)
-      continue
-    }
-    if (docsSha) {
-      state[repo.name] = { sha: docsSha, description: repo.description ?? '' }
-      synced.push({
-        slug: repo.name,
-        title: formatTitle(repo.name),
-        description: repo.description ?? '',
-        repo: repo.full_name,
-      })
-      console.log(`✓ synced ${repo.name}`)
-    } else {
-      console.log(`· skipped ${repo.name} (no docs/ folder)`)
-    }
+  let synced: RepoMetadata[]
+  try {
+    synced = syncDocs(ROOT, await listDocsSources(OWNER))
+  } finally {
+    rmSync(join(ROOT, TMP_DIR_NAME), { recursive: true, force: true })
   }
-
-  // Sort alphabetically by slug
-  synced.sort((a, b) => a.slug.localeCompare(b.slug))
-
-  writeFileSync(
-    join(SYNCED_DIR, '.repos-metadata.json'),
-    JSON.stringify(synced, null, 2),
-    'utf-8',
-  )
-
-  writeFileSync(SYNC_STATE_PATH, serializeSyncState(state), 'utf-8')
-
-  rmSync(TMP_DIR, { recursive: true, force: true })
   console.log(`Synced ${synced.length} repo(s): ${synced.map((r) => r.slug).join(', ') || '(none)'}`)
 }
 
-await main()
+// Run only as a script: importing this module must not start a sync.
+if (import.meta.main) await main()

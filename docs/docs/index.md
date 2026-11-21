@@ -3,11 +3,12 @@ title: "Docs Generator"
 description: "Documentation for this documentation hub — sync, generation, and contribution guides."
 repo: KevinDeBenedetti/kevindebenedetti.github.io
 order: 0
+generated: true
 ---
 
 # Docs Generator
 
-Documentation for this documentation hub — sync, generation, and contribution guides.
+<span v-pre>Documentation for this documentation hub — sync, generation, and contribution guides.</span>
 
 ## Source repository
 

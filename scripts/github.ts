@@ -11,17 +11,6 @@ export interface GitHubRepo {
   fork: boolean
 }
 
-/** Repos skipped during sync — their docs are managed locally in docs/. */
-export const EXCLUDED_REPOS = new Set(['kevindebenedetti.github.io'])
-
-/**
- * Snapshot of what a sync pulled in, keyed by repo slug. `sha` is the git tree
- * SHA of the repo's docs/ directory on its default branch, so any change under
- * docs/ (and only there) changes it. Published as /sync-state.json with the site
- * so the scheduled poll can tell whether a rebuild is needed.
- */
-export type SyncState = Record<string, { sha: string; description: string }>
-
 export function githubHeaders(): Record<string, string> {
   const headers: Record<string, string> = {
     Accept: 'application/vnd.github+json',
@@ -35,7 +24,7 @@ export function githubHeaders(): Record<string, string> {
   return headers
 }
 
-/** Public, active, non-fork repos of `owner` (EXCLUDED_REPOS is left to callers). */
+/** Public, active, non-fork repos of `owner`. */
 export async function fetchPublicRepos(owner: string): Promise<GitHubRepo[]> {
   const repos: GitHubRepo[] = []
 
@@ -56,10 +45,4 @@ export async function fetchPublicRepos(owner: string): Promise<GitHubRepo[]> {
   }
 
   return repos.filter((repo) => !repo.archived && !repo.disabled && !repo.fork)
-}
-
-/** Stable serialization so two states compare equal regardless of key order. */
-export function serializeSyncState(state: SyncState): string {
-  const sorted = Object.fromEntries(Object.entries(state).sort(([a], [b]) => a.localeCompare(b)))
-  return JSON.stringify(sorted, null, 2)
 }

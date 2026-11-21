@@ -24,6 +24,28 @@ export function githubHeaders(): Record<string, string> {
   return headers
 }
 
+/**
+ * The error for a failed API call about `subject`. When the rate limit is spent
+ * (60 requests an hour without a token, a few local runs), it says when it
+ * resets and, without a token, how to get a higher one.
+ */
+export function apiError(response: Response, subject: string): Error {
+  const failure = `GitHub API request failed for ${subject}: ${response.status} ${response.statusText}`.trimEnd()
+  // 403 with no requests left is the primary limit; with retry-after, the secondary one.
+  const limited =
+    response.status === 429 ||
+    (response.status === 403 &&
+      (response.headers.get('x-ratelimit-remaining') === '0' || response.headers.has('retry-after')))
+  if (!limited) return new Error(failure)
+
+  const reset = Number(response.headers.get('x-ratelimit-reset'))
+  const when = Number.isFinite(reset) && reset > 0 ? ` until ${new Date(reset * 1000).toISOString()}` : ''
+  const hint = process.env.GITHUB_TOKEN
+    ? ''
+    : ' Unauthenticated requests are limited to 60 an hour: set GITHUB_TOKEN, e.g. `export GITHUB_TOKEN=$(gh auth token)`.'
+  return new Error(`${failure} (rate limit spent${when}).${hint}`)
+}
+
 /** Public, active, non-fork repos of `owner`. */
 export async function fetchPublicRepos(owner: string): Promise<GitHubRepo[]> {
   const repos: GitHubRepo[] = []
@@ -35,7 +57,7 @@ export async function fetchPublicRepos(owner: string): Promise<GitHubRepo[]> {
     )
 
     if (!response.ok) {
-      throw new Error(`GitHub API request failed: ${response.status} ${response.statusText}`)
+      throw apiError(response, `the repositories of ${owner}`)
     }
 
     const data = (await response.json()) as GitHubRepo[]

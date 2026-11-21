@@ -8,7 +8,7 @@
  * No dependency outside this folder: the poll runs it without `bun install`.
  */
 
-import { API_URL, fetchPublicRepos, githubHeaders } from './github'
+import { API_URL, apiError, fetchPublicRepos, githubHeaders } from './github'
 
 /** Repositories never synced: their docs are written in this repository. */
 const EXCLUDED_REPOS = new Set(['kevindebenedetti.github.io'])
@@ -47,7 +47,7 @@ export async function listDocsSources(owner: string): Promise<DocsSource[]> {
     // 404: empty repository, nothing to publish.
     if (response.status === 404) continue
     if (!response.ok) {
-      throw new Error(`GitHub API request failed for ${repo.full_name}: ${response.status} ${response.statusText}`)
+      throw apiError(response, repo.full_name)
     }
 
     const entries = (await response.json()) as ContentEntry[]

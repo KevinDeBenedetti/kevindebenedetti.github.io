@@ -4,7 +4,7 @@ import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, describe, expect, it } from 'vitest'
 import { parse as parseYaml } from 'yaml'
-import { buildSiteNavigation, editLinkPattern } from '../site-navigation'
+import { buildSiteNavigation, editLinkPattern, pageDescription } from '../site-navigation'
 
 const roots: string[] = []
 
@@ -281,6 +281,19 @@ describe('generated pages', () => {
     ])
   })
 
+  it('shows the icon of a local project on its homepage card', () => {
+    const root = repo({
+      'docs/hub/index.md': '---\nrepo: owner/hub\nicon: "📚"\n---\n\n# Hub Docs\n',
+      'docs/plain/index.md': '---\nrepo: owner/plain\n---\n\n# Plain\n',
+    })
+
+    const home = buildSiteNavigation(root).pages.find((page) => page.path === 'docs/index.md')!
+    const features = parseYaml(home.content.split('---')[1]).features
+
+    expect(features.find((f: { title: string }) => f.title === 'Hub Docs').icon).toBe('📚')
+    expect(features.find((f: { title: string }) => f.title === 'Plain')).not.toHaveProperty('icon')
+  })
+
   it('writes a Projects page with one table row per project, in project order', () => {
     const root = repo({
       'synced/.repos-metadata.json': JSON.stringify([
@@ -388,5 +401,24 @@ describe('edit link', () => {
     expect(rebuilt({ filePath: 'synced/alpha/guides/setup.md' })).toBe(
       'https://github.com/owner/alpha/edit/main/docs/guides/setup.md',
     )
+  })
+})
+
+describe('page description', () => {
+  const projects = () =>
+    buildSiteNavigation(repo({ ...synced('tools'), 'synced/tools/setup.md': '# Setup\n' })).projects
+
+  it('keeps the description a page sets', () => {
+    expect(pageDescription(projects(), 'tools/setup.md', 'Setup', 'Install it.')).toBe('Install it.')
+  })
+
+  it('describes a project page that sets none from its title and its project', () => {
+    expect(pageDescription(projects(), 'tools/setup.md', 'Setup', '')).toBe(
+      'Setup, in the Title of tools documentation: About tools',
+    )
+  })
+
+  it('returns undefined outside a project, so the site description applies', () => {
+    expect(pageDescription(projects(), 'about/index.md', 'About', '')).toBeUndefined()
   })
 })

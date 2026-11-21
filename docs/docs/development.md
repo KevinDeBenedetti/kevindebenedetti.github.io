@@ -38,7 +38,7 @@ bun install
 | `bun run clean`     | Remove `node_modules`, build output, VitePress cache and `synced/`   |
 
 ::: warning Network required
-`bun run dev` and `bun run build` call `scripts/sync-docs.ts` first, which requires access to the GitHub API and clones remote repositories. Pass `GITHUB_TOKEN` to avoid rate limits.
+`bun run dev` and `bun run build` call `scripts/sync-docs.ts` first, which requires access to the GitHub API and clones remote repositories. Each run makes one API request per public repository; without a token GitHub allows 60 an hour, so a few runs in a row stop with a "rate limit spent" error that says when it resets. Set `GITHUB_TOKEN` to avoid it, for example `export GITHUB_TOKEN=$(gh auth token)`.
 :::
 
 ## Project structure

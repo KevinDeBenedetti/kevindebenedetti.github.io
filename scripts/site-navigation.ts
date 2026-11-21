@@ -350,7 +350,8 @@ function homePage(projects: Project[]): GeneratedPage {
     .map((p) =>
       [
         // JSON strings are valid YAML: quotes and colons in the text stay text.
-        `  - title: ${JSON.stringify(p.title)}`,
+        // VitePress shows a feature's `icon:` (an emoji or text) above its title.
+        ...(p.icon ? [`  - icon: ${JSON.stringify(p.icon)}`, `    title: ${JSON.stringify(p.title)}`] : [`  - title: ${JSON.stringify(p.title)}`]),
         `    details: ${JSON.stringify(p.description)}`,
         `    link: /${p.slug}/`,
         `    linkText: View docs`,
@@ -435,6 +436,26 @@ export function buildSiteNavigation(root: string): SiteNavigation {
       projectsPage(projects),
     ],
   }
+}
+
+/**
+ * Meta description of the page at `relativePath` (its URL path, as in
+ * VitePress pageData). A page that sets none, under a project, is described
+ * from its title and that project, so search results do not show the same
+ * site-wide text for every page. Undefined elsewhere: the site description
+ * applies.
+ */
+export function pageDescription(
+  projects: Pick<Project, 'slug' | 'title' | 'description'>[],
+  relativePath: string,
+  title: string,
+  description: string,
+): string | undefined {
+  if (description) return description
+  const project = projects.find((p) => relativePath.startsWith(`${p.slug}/`))
+  if (!project) return undefined
+  const context = `${title}, in the ${project.title} documentation`
+  return project.description ? `${context}: ${project.description}` : `${context}.`
 }
 
 /**

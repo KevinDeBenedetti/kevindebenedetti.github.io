@@ -56,9 +56,8 @@ pass_filenames = true
 # ─── Docs link safety ────────────────────────────────────────────────────────
 [[repos]]
 repo = "https://github.com/KevinDeBenedetti/github-workflows"
-# Same release as the workflows pinned in .github/workflows/ci-cd.yml
-# (scripts/__tests__/version-pins.test.ts fails when they differ).
-rev = "v0.54.0"
+# Same release as the workflows pinned in .github/workflows/ci-cd.yml.
+rev = "v0.55.0"
 hooks = [
   { id = "check-docs-links" },
   { id = "check-vitepress-md" },

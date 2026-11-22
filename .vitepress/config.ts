@@ -4,9 +4,13 @@ import { buildSiteNavigation, editLinkPattern, pageDescription } from '../script
 import { logql } from './shiki/logql'
 
 const SITE_URL = 'https://kevindebenedetti.github.io'
-// Title of the homepage; every other page is "<page> | <SITE_NAME>".
+// Site title, shown in the nav bar; every page but the homepage is titled
+// "<page> | <SITE_NAME>".
 const SITE_TITLE = "Home"
 const SITE_NAME = "Kevin's Docs"
+// The homepage's <title>, og:title and twitter:title: one descriptive title
+// for search results and link previews.
+const HOME_TITLE = `${SITE_NAME}: developer documentation hub`
 const SITE_DESCRIPTION = 'Centralized developer documentation hub for all @KevinDeBenedetti open source projects.'
 const OG_IMAGE = `${SITE_URL}/og-image.png`
 
@@ -107,7 +111,15 @@ export default defineConfig({
       .replace(/\.md$/, '')
 
     const isHome = pageData.frontmatter.layout === 'home'
-    const pageTitle = pageData.title ? `${pageData.title} | ${SITE_NAME}` : SITE_NAME
+    if (isHome) {
+      // The home layout has no H1, so VitePress would title it SITE_TITLE
+      // through titleTemplate ("Home | Kevin's Docs").
+      pageData.title = HOME_TITLE
+      pageData.titleTemplate = false
+    }
+    const pageTitle = isHome
+      ? HOME_TITLE
+      : pageData.title ? `${pageData.title} | ${SITE_NAME}` : SITE_NAME
     const description =
       pageDescription(projects, pageData.relativePath, pageData.title, pageData.description) ?? SITE_DESCRIPTION
     // VitePress writes <meta name="description"> from pageData.description.

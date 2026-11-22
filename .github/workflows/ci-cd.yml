@@ -19,8 +19,8 @@ permissions:
 # Shared workflows are pinned to a github-workflows release, not to @main: the
 # Pages and release jobs hold write tokens, and a change pushed to that repo's
 # main would otherwise reach them unreviewed. Each github-workflows release
-# opens the bump PR here (its propagate-release workflow); Dependabot ignores
-# these pins.
+# opens the bump PR here (its propagate-release workflow); Renovate ignores
+# these pins (renovate.json).
 jobs:
   # ── Workflow validation ────────────────────────────────────────────────────
   shell:
@@ -34,7 +34,7 @@ jobs:
 
   # ── prek hooks (server-side) ───────────────────────────────────────────────
   # Re-runs prek.toml for changes that never went through the local hooks
-  # (Dependabot PRs, web edits, --no-verify pushes): file hygiene, oxlint and
+  # (Renovate PRs, web edits, --no-verify pushes): file hygiene, oxlint and
   # the docs link / Vue interpolation checks.
   prek:
     name: prek

@@ -1,0 +1,65 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "extends": [
+    "config:recommended",
+    ":dependencyDashboard",
+    ":separateMultipleMajorReleases",
+    "helpers:pinGitHubActionDigests"
+  ],
+  "timezone": "Europe/Paris",
+  "schedule": ["before 6am on monday"],
+  "configMigration": true,
+  "minimumReleaseAge": "3 days",
+  "internalChecksFilter": "strict",
+  "enabledManagers": ["bun", "github-actions", "custom.regex"],
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "prek hook revs (prek.toml) — inline renovate comments (datasource=github-tags). No manager understands prek TOML, so without this the hook pins only move when someone runs `prek autoupdate`.",
+      "managerFilePatterns": ["/^prek\\.toml$/"],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>[^\\s]+) depName=(?<depName>[^\\s]+)\\nrev = \"(?<currentValue>v?[\\d][^\"]*)\""
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "The oxlint version the prek hook installs (prek.toml additional_dependencies). It must equal package.json's (scripts/__tests__/version-pins.test.ts), so it moves in the same pull request: see the oxlint rule below.",
+      "managerFilePatterns": ["/^prek\\.toml$/"],
+      "matchStrings": ["\"(?<depName>oxlint)@(?<currentValue>\\d[^\"]*)\""],
+      "datasourceTemplate": "npm"
+    }
+  ],
+  "packageRules": [
+    {
+      "description": "Bump the package.json range with the lockfile, as Dependabot did: a range left at its old floor would make the prek oxlint pin differ from package.json.",
+      "matchManagers": ["bun"],
+      "rangeStrategy": "bump",
+      "addLabels": ["dependencies"]
+    },
+    {
+      "description": "oxlint is pinned twice (package.json and the prek hook): one pull request moves both.",
+      "matchPackageNames": ["oxlint"],
+      "groupName": "oxlint"
+    },
+    {
+      "description": "TypeScript 7 dropped the `typescript/lib/tsc` subpath from its package exports map, which vue-tsc still requires internally: bumping past 6.x breaks `bun run typecheck`. Re-allow once vue-tsc ships TS7 support.",
+      "matchPackageNames": ["typescript"],
+      "allowedVersions": "<7.0.0"
+    },
+    {
+      "description": "github-workflows pins (ci-cd.yml, and the prek.toml hook rev) come with each of its releases, as a pull request its propagate-release job opens: Renovate would only duplicate them, and would pin them to SHAs.",
+      "matchPackageNames": ["KevinDeBenedetti/github-workflows", "KevinDeBenedetti/github-workflows/**"],
+      "enabled": false
+    },
+    {
+      "description": "Label GitHub Actions updates",
+      "matchManagers": ["github-actions"],
+      "addLabels": ["dependencies", "github-actions"]
+    },
+    {
+      "description": "Label prek hook updates",
+      "matchManagers": ["custom.regex"],
+      "addLabels": ["dependencies"]
+    }
+  ]
+}

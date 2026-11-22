@@ -1,9 +1,10 @@
 // @vitest-environment node
 /**
  * prek.toml repeats two versions that bump pull requests change elsewhere:
- * oxlint (package.json, Dependabot) and the github-workflows release
- * (.github/workflows/ci-cd.yml, the release bump PR). These tests fail on such
- * a PR until prek.toml follows, so the git hook and CI run the same versions.
+ * oxlint (package.json; Renovate moves both in one PR, see renovate.json) and
+ * the github-workflows release (.github/workflows/ci-cd.yml, the release bump
+ * PR). These tests fail on a PR that moves one copy only, so the git hook and
+ * CI run the same versions.
  */
 import { readFileSync } from 'node:fs'
 import { join } from 'node:path'

@@ -63,12 +63,14 @@ Key settings:
 | `srcDir`               | `.` (repo root)                                                                     |
 | `srcExclude`           | `README.md`, `TODO.md`, `CHANGELOG.md`, `CLAUDE.md`, `GLOSSARY.md`, `docs/adr/**`   |
 | `rewrites`             | Maps `synced/:slug/*` and `docs/:slug/*` → `/:slug/*`                               |
-| `title`                | `Home` (pages use the `:title \| Kevin's Docs` template)                            |
+| `title`                | `Home`, the nav bar title (pages use the `:title \| Kevin's Docs` template)          |
 | `themeConfig.nav`      | `nav` from `buildSiteNavigation`                                                    |
 | `themeConfig.sidebar`  | `sidebar` from `buildSiteNavigation`                                                |
 | `themeConfig.editLink` | `editLinkPattern(projects)`: links each page back to its source file on GitHub      |
 | `markdown`             | `languageAlias` (`env` → `dotenv`), Shiki grammars from `.vitepress/shiki/` (LogQL) |
-| `transformPageData`    | Canonical URL, Open Graph, Twitter and JSON-LD tags per page                        |
+| `transformPageData`    | Canonical URL, Open Graph, Twitter and JSON-LD tags per page; the homepage title    |
+
+The homepage is titled `Kevin's Docs: developer documentation hub` (`HOME_TITLE`), with no template, in its `<title>`, `og:title` and `twitter:title`.
 
 A page's meta description is its frontmatter `description:`. A project page that sets none gets `<page title>, in the <project> documentation: <project description>` (`pageDescription` in `scripts/site-navigation.ts`), so search results do not repeat the site description for every page.
 

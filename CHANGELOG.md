@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.3.0](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/compare/v0.2.0...v0.3.0) (2026-11-22)
+
+
+### Features
+
+* SEO descriptions, dead-link check, pin drift check, rate-limit hint and project icons ([2124d0e](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/2124d0e718cb4fae77badae61ac4f392cb929273)), closes [#118](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/118) [#120](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/120) [#121](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/121) [#122](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/122) [#123](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/123)
+* switch dependency updates to Renovate and give the homepage one title ([ddda7f0](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/ddda7f0e295815a35bbf61fa6ae3d2c775b45d1e)), closes [#124](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/124) [#126](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/126)
+
 ## [0.2.0](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/compare/v0.1.0...v0.2.0) (2026-10-24)
 
 

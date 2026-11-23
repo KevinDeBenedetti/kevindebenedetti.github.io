@@ -132,6 +132,7 @@ release-please runs on `GITHUB_TOKEN` only, so the release PR, its commits, and 
 | oxlint manager and group   | oxlint is pinned in `package.json` and in the prek hook: one pull request moves both        |
 | bun `rangeStrategy: bump`  | A `package.json` range left at its old floor would make the prek oxlint pin differ          |
 | `typescript` below 7       | vue-tsc still needs the `typescript/lib/tsc` subpath that TypeScript 7 dropped              |
+| No majors for `overrides`  | They hold transitive dependencies at a patched floor of the major their parents accept     |
 
 The github-workflows pins are left to that repository's `propagate-release` job. `scripts/__tests__/version-pins.test.ts` fails when the workflows or `prek.toml` pin different releases, or when the prek oxlint pin differs from `package.json`. The `renovate-config-validator` prek hook checks `renovate.json` before a commit and in CI.
 

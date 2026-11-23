@@ -35,6 +35,17 @@ hooks = [
   { id = "actionlint" },
 ]
 
+# ─── Renovate config ────────────────────────────────────────────────────────
+# Validates renovate.json (and the shared preset it extends) before it reaches
+# main, where a broken config is only discovered when the bot runs.
+[[repos]]
+repo = "https://github.com/renovatebot/pre-commit-hooks"
+# renovate: datasource=github-tags depName=renovatebot/pre-commit-hooks
+rev = "44.257.9"
+hooks = [
+  { id = "renovate-config-validator", args = ["--strict"] },
+]
+
 # ─── Local hooks ────────────────────────────────────────────────────────────
 # oxlint is a dev dependency — prek uses the node language to manage its own
 # Node.js runtime so the hook works regardless of the caller's $PATH (IDE, CI…)

@@ -123,6 +123,22 @@ In **Settings → Pages → Build and deployment**, the source must be **GitHub 
 
 release-please runs on `GITHUB_TOKEN` only, so the release PR, its commits, and the tags are authored by `github-actions[bot]`. GitHub does not start CI on a PR opened with that token: click **Approve workflows to run** on the release PR to get its checks.
 
+### Dependency updates
+
+[Renovate](https://docs.renovatebot.com/) runs from `.github/workflows/renovate.yml`, which calls the `renovate.yml` shared workflow of [github-workflows](https://github.com/KevinDeBenedetti/github-workflows) every day at 01:17 UTC. `renovate.json` extends the shared preset [`KevinDeBenedetti/renovate-config`](https://github.com/KevinDeBenedetti/renovate-config): `config:best-practices`, pull requests on Monday before 6am Paris time only, a 3-day release age, and the `prek.toml` hook revs. On top of it, `renovate.json` keeps this repository's own rules:
+
+| Rule                       | Why                                                                                        |
+| -------------------------- | ------------------------------------------------------------------------------------------ |
+| oxlint manager and group   | oxlint is pinned in `package.json` and in the prek hook: one pull request moves both        |
+| bun `rangeStrategy: bump`  | A `package.json` range left at its old floor would make the prek oxlint pin differ          |
+| `typescript` below 7       | vue-tsc still needs the `typescript/lib/tsc` subpath that TypeScript 7 dropped              |
+
+The github-workflows pins are left to that repository's `propagate-release` job. `scripts/__tests__/version-pins.test.ts` fails when the workflows or `prek.toml` pin different releases, or when the prek oxlint pin differs from `package.json`. The `renovate-config-validator` prek hook checks `renovate.json` before a commit and in CI.
+
+::: warning App token
+The workflow uses the release GitHub App: the `RELEASE_APP_CLIENT_ID` variable and the `RELEASE_APP_PRIVATE_KEY` secret must exist on the repository, and the App needs **Contents**, **Issues**, **Pull requests**, **Workflows** and **Commit statuses** set to *Read and write*. A manual run is a dry run by default: its log lists the updates found.
+:::
+
 ### Link checks
 
 Source repositories check their links: their docs CI ([github-workflows](https://github.com/KevinDeBenedetti/github-workflows)' `cd-docs.yml`, or `ci-shell.yml` with `run-docs-external-link-check`) runs lychee on the pages a push changes, `github.com` links included, so a link that is already dead when written fails right after the push. An external link that rots later is not re-checked: nothing crawls the live site.

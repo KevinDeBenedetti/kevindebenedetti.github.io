@@ -20,7 +20,7 @@ permissions:
 # Pages and release jobs hold write tokens, and a change pushed to that repo's
 # main would otherwise reach them unreviewed. Each github-workflows release
 # opens the bump PR here (its propagate-release workflow); Renovate ignores
-# these pins (renovate.json).
+# these pins (the shared preset github>KevinDeBenedetti/renovate-config).
 jobs:
   # ── Workflow validation ────────────────────────────────────────────────────
   shell:

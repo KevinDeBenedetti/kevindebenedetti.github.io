@@ -2,11 +2,11 @@
 /**
  * prek.toml repeats two versions that bump pull requests change elsewhere:
  * oxlint (package.json; Renovate moves both in one PR, see renovate.json) and
- * the github-workflows release (.github/workflows/ci-cd.yml, the release bump
+ * the github-workflows release (every .github/workflows/ file, the release bump
  * PR). These tests fail on a PR that moves one copy only, so the git hook and
  * CI run the same versions.
  */
-import { readFileSync } from 'node:fs'
+import { readdirSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { describe, expect, it } from 'vitest'
@@ -24,15 +24,18 @@ describe('prek.toml version pins', () => {
     expect(hookPin, 'oxlint@<version> in prek.toml additional_dependencies').toBe(range.replace(/^[\^~]/, ''))
   })
 
-  it('runs the github-workflows release of ci-cd.yml', () => {
+  it('runs the github-workflows release of the workflows', () => {
+    const workflows = readdirSync(join(ROOT, '.github/workflows')).filter((f) => /\.ya?ml$/.test(f))
     const workflowPins = new Set(
-      [...read('.github/workflows/ci-cd.yml').matchAll(/KevinDeBenedetti\/github-workflows\/\S+@(v[\d.]+)/g)].map(
-        (m) => m[1],
+      workflows.flatMap((f) =>
+        [...read(`.github/workflows/${f}`).matchAll(/KevinDeBenedetti\/github-workflows\/\S+@(v[\d.]+)/g)].map(
+          (m) => m[1],
+        ),
       ),
     )
     const hookRev = prek.match(/repo = "https:\/\/github\.com\/KevinDeBenedetti\/github-workflows"\s*\n(?:#.*\n)*rev = "([^"]+)"/)?.[1]
 
-    expect([...workflowPins], 'one github-workflows release across ci-cd.yml').toHaveLength(1)
+    expect([...workflowPins], 'one github-workflows release across .github/workflows/').toHaveLength(1)
     expect(hookRev, 'rev of the github-workflows hooks in prek.toml').toBe([...workflowPins][0])
   })
 })

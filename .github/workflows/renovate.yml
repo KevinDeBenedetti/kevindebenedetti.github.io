@@ -1,0 +1,33 @@
+name: Renovate
+
+# Runs Renovate on this repository with the release App's token (the reusable
+# workflow of github-workflows). renovate.json, through the shared preset
+# github>KevinDeBenedetti/renovate-config, decides what is updated and when:
+# pull requests open on Monday before 6am Paris time only. The daily run keeps
+# the Dependency Dashboard's checkboxes and the open pull requests current in
+# between; 01:17 UTC stays inside the Monday window even when GitHub starts a
+# scheduled run late.
+on:
+  schedule:
+    - cron: '17 1 * * *'
+  workflow_dispatch:
+    inputs:
+      dry-run:
+        description: Look the updates up and log them, change nothing on GitHub
+        type: boolean
+        default: true
+
+permissions: {}
+
+# Pinned to the github-workflows release of ci-cd.yml, which its
+# propagate-release job moves; Renovate ignores this pin (the shared preset).
+jobs:
+  renovate:
+    name: Renovate
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/renovate.yml@v0.55.0
+    permissions: {}
+    with:
+      app-client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
+      dry-run: ${{ inputs.dry-run == true }} # false on a schedule
+    secrets:
+      APP_PRIVATE_KEY: ${{ secrets.RELEASE_APP_PRIVATE_KEY }}

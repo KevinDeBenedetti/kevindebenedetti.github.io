@@ -19,6 +19,12 @@
       "rangeStrategy": "bump"
     },
     {
+      "description": "The package.json overrides hold transitive dependencies at a patched floor of the major their parents accept: a new major (vite 6 → 8 under VitePress 1.x) would force it on parents that do not support it. Minors and patches still flow.",
+      "matchDepTypes": ["overrides"],
+      "matchUpdateTypes": ["major"],
+      "enabled": false
+    },
+    {
       "description": "oxlint is pinned twice (package.json and the prek hook): one pull request moves both.",
       "matchPackageNames": ["oxlint"],
       "groupName": "oxlint"

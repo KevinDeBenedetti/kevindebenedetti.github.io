@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.1](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/compare/v0.3.0...v0.3.1) (2026-11-23)
+
+
+### Bug Fixes
+
+* **renovate:** call the reusable renovate workflow of github-workflows v0.56.0 ([877cbcb](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/877cbcb4b80853745426b0706920ddb441063030))
+* **renovate:** hold the majors of package.json overrides ([c6facd7](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/c6facd79748e1fc58cab4100c46ae0019dd0d593))
+* **renovate:** run Renovate and extend the shared renovate-config preset ([c8cb0bf](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/c8cb0bff1ca34ad8de52f21f05b98ddf771722a7))
+
 ## [0.3.0](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/compare/v0.2.0...v0.3.0) (2026-11-22)
 
 

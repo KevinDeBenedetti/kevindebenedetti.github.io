@@ -8,7 +8,8 @@
  */
 
 import { spawnSync } from 'node:child_process'
-import { cpSync, existsSync, mkdirSync, rmSync, writeFileSync } from 'node:fs'
+import { cpSync, existsSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs'
+import { tmpdir } from 'node:os'
 import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { listDocsSources, serializeSyncState, syncStateOf, type DocsSource } from './docs-sources'
@@ -16,7 +17,6 @@ import { OWNER } from './github'
 import { titleCase } from './site-navigation'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
-const TMP_DIR_NAME = '.tmp-doc-sync'
 
 export interface RepoMetadata {
   slug: string
@@ -64,16 +64,13 @@ function cloneWithRetry(cloneUrl: string, cloneDir: string): void {
 }
 
 /**
- * Empties synced/ and the temporary clone folder under `root`, and drops the
- * state recorded by the previous sync, so a sync that fails leaves nothing a
- * build could deploy from. Synced docs live only there: nothing under docs/
- * is touched.
+ * Empties synced/ under `root` and drops the state recorded by the previous
+ * sync, so a sync that fails leaves nothing a build could deploy from. Synced
+ * docs live only there: nothing under docs/ is touched.
  */
 export function resetSyncDirs(root: string): void {
-  for (const dir of [join(root, 'synced'), join(root, TMP_DIR_NAME)]) {
-    rmSync(dir, { recursive: true, force: true })
-    mkdirSync(dir, { recursive: true })
-  }
+  rmSync(join(root, 'synced'), { recursive: true, force: true })
+  mkdirSync(join(root, 'synced'), { recursive: true })
   rmSync(join(root, 'public', 'sync-state.json'), { force: true })
 }
 
@@ -103,11 +100,7 @@ export function cloneDocsWithGit(tmpDir: string): CloneDocs {
  * Throws when a source cannot be cloned, before recording anything: a build
  * that went on would deploy the site without that project.
  */
-export function syncDocs(
-  root: string,
-  sources: DocsSource[],
-  cloneDocs: CloneDocs = cloneDocsWithGit(join(root, TMP_DIR_NAME)),
-): RepoMetadata[] {
+export function syncDocs(root: string, sources: DocsSource[], cloneDocs: CloneDocs): RepoMetadata[] {
   const failed: string[] = []
 
   for (const source of sources) {
@@ -143,16 +136,27 @@ export function syncDocs(
   return synced
 }
 
+/**
+ * Runs `fn` with a fresh folder under the system temp folder, removed
+ * afterwards, even when `fn` throws. The git clones go there, never inside the
+ * project: a clone writes .git/config and .git/hooks/, which some environments
+ * (an agent sandbox) refuse inside a project.
+ */
+export function withTempDir<T>(fn: (dir: string) => T): T {
+  const dir = mkdtempSync(join(tmpdir(), 'docs-sync-'))
+  try {
+    return fn(dir)
+  } finally {
+    rmSync(dir, { recursive: true, force: true })
+  }
+}
+
 async function main(): Promise<void> {
   console.log(`Syncing docs for public repos owned by ${OWNER}`)
   resetSyncDirs(ROOT)
 
-  let synced: RepoMetadata[]
-  try {
-    synced = syncDocs(ROOT, await listDocsSources(OWNER))
-  } finally {
-    rmSync(join(ROOT, TMP_DIR_NAME), { recursive: true, force: true })
-  }
+  const sources = await listDocsSources(OWNER)
+  const synced = withTempDir((tmpDir) => syncDocs(ROOT, sources, cloneDocsWithGit(tmpDir)))
   console.log(`Synced ${synced.length} repo(s): ${synced.map((r) => r.slug).join(', ') || '(none)'}`)
 }
 

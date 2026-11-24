@@ -1,11 +1,11 @@
 // @vitest-environment node
 import { spawnSync } from 'node:child_process'
-import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DocsSource } from '../docs-sources'
-import { cloneDocsWithGit, resetSyncDirs, syncDocs, type CloneDocs } from '../sync-docs'
+import { cloneDocsWithGit, resetSyncDirs, syncDocs, withTempDir, type CloneDocs } from '../sync-docs'
 
 const roots: string[] = []
 
@@ -134,6 +134,39 @@ describe('git clone of a docs source', () => {
     expect(readFileSync(join(root, 'synced/tools/guides/setup.md'), 'utf-8')).toBe('# Setup\n')
     expect(existsSync(join(root, 'synced/tools/README.md'))).toBe(false)
     expect(existsSync(join(root, 'clones/tools')), 'the temporary clone is removed').toBe(false)
+  })
+
+  it('clones under the system temp folder, never in the repository, and removes the clone', () => {
+    const src = sourceRepo({ 'docs/page.md': '# Page\n' })
+    const root = repo({})
+    // A system temp folder of this test's own, so no other process shares it.
+    const systemTemp = repo({})
+    vi.stubEnv('TMPDIR', systemTemp)
+    const clonedIn: string[] = []
+    const cloneWithGit = (dir: string): CloneDocs => (docsSource, dest) => {
+      clonedIn.push(dir)
+      cloneDocsWithGit(dir)(docsSource, dest)
+    }
+
+    withTempDir((dir) => syncDocs(root, [{ ...source('tools'), cloneUrl: `file://${src}` }], cloneWithGit(dir)))
+
+    expect(readFileSync(join(root, 'synced/tools/page.md'), 'utf-8')).toBe('# Page\n')
+    expect(readdirSync(root).sort(), 'nothing else written in the repository').toEqual(['public', 'synced'])
+    expect(clonedIn).toHaveLength(1)
+    expect(dirname(clonedIn[0])).toBe(systemTemp)
+    expect(readdirSync(systemTemp), 'the temp folder is removed').toEqual([])
+  })
+
+  it('removes its temp folder when the sync fails', () => {
+    const systemTemp = repo({})
+    vi.stubEnv('TMPDIR', systemTemp)
+
+    expect(() =>
+      withTempDir(() => {
+        throw new Error('clone failed')
+      }),
+    ).toThrow('clone failed')
+    expect(readdirSync(systemTemp)).toEqual([])
   })
 
   it("installs nothing from git's template directory", () => {

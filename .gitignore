@@ -5,9 +5,8 @@
 *.env
 *.DS_Store
 
-# Synced project docs (raw clones) — rebuilt by CI, never commit
+# Synced project docs — rebuilt by CI, never commit
 synced/
-.tmp-doc-sync/
 
 # Written by scripts/sync-docs.ts, served as /sync-state.json
 public/sync-state.json

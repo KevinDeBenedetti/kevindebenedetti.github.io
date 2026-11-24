@@ -6,11 +6,11 @@ title: Development
 
 ## Prerequisites
 
-| Tool                          | Version | Purpose                                   |
-| ----------------------------- | ------- | ----------------------------------------- |
-| [Bun](https://bun.sh)         | ≥ 1.2   | Runtime, package manager, script runner   |
-| [Git](https://git-scm.com)    | any     | Repository operations and sparse checkout |
-| [Node.js](https://nodejs.org) | ≥ 18    | Required by VitePress (CI uses 22)        |
+| Tool                          | Version            | Purpose                                   |
+| ----------------------------- | ------------------ | ----------------------------------------- |
+| [Bun](https://bun.sh)         | ≥ 1.2              | Runtime, package manager, script runner   |
+| [Git](https://git-scm.com)    | any                | Repository operations and sparse checkout |
+| [Node.js](https://nodejs.org) | 22.12+, 24 or ≥ 26 | Required by Vitest and jsdom (CI uses 22) |
 
 ## Setup
 
@@ -50,7 +50,8 @@ kevindebenedetti.github.io/
 │   ├── release/               # release-please config + manifest
 │   └── workflows/
 │       ├── ci-cd.yml          # CI checks + GitHub Pages deploy + release
-│       └── docs-poll.yml      # Redeploys when a project's docs/ changed
+│       ├── docs-poll.yml      # Redeploys when a project's docs/ changed
+│       └── renovate.yml       # Runs Renovate (dependency update PRs)
 ├── .vitepress/
 │   ├── config.ts              # VitePress config (nav, sidebar, edit links built at load)
 │   ├── shiki/                 # Extra Shiki grammars (LogQL)
@@ -78,6 +79,7 @@ kevindebenedetti.github.io/
 ├── GLOSSARY.md                # Domain vocabulary — excluded from the site
 ├── package.json
 ├── prek.toml                  # Git hooks (also run in CI)
+├── renovate.json              # Renovate rules on top of the shared preset
 ├── tsconfig.json
 └── vitest.config.ts
 ```

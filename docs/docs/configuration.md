@@ -14,7 +14,8 @@ Written by `scripts/sync-docs.ts` after each sync. **Do not edit manually** — 
     "slug": "dotfiles",
     "title": "Dotfiles",
     "description": "macOS and Debian dotfiles and setup scripts.",
-    "repo": "KevinDeBenedetti/dotfiles"
+    "repo": "KevinDeBenedetti/dotfiles",
+    "branch": "main"
   }
 ]
 ```
@@ -25,6 +26,7 @@ Written by `scripts/sync-docs.ts` after each sync. **Do not edit manually** — 
 | `title`       | Human-readable title derived from the repository name (kebab-case → Title Case). |
 | `description` | GitHub repository description.                                                   |
 | `repo`        | Full `owner/name` slug.                                                          |
+| `branch`      | Default branch of the repository: the source card and edit links point at it.    |
 
 ## Local project metadata
 
@@ -76,10 +78,11 @@ A page's meta description is its frontmatter `description:`. A project page that
 
 ## Environment variables
 
-Used by `scripts/sync-docs.ts` at sync time:
+Used by `scripts/sync-docs.ts` at sync time and by `scripts/check-docs-changes.ts` in the docs poll:
 
-| Variable         | Default                  | Description                                                                                                     |
-| ---------------- | ------------------------ | --------------------------------------------------------------------------------------------------------------- |
-| `GITHUB_TOKEN`   | _(empty)_                | Personal access token for the GitHub API. Without it, requests are unauthenticated and rate-limited to 60/hour. |
-| `GITHUB_OWNER`   | `KevinDeBenedetti`       | GitHub username to fetch repositories for.                                                                      |
-| `GITHUB_API_URL` | `https://api.github.com` | GitHub API base URL. Override for GitHub Enterprise.                                                            |
+| Variable         | Default                              | Description                                                                                                     |
+| ---------------- | ------------------------------------ | --------------------------------------------------------------------------------------------------------------- |
+| `GITHUB_TOKEN`   | _(empty)_                            | Personal access token for the GitHub API. Without it, requests are unauthenticated and rate-limited to 60/hour. |
+| `GITHUB_OWNER`   | `KevinDeBenedetti`                   | GitHub username to fetch repositories for.                                                                      |
+| `GITHUB_API_URL` | `https://api.github.com`             | GitHub API base URL. Override for GitHub Enterprise.                                                            |
+| `SITE_URL`       | `https://kevindebenedetti.github.io` | Live site the docs poll reads `/sync-state.json` from (`scripts/check-docs-changes.ts` only).                   |

@@ -37,7 +37,7 @@ features:
     link: /k3s-lab/
     linkText: View docs
   - title: "Notes"
-    details: "Personal dev notes & references in Markdown."
+    details: "Personal dev notes &amp; references in Markdown."
     link: /notes/
     linkText: View docs
   - title: "Tools"

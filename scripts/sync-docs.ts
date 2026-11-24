@@ -13,6 +13,7 @@ import { join } from 'node:path'
 import { fileURLToPath } from 'node:url'
 import { listDocsSources, serializeSyncState, syncStateOf, type DocsSource } from './docs-sources'
 import { OWNER } from './github'
+import { titleCase } from './site-navigation'
 
 const ROOT = fileURLToPath(new URL('..', import.meta.url))
 const TMP_DIR_NAME = '.tmp-doc-sync'
@@ -22,10 +23,8 @@ export interface RepoMetadata {
   title: string
   description: string
   repo: string
-}
-
-function formatTitle(name: string): string {
-  return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
+  /** Default branch of the docs source. */
+  branch: string
 }
 
 function runGit(args: string[]): void {
@@ -127,9 +126,10 @@ export function syncDocs(
   const synced = sources
     .map((source) => ({
       slug: source.slug,
-      title: formatTitle(source.slug),
+      title: titleCase(source.slug),
       description: source.description,
       repo: source.repo,
+      branch: source.branch,
     }))
     .sort((a, b) => a.slug.localeCompare(b.slug))
 

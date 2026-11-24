@@ -13,6 +13,7 @@
 import { existsSync, readdirSync, readFileSync } from 'node:fs'
 import { basename, join } from 'node:path'
 import { parse as parseYaml } from 'yaml'
+import type { RepoMetadata } from './sync-docs'
 
 const HUB_REPO = 'KevinDeBenedetti/kevindebenedetti.github.io'
 /** Frontmatter field carried by every index page generated here. */
@@ -24,6 +25,8 @@ export interface Project {
   description: string
   /** `owner/name` of the repository the docs come from. */
   repo: string
+  /** Branch the docs are read from: the default branch of a docs source, `main` for a local project. */
+  branch: string
   /** Folder holding the project's pages, relative to the repo root. */
   dir: string
   /** False when the index page is generated here instead of written in the source repo. */
@@ -60,7 +63,8 @@ export interface SiteNavigation {
 }
 
 // ── Page metadata ──────────────────────────────────────────────────────────
-function titleCase(name: string): string {
+/** A file, folder or repository name as a title: `my-repo_name` → `My Repo Name`. */
+export function titleCase(name: string): string {
   return name.replace(/[-_]/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())
 }
 
@@ -115,9 +119,7 @@ function syncedProjects(root: string): Project[] {
   const metadataPath = join(root, 'synced', '.repos-metadata.json')
   if (!existsSync(metadataPath)) return []
 
-  const repos: Pick<Project, 'slug' | 'title' | 'description' | 'repo'>[] = JSON.parse(
-    readFileSync(metadataPath, 'utf-8'),
-  )
+  const repos: RepoMetadata[] = JSON.parse(readFileSync(metadataPath, 'utf-8'))
 
   return repos
     .map((repo) => {
@@ -155,6 +157,7 @@ function localProjects(root: string, syncedSlugs: Set<string>): Project[] {
       title,
       description: frontmatterField(frontmatter, 'description') ?? '',
       repo,
+      branch: 'main',
       ...(icon !== undefined ? { icon } : {}),
       ...(Number.isFinite(order) ? { order } : {}),
       dir: `docs/${entry.name}`,
@@ -276,20 +279,27 @@ const FOLDER_ICON = 'M3 7a2 2 0 0 1 2-2h4l2 2h8a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2H5a
  * Styled by .vp-source in .vitepress/theme/custom.css. No blank line inside —
  * markdown-it would end the HTML block there.
  */
-function sourceCard(repo: string): string {
+function sourceCard(repo: string, branch: string): string {
   const url = `https://github.com/${repo}`
+  // Git allows `&` and quotes in a branch name: escape it for the text and the href.
+  const ref = escapeHtml(branch).replace(/"/g, '&quot;')
   return `<div class="vp-source">
   <a class="vp-source__row" href="${url}" target="_blank" rel="noopener noreferrer">
     <svg class="vp-source__icon" viewBox="0 0 16 16" aria-hidden="true" fill="currentColor"><path d="${GITHUB_MARK}"/></svg>
     <span class="vp-source__text"><span class="vp-source__label">Repository</span><span class="vp-source__value">${repo}</span></span>
     <span class="vp-source__arrow" aria-hidden="true">→</span>
   </a>
-  <a class="vp-source__row" href="${url}/tree/main/docs" target="_blank" rel="noopener noreferrer">
+  <a class="vp-source__row" href="${url}/tree/${ref}/docs" target="_blank" rel="noopener noreferrer">
     <svg class="vp-source__icon" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="${FOLDER_ICON}"/></svg>
-    <span class="vp-source__text"><span class="vp-source__label">Source docs</span><span class="vp-source__value"><code>docs/</code> on <code>main</code></span></span>
+    <span class="vp-source__text"><span class="vp-source__label">Source docs</span><span class="vp-source__value"><code>docs/</code> on <code>${ref}</code></span></span>
     <span class="vp-source__arrow" aria-hidden="true">→</span>
   </a>
 </div>`
+}
+
+/** Free text with its HTML escaped: `&`, `<` and `>` read as themselves. */
+function escapeHtml(text: string): string {
+  return text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
 }
 
 /**
@@ -299,8 +309,7 @@ function sourceCard(repo: string): string {
  */
 function plainText(text: string): string {
   if (!text) return ''
-  const escaped = text.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
-  return `<span v-pre>${escaped}</span>`
+  return `<span v-pre>${escapeHtml(text)}</span>`
 }
 
 function linkedPages(items: SidebarItem[]): SidebarItem[] {
@@ -335,7 +344,7 @@ ${plainText(project.description)}
 
 ## Source repository
 
-${sourceCard(project.repo)}
+${sourceCard(project.repo, project.branch)}
 
 ## Documentation
 
@@ -350,9 +359,12 @@ function homePage(projects: Project[]): GeneratedPage {
     .map((p) =>
       [
         // JSON strings are valid YAML: quotes and colons in the text stay text.
-        // VitePress shows a feature's `icon:` (an emoji or text) above its title.
-        ...(p.icon ? [`  - icon: ${JSON.stringify(p.icon)}`, `    title: ${JSON.stringify(p.title)}`] : [`  - title: ${JSON.stringify(p.title)}`]),
-        `    details: ${JSON.stringify(p.description)}`,
+        // VitePress renders a feature's title and details with v-html, so their
+        // HTML is escaped. Its `icon:` (an emoji or text) shows above the title.
+        ...(p.icon
+          ? [`  - icon: ${JSON.stringify(p.icon)}`, `    title: ${JSON.stringify(escapeHtml(p.title))}`]
+          : [`  - title: ${JSON.stringify(escapeHtml(p.title))}`]),
+        `    details: ${JSON.stringify(escapeHtml(p.description))}`,
         `    link: /${p.slug}/`,
         `    linkText: View docs`,
       ].join('\n'),
@@ -464,7 +476,7 @@ export function pageDescription(
  */
 function editLinkFor(
   filePath: string,
-  synced: Pick<Project, 'dir' | 'repo' | 'hasSourceIndex'>[],
+  synced: Pick<Project, 'dir' | 'repo' | 'branch' | 'hasSourceIndex'>[],
   hubRepo: string,
 ): string {
   const project = synced.find((p) => filePath.startsWith(`${p.dir}/`))
@@ -473,9 +485,9 @@ function editLinkFor(
   const page = filePath.slice(project.dir.length + 1)
   // A generated index page has no source file: point at the docs folder.
   if (page === 'index.md' && !project.hasSourceIndex) {
-    return `https://github.com/${project.repo}/tree/main/docs`
+    return `https://github.com/${project.repo}/tree/${project.branch}/docs`
   }
-  return `https://github.com/${project.repo}/edit/main/docs/${page}`
+  return `https://github.com/${project.repo}/edit/${project.branch}/docs/${page}`
 }
 
 /**
@@ -491,7 +503,7 @@ export function editLinkPattern(projects: Project[]): (page: { filePath: string 
   // Only synced pages live elsewhere; a local project's pages are files of this repo.
   const sources = projects
     .filter((project) => project.dir.startsWith('synced/'))
-    .map(({ dir, repo, hasSourceIndex }) => ({ dir, repo, hasSourceIndex }))
+    .map(({ dir, repo, branch, hasSourceIndex }) => ({ dir, repo, branch, hasSourceIndex }))
   return new Function(
     'page',
     `return (${editLinkFor.toString()})(page.filePath, ${JSON.stringify(sources)}, ${JSON.stringify(HUB_REPO)})`,

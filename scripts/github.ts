@@ -6,6 +6,7 @@ export interface GitHubRepo {
   full_name: string
   clone_url: string
   description: string | null
+  default_branch: string
   archived: boolean
   disabled: boolean
   fork: boolean

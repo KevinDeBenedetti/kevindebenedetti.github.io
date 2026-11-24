@@ -20,6 +20,8 @@ export interface DocsSource {
   repo: string
   cloneUrl: string
   description: string
+  /** Default branch: what the sync clones, and what the edit links point at. */
+  branch: string
   /** Git tree SHA of docs/ on the default branch: changes with any change under docs/, and only then. */
   sha: string
 }
@@ -59,6 +61,7 @@ export async function listDocsSources(owner: string): Promise<DocsSource[]> {
       repo: repo.full_name,
       cloneUrl: repo.clone_url,
       description: repo.description ?? '',
+      branch: repo.default_branch,
       sha: docs.sha,
     })
   }

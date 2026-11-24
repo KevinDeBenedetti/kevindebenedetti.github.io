@@ -47,12 +47,13 @@ describe('sync reset', () => {
   })
 })
 
-function source(slug: string, description = `About ${slug}`): DocsSource {
+function source(slug: string, description = `About ${slug}`, branch = 'main'): DocsSource {
   return {
     slug,
     repo: `owner/${slug}`,
     cloneUrl: `https://example.com/owner/${slug}.git`,
     description,
+    branch,
     sha: `sha-of-${slug}`,
   }
 }
@@ -68,12 +69,12 @@ describe('sync', () => {
   it('copies the docs of each source and records what it synced', () => {
     const root = repo({ 'public/robots.txt': '' })
 
-    syncDocs(root, [source('tools'), source('alpha-kit', '')], cloneOnePage)
+    syncDocs(root, [source('tools'), source('alpha-kit', '', 'develop')], cloneOnePage)
 
     expect(readFileSync(join(root, 'synced/tools/page.md'), 'utf-8')).toBe('# tools\n')
     expect(JSON.parse(readFileSync(join(root, 'synced/.repos-metadata.json'), 'utf-8'))).toEqual([
-      { slug: 'alpha-kit', title: 'Alpha Kit', description: '', repo: 'owner/alpha-kit' },
-      { slug: 'tools', title: 'Tools', description: 'About tools', repo: 'owner/tools' },
+      { slug: 'alpha-kit', title: 'Alpha Kit', description: '', repo: 'owner/alpha-kit', branch: 'develop' },
+      { slug: 'tools', title: 'Tools', description: 'About tools', repo: 'owner/tools', branch: 'main' },
     ])
     expect(JSON.parse(readFileSync(join(root, 'public/sync-state.json'), 'utf-8'))).toEqual({
       'alpha-kit': { sha: 'sha-of-alpha-kit', description: '' },

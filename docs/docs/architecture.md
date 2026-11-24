@@ -36,7 +36,7 @@ GitHub repos (public)
 1. Asks `scripts/docs-sources.ts` for the **docs sources**: the public repositories that are not archived, disabled, or forks and have a root `docs/` folder, each with the git tree SHA of that folder (read through the GitHub REST API). This repository itself is skipped.
 2. For each source, performs a `git clone --depth=1 --filter=blob:none --sparse`, checks out only the `docs/` directory, and copies it to `synced/<repo-name>/`.
 3. Stops with an error if a source cannot be cloned, before writing the files below: the build fails and the previous site stays online, instead of a deploy without that project.
-4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo }` records for every synced project.
+4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo, branch }` records (`branch` is the repository's default branch, which the source card and edit links point at) for every synced project.
 5. Writes `public/sync-state.json` — the git tree SHA of each project's `docs/` plus its description. It ships with the site at `/sync-state.json` and lets the scheduled poll know what the live site was built from.
 6. Deletes the temporary clone directory.
 
@@ -146,7 +146,7 @@ Source repositories check their links: their docs CI ([github-workflows](https:/
 
 Internal links are checked by every hub build: `vitepress build` fails on a link to a page that does not exist, on a local page or a synced one (`ignoreDeadLinks: 'localhostLinks'` only skips `http://localhost` examples). A page renamed in a source repository therefore fails the next hub build, and the live site stays on the previous deploy until the link is fixed in that repository.
 
-### Picking up upstream changes
+### Picking up changes in docs sources
 
 Source repositories do not notify the hub. Instead, `.github/workflows/docs-poll.yml` runs every 12 hours (and on demand via **Run workflow**):
 
@@ -168,4 +168,4 @@ A repository is automatically included when it:
 
 No configuration change is required in this hub: the next scheduled poll (within 12 hours) picks it up. The display title comes from the repository name and the card description from its GitHub description.
 
-The [Projects](../projects/index.md) table is maintained by hand in `docs/projects/index.md`: add a row there for a new project.
+It also gets a row in the [Projects](../projects/index.md) table, which is generated with the homepage.

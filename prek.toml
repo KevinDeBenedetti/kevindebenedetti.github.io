@@ -68,7 +68,7 @@ pass_filenames = true
 [[repos]]
 repo = "https://github.com/KevinDeBenedetti/github-workflows"
 # Same release as the workflows pinned in .github/workflows/ci-cd.yml.
-rev = "v0.56.0"
+rev = "v0.56.2"
 hooks = [
   { id = "check-docs-links" },
   { id = "check-vitepress-md" },

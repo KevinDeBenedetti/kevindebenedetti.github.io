@@ -27,7 +27,7 @@ A repository whose docs the hub publishes, seen from the sync: where to copy the
 _Avoid_: upstream, origin repo
 
 **Sync state**:
-What the published site was built from: for each docs source, the version of its docs folder and its description. The scheduled check compares it with the current one to decide whether to rebuild.
+What the published site was built from: for each docs source, the version of its docs folder, its description and its default branch. The scheduled check compares it with the current one to decide whether to rebuild.
 _Avoid_: snapshot, cache, manifest
 
 ### Navigation

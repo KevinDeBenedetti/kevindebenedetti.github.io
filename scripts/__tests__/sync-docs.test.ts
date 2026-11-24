@@ -1,10 +1,11 @@
 // @vitest-environment node
-import { existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
+import { spawnSync } from 'node:child_process'
+import { chmodSync, existsSync, mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { tmpdir } from 'node:os'
 import { dirname, join } from 'node:path'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest'
 import type { DocsSource } from '../docs-sources'
-import { resetSyncDirs, syncDocs, type CloneDocs } from '../sync-docs'
+import { cloneDocsWithGit, resetSyncDirs, syncDocs, type CloneDocs } from '../sync-docs'
 
 const roots: string[] = []
 
@@ -77,8 +78,8 @@ describe('sync', () => {
       { slug: 'tools', title: 'Tools', description: 'About tools', repo: 'owner/tools', branch: 'main' },
     ])
     expect(JSON.parse(readFileSync(join(root, 'public/sync-state.json'), 'utf-8'))).toEqual({
-      'alpha-kit': { sha: 'sha-of-alpha-kit', description: '' },
-      tools: { sha: 'sha-of-tools', description: 'About tools' },
+      'alpha-kit': { sha: 'sha-of-alpha-kit', description: '', branch: 'develop' },
+      tools: { sha: 'sha-of-tools', description: 'About tools', branch: 'main' },
     })
   })
 
@@ -89,5 +90,65 @@ describe('sync', () => {
     // Nothing a build could deploy from: the previous site stays online.
     expect(existsSync(join(root, 'synced/.repos-metadata.json'))).toBe(false)
     expect(existsSync(join(root, 'public/sync-state.json'))).toBe(false)
+  })
+})
+
+describe('git clone of a docs source', () => {
+  // Real git, isolated from the developer's global and system config
+  // (signing, core.hooksPath, url rewrites).
+  beforeEach(() => {
+    vi.stubEnv('GIT_CONFIG_GLOBAL', '/dev/null')
+    vi.stubEnv('GIT_CONFIG_NOSYSTEM', '1')
+  })
+  afterEach(() => {
+    vi.unstubAllEnvs()
+  })
+
+  /** A local repository holding `files`, committed, to clone over file://. */
+  function sourceRepo(files: Record<string, string>): string {
+    const dir = repo(files)
+    for (const args of [
+      ['init', '--quiet', '--template=', '--initial-branch=main'],
+      ['add', '.'],
+      ['-c', 'user.name=test', '-c', 'user.email=test@example.com', 'commit', '--quiet', '-m', 'docs'],
+    ]) {
+      const { status, stderr } = spawnSync('git', ['-C', dir, ...args], { encoding: 'utf-8' })
+      if (status !== 0) throw new Error(`git ${args.join(' ')} failed: ${stderr}`)
+    }
+    return dir
+  }
+
+  /** Clones `src` as the docs source "tools" of a new root; returns that root. */
+  function cloneInto(src: string): string {
+    const root = repo({})
+    cloneDocsWithGit(join(root, 'clones'))({ ...source('tools'), cloneUrl: `file://${src}` }, join(root, 'synced/tools'))
+    return root
+  }
+
+  it('copies the docs/ folder of the default branch, and only it', () => {
+    const src = sourceRepo({ 'docs/page.md': '# Page\n', 'docs/guides/setup.md': '# Setup\n', 'README.md': '# Readme\n' })
+
+    const root = cloneInto(src)
+
+    expect(readFileSync(join(root, 'synced/tools/page.md'), 'utf-8')).toBe('# Page\n')
+    expect(readFileSync(join(root, 'synced/tools/guides/setup.md'), 'utf-8')).toBe('# Setup\n')
+    expect(existsSync(join(root, 'synced/tools/README.md'))).toBe(false)
+    expect(existsSync(join(root, 'clones/tools')), 'the temporary clone is removed').toBe(false)
+  })
+
+  it("installs nothing from git's template directory", () => {
+    // A template (a plain folder, not a repository) whose post-checkout hook
+    // leaves a marker: the marker shows whether the clone got the template.
+    const template = repo({ 'hooks/post-checkout': '#!/bin/sh\ntouch "$HOOK_MARKER"\n' })
+    chmodSync(join(template, 'hooks/post-checkout'), 0o755)
+    const marker = join(template, 'hook-ran')
+    const src = sourceRepo({ 'docs/page.md': '# Page\n' })
+    vi.stubEnv('GIT_TEMPLATE_DIR', template)
+    vi.stubEnv('HOOK_MARKER', marker)
+
+    const root = cloneInto(src)
+
+    expect(existsSync(join(root, 'synced/tools/page.md'))).toBe(true)
+    expect(existsSync(marker), 'a template hook ran in the clone').toBe(false)
   })
 })

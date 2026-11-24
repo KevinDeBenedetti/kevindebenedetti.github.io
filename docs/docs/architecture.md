@@ -34,10 +34,10 @@ GitHub repos (public)
 **Entry point:** `scripts/sync-docs.ts`
 
 1. Asks `scripts/docs-sources.ts` for the **docs sources**: the public repositories that are not archived, disabled, or forks and have a root `docs/` folder, each with the git tree SHA of that folder (read through the GitHub REST API). This repository itself is skipped.
-2. For each source, performs a `git clone --depth=1 --filter=blob:none --sparse`, checks out only the `docs/` directory, and copies it to `synced/<repo-name>/`.
+2. For each source, performs a `git clone --template= --depth=1 --filter=blob:none --sparse` (the empty template copies no sample hooks into the throwaway clone), checks out only the `docs/` directory, and copies it to `synced/<repo-name>/`.
 3. Stops with an error if a source cannot be cloned, before writing the files below: the build fails and the previous site stays online, instead of a deploy without that project.
 4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo, branch }` records (`branch` is the repository's default branch, which the source card and edit links point at) for every synced project.
-5. Writes `public/sync-state.json` — the git tree SHA of each project's `docs/` plus its description. It ships with the site at `/sync-state.json` and lets the scheduled poll know what the live site was built from.
+5. Writes `public/sync-state.json` — the git tree SHA of each project's `docs/`, its description and its default branch. It ships with the site at `/sync-state.json` and lets the scheduled poll know what the live site was built from.
 6. Deletes the temporary clone directory.
 
 The scheduled poll gets the current state from the same `scripts/docs-sources.ts` listing, so the sync and the poll cannot disagree on what a repository's state is.
@@ -151,7 +151,7 @@ Internal links are checked by every hub build: `vitepress build` fails on a link
 Source repositories do not notify the hub. Instead, `.github/workflows/docs-poll.yml` runs every 12 hours (and on demand via **Run workflow**):
 
 1. `scripts/check-docs-changes.ts` lists the docs sources (`scripts/docs-sources.ts`) and compares their state with the live `/sync-state.json`.
-2. If anything differs — updated docs, a new or removed project, a changed description — it triggers `ci-cd.yml` with `workflow_dispatch`, which re-syncs and redeploys.
+2. If anything differs — updated docs, a new or removed project, a changed description or default branch — it triggers `ci-cd.yml` with `workflow_dispatch`, which re-syncs and redeploys.
 
 Only public data is read and `GITHUB_TOKEN` is allowed to trigger `workflow_dispatch`, so no GitHub App or secret is needed. Upstream changes show up within 12 hours; run **CI/CD** manually to publish sooner.
 

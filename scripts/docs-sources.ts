@@ -28,9 +28,10 @@ export interface DocsSource {
 
 /**
  * What a sync pulled in, keyed by slug. Published as /sync-state.json with the
- * site, so the poll can tell whether a rebuild is needed.
+ * site, so the poll can tell whether a rebuild is needed. `branch` is absent
+ * from a state deployed before it was recorded.
  */
-export type SyncState = Record<string, { sha: string; description: string }>
+export type SyncState = Record<string, { sha: string; description: string; branch?: string }>
 
 interface ContentEntry {
   name: string
@@ -70,7 +71,9 @@ export async function listDocsSources(owner: string): Promise<DocsSource[]> {
 }
 
 export function syncStateOf(sources: DocsSource[]): SyncState {
-  return Object.fromEntries(sources.map(({ slug, sha, description }) => [slug, { sha, description }]))
+  return Object.fromEntries(
+    sources.map(({ slug, sha, description, branch }) => [slug, { sha, description, branch }]),
+  )
 }
 
 /** Stable serialization: sorted by slug, whatever the order sources came in. */
@@ -97,6 +100,10 @@ export function describeChanges(deployed: SyncState | null, current: SyncState):
     else if (!after) changes.push(`- ${slug} (docs removed)`)
     else if (before.sha !== after.sha) changes.push(`~ ${slug} (docs updated)`)
     else if (before.description !== after.description) changes.push(`~ ${slug} (description updated)`)
+    // The edit links and source cards point at the default branch.
+    else if (before.branch !== undefined && before.branch !== after.branch) {
+      changes.push(`~ ${slug} (default branch changed)`)
+    }
   }
 
   return changes

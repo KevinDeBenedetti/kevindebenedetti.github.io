@@ -86,7 +86,7 @@ kevindebenedetti.github.io/
 
 ## Testing
 
-Unit tests use [Vitest](https://vitest.dev) with `@vue/test-utils` and the `jsdom` environment. Tests live next to the components they cover in `.vitepress/theme/components/__tests__/`. The site navigation rules (project discovery, sidebar, edit links, generated pages) are tested in `scripts/__tests__/`, against temporary folders of Markdown files. The sync and the change detection are tested there too, with a stand-in for the git clone and for the GitHub API.
+Unit tests use [Vitest](https://vitest.dev) with `@vue/test-utils` and the `jsdom` environment. Tests live next to the components they cover in `.vitepress/theme/components/__tests__/`. The site navigation rules (project discovery, sidebar, edit links, generated pages) are tested in `scripts/__tests__/`, against temporary folders of Markdown files. The sync and the change detection are tested there too, with a stand-in for the GitHub API; the sync's git clone runs for real, against a local repository cloned over `file://`, isolated from your git config.
 
 ```sh
 bun run test   # run once

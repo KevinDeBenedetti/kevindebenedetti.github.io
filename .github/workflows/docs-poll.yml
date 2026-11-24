@@ -22,6 +22,9 @@ jobs:
   poll:
     name: Check for docs changes
     runs-on: ubuntu-latest
+    # Lists the repositories and reads one JSON file: a hung API call must not
+    # hold a runner for the 6-hour default.
+    timeout-minutes: 10
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:

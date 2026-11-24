@@ -26,6 +26,7 @@ function synced(...slugs: string[]): Record<string, string> {
     title: `Title of ${slug}`,
     description: `About ${slug}`,
     repo: `owner/${slug}`,
+    branch: 'main',
   }))
   return { 'synced/.repos-metadata.json': JSON.stringify(repos) }
 }
@@ -156,6 +157,7 @@ describe('projects', () => {
         title: 'Hub Docs',
         description: 'The hub itself.',
         repo: 'owner/hub',
+        branch: 'main',
         icon: '📖',
         order: 0,
         dir: 'docs/hub',
@@ -170,7 +172,7 @@ describe('projects', () => {
     })
 
     expect(buildSiteNavigation(root).projects).toEqual([
-      { slug: 'hub', title: 'Hub Docs', description: '', repo: 'owner/hub', dir: 'docs/hub', hasSourceIndex: false },
+      { slug: 'hub', title: 'Hub Docs', description: '', repo: 'owner/hub', branch: 'main', dir: 'docs/hub', hasSourceIndex: false },
     ])
   })
 
@@ -253,6 +255,34 @@ describe('generated pages', () => {
     expect(index).toContain('## Documentation\n\n- [Page](./page.md)\n- [Deep](./guides/deep.md)\n')
   })
 
+  it("links the source card to the docs source's default branch", () => {
+    const root = repo({
+      'synced/.repos-metadata.json': JSON.stringify([
+        { slug: 'alpha', title: 'Alpha', description: '', repo: 'owner/alpha', branch: 'develop' },
+      ]),
+      'synced/alpha/page.md': '# Page\n',
+    })
+
+    const index = buildSiteNavigation(root).pages[0].content
+
+    expect(index).toContain('href="https://github.com/owner/alpha/tree/develop/docs"')
+    expect(index).toContain('<code>docs/</code> on <code>develop</code>')
+  })
+
+  it('escapes a branch name in the source card', () => {
+    const root = repo({
+      'synced/.repos-metadata.json': JSON.stringify([
+        { slug: 'alpha', title: 'Alpha', description: '', repo: 'owner/alpha', branch: 'a&"b"' },
+      ]),
+      'synced/alpha/page.md': '# Page\n',
+    })
+
+    const index = buildSiteNavigation(root).pages[0].content
+
+    expect(index).toContain('href="https://github.com/owner/alpha/tree/a&amp;&quot;b&quot;/docs"')
+    expect(index).toContain('<code>a&amp;&quot;b&quot;</code>')
+  })
+
   it('links a nested index page by its file name', () => {
     const root = repo({
       ...synced('alpha'),
@@ -268,7 +298,7 @@ describe('generated pages', () => {
   it('writes a homepage that stays valid YAML whatever the title and description hold', () => {
     const root = repo({
       'synced/.repos-metadata.json': JSON.stringify([
-        { slug: 'alpha', title: 'Say "hi"', description: 'CLI: sync tools # fast', repo: 'owner/alpha' },
+        { slug: 'alpha', title: 'Say "hi"', description: 'CLI: sync tools # fast', repo: 'owner/alpha', branch: 'main' },
       ]),
       'synced/alpha/page.md': '# Page\n',
     })
@@ -297,7 +327,7 @@ describe('generated pages', () => {
   it('writes a Projects page with one table row per project, in project order', () => {
     const root = repo({
       'synced/.repos-metadata.json': JSON.stringify([
-        { slug: 'beta', title: 'Beta', description: 'Pipes | and more', repo: 'owner/beta' },
+        { slug: 'beta', title: 'Beta', description: 'Pipes | and more', repo: 'owner/beta', branch: 'main' },
       ]),
       'synced/beta/page.md': '# Page\n',
       'docs/hub/index.md': '---\ndescription: The hub.\nrepo: owner/hub\norder: 0\n---\n\n# Hub Docs\n',
@@ -317,7 +347,7 @@ describe('generated pages', () => {
   it('keeps Vue syntax and HTML in a description as plain text on generated pages', () => {
     const root = repo({
       'synced/.repos-metadata.json': JSON.stringify([
-        { slug: 'alpha', title: 'Alpha', description: 'Render {{ name }} in <slot> & more', repo: 'owner/alpha' },
+        { slug: 'alpha', title: 'Alpha', description: 'Render {{ name }} in <slot> & more', repo: 'owner/alpha', branch: 'main' },
       ]),
       'synced/alpha/page.md': '# Page\n',
     })
@@ -327,6 +357,22 @@ describe('generated pages', () => {
 
     expect(pages.find((p) => p.path === 'docs/projects/index.md')!.content).toContain(`| **Alpha** | ${safe} |`)
     expect(pages.find((p) => p.path === 'synced/alpha/index.md')!.content).toContain(`# Alpha\n\n${safe}\n`)
+  })
+
+  it('keeps HTML in a title or description as plain text on the homepage cards', () => {
+    // VitePress renders a feature's title and details with v-html.
+    const root = repo({
+      'synced/.repos-metadata.json': JSON.stringify([
+        { slug: 'alpha', title: 'A <b> & B', description: 'Parse <input> files & more', repo: 'owner/alpha', branch: 'main' },
+      ]),
+      'synced/alpha/page.md': '# Page\n',
+    })
+
+    const home = buildSiteNavigation(root).pages.find((page) => page.path === 'docs/index.md')!
+    const [feature] = parseYaml(home.content.split('---')[1]).features
+
+    expect(feature.title).toBe('A &lt;b&gt; &amp; B')
+    expect(feature.details).toBe('Parse &lt;input&gt; files &amp; more')
   })
 
   it('gives the same result once its own pages are on disk', () => {
@@ -365,9 +411,10 @@ describe('generated pages', () => {
 
 describe('edit link', () => {
   const projects = [
-    { slug: 'alpha', title: 'Alpha', description: '', repo: 'owner/alpha', dir: 'synced/alpha', hasSourceIndex: false },
-    { slug: 'beta', title: 'Beta', description: '', repo: 'owner/beta', dir: 'synced/beta', hasSourceIndex: true },
-    { slug: 'hub', title: 'Hub', description: '', repo: 'owner/hub', dir: 'docs/hub', hasSourceIndex: false },
+    { slug: 'alpha', title: 'Alpha', description: '', repo: 'owner/alpha', branch: 'main', dir: 'synced/alpha', hasSourceIndex: false },
+    { slug: 'beta', title: 'Beta', description: '', repo: 'owner/beta', branch: 'main', dir: 'synced/beta', hasSourceIndex: true },
+    { slug: 'gamma', title: 'Gamma', description: '', repo: 'owner/gamma', branch: 'develop', dir: 'synced/gamma', hasSourceIndex: false },
+    { slug: 'hub', title: 'Hub', description: '', repo: 'owner/hub', branch: 'main', dir: 'docs/hub', hasSourceIndex: false },
   ]
 
   const editLink = (filePath: string) => editLinkPattern(projects)({ filePath })
@@ -381,6 +428,13 @@ describe('edit link', () => {
   it('points a generated index page at the docs folder, and a source index page at its file', () => {
     expect(editLink('synced/alpha/index.md')).toBe('https://github.com/owner/alpha/tree/main/docs')
     expect(editLink('synced/beta/index.md')).toBe('https://github.com/owner/beta/edit/main/docs/index.md')
+  })
+
+  it("points at the docs source's default branch", () => {
+    expect(editLink('synced/gamma/guides/setup.md')).toBe(
+      'https://github.com/owner/gamma/edit/develop/docs/guides/setup.md',
+    )
+    expect(editLink('synced/gamma/index.md')).toBe('https://github.com/owner/gamma/tree/develop/docs')
   })
 
   it('points a page of a local project, and any other page, at its file in this repository', () => {

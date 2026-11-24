@@ -19,6 +19,7 @@ function apiRepo(name: string, overrides: Record<string, unknown> = {}) {
     full_name: `owner/${name}`,
     clone_url: `https://example.com/owner/${name}.git`,
     description: `About ${name}`,
+    default_branch: 'main',
     archived: false,
     disabled: false,
     fork: false,
@@ -47,7 +48,7 @@ describe('docs sources', () => {
         apiRepo('old', { archived: true }),
         apiRepo('copy', { fork: true }),
         apiRepo('off', { disabled: true }),
-        apiRepo('quiet', { description: null }),
+        apiRepo('quiet', { description: null, default_branch: 'develop' }),
         apiRepo('kevindebenedetti.github.io'),
       ],
       '/repos/owner/tools/contents': [
@@ -65,6 +66,7 @@ describe('docs sources', () => {
         repo: 'owner/tools',
         cloneUrl: 'https://example.com/owner/tools.git',
         description: 'About tools',
+        branch: 'main',
         sha: 'sha-tools',
       },
       {
@@ -72,9 +74,33 @@ describe('docs sources', () => {
         repo: 'owner/quiet',
         cloneUrl: 'https://example.com/owner/quiet.git',
         description: '',
+        branch: 'develop',
         sha: 'sha-quiet',
       },
     ])
+  })
+
+  it('lists the repositories past the first page of 100', async () => {
+    const firstPage = Array.from({ length: 100 }, (_, i) => apiRepo(`repo-${String(i).padStart(3, '0')}`))
+    const listPages: string[] = []
+    vi.stubGlobal('fetch', async (input: string | URL) => {
+      const url = new URL(String(input))
+      if (url.pathname === '/users/owner/repos') {
+        const page = url.searchParams.get('page') ?? ''
+        listPages.push(page)
+        return Response.json(page === '1' ? firstPage : page === '2' ? [apiRepo('last')] : [])
+      }
+      // Only the first repository of each page publishes docs; the others are empty.
+      if (['/repos/owner/repo-000/contents', '/repos/owner/last/contents'].includes(url.pathname)) {
+        return Response.json([{ name: 'docs', type: 'dir', sha: 'sha' }])
+      }
+      return new Response('', { status: 404 })
+    })
+
+    const sources = await listDocsSources('owner')
+
+    expect(sources.map((s) => s.slug)).toEqual(['repo-000', 'last'])
+    expect(listPages).toEqual(['1', '2'])
   })
 
   it('fails when GitHub does not answer for a repository', async () => {
@@ -129,6 +155,7 @@ describe('sync state', () => {
     repo: `owner/${slug}`,
     cloneUrl: '',
     description,
+    branch: 'main',
     sha,
   })
 

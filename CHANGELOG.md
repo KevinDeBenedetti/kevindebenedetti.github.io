@@ -1,5 +1,14 @@
 # Changelog
 
+## [0.3.2](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/compare/v0.3.1...v0.3.2) (2026-11-24)
+
+
+### Bug Fixes
+
+* **site:** escape the homepage cards and link docs sources by their default branch ([1f54fcb](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/1f54fcbc4ab24f84aa58462756f9583b905e4e30)), closes [#138](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/138) [#139](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/139) [#140](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/140) [#141](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/141) [#142](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/142) [#143](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/143)
+* **sync:** clone docs sources under the system temp folder ([4326a40](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/4326a409ac57398d145f3ba78c8672452389c5b8)), closes [#147](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/147)
+* **sync:** clone without template hooks and rebuild on a default branch change ([a77cad7](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/commit/a77cad74bf4f655dcc5e3e29675c1e2f6c34326a)), closes [#144](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/144) [#145](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/issues/145)
+
 ## [0.3.1](https://github.com/KevinDeBenedetti/kevindebenedetti.github.io/compare/v0.3.0...v0.3.1) (2026-11-23)
 
 

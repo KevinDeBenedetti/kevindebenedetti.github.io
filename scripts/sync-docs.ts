@@ -51,7 +51,9 @@ function cloneWithRetry(cloneUrl: string, cloneDir: string): void {
   for (let attempt = 1; attempt <= CLONE_RETRIES; attempt += 1) {
     rmSync(cloneDir, { recursive: true, force: true })
     try {
-      runGit(['clone', '--depth=1', '--filter=blob:none', '--sparse', cloneUrl, cloneDir])
+      // --template= (empty): no sample hooks copied into .git/hooks/. The clone
+      // is only read, and copying them fails where hooks cannot be written.
+      runGit(['clone', '--template=', '--depth=1', '--filter=blob:none', '--sparse', cloneUrl, cloneDir])
       return
     } catch (err) {
       if (attempt === CLONE_RETRIES) throw err
@@ -78,7 +80,7 @@ export function resetSyncDirs(root: string): void {
 /** Puts the docs/ folder of `source` at `dest`. Throws when it cannot. */
 export type CloneDocs = (source: DocsSource, dest: string) => void
 
-function cloneDocsWithGit(tmpDir: string): CloneDocs {
+export function cloneDocsWithGit(tmpDir: string): CloneDocs {
   return (source, dest) => {
     const cloneDir = join(tmpDir, source.slug)
     try {

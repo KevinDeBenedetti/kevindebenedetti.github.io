@@ -150,20 +150,34 @@ describe('docs sources', () => {
 })
 
 describe('sync state', () => {
-  const source = (slug: string, sha: string, description = ''): DocsSource => ({
+  const source = (slug: string, sha: string, description = '', branch = 'main'): DocsSource => ({
     slug,
     repo: `owner/${slug}`,
     cloneUrl: '',
     description,
-    branch: 'main',
+    branch,
     sha,
   })
 
-  it('keeps the sha and description of each source, keyed by slug', () => {
-    expect(syncStateOf([source('tools', 'abc', 'Tools'), source('notes', 'def')])).toEqual({
-      tools: { sha: 'abc', description: 'Tools' },
-      notes: { sha: 'def', description: '' },
+  it('keeps the sha, description and default branch of each source, keyed by slug', () => {
+    expect(syncStateOf([source('tools', 'abc', 'Tools'), source('notes', 'def', '', 'develop')])).toEqual({
+      tools: { sha: 'abc', description: 'Tools', branch: 'main' },
+      notes: { sha: 'def', description: '', branch: 'develop' },
     })
+  })
+
+  it('reports a changed default branch, so the edit links get rebuilt', () => {
+    const deployed = { tools: { sha: '1', description: '', branch: 'master' } }
+    const current = { tools: { sha: '1', description: '', branch: 'main' } }
+
+    expect(describeChanges(deployed, current)).toEqual(['~ tools (default branch changed)'])
+  })
+
+  it('reads a deployed state that predates the default branch as up to date for it', () => {
+    const deployed = { tools: { sha: '1', description: '' } }
+    const current = { tools: { sha: '1', description: '', branch: 'main' } }
+
+    expect(describeChanges(deployed, current)).toEqual([])
   })
 
   it('reports new, removed and updated docs and a changed description', () => {

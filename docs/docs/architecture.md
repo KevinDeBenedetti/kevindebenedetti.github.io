@@ -38,11 +38,11 @@ GitHub repos (public)
 3. Stops with an error if a source cannot be cloned, before writing the files below: the build fails and the previous site stays online, instead of a deploy without that project.
 4. Writes `synced/.repos-metadata.json` — a sorted array of `{ slug, title, description, repo, branch }` records (`branch` is the repository's default branch, which the source card and edit links point at) for every synced project.
 5. Writes `public/sync-state.json` — the git tree SHA of each project's `docs/`, its description and its default branch. It ships with the site at `/sync-state.json` and lets the scheduled poll know what the live site was built from.
-6. Deletes the temporary clone directory.
+6. Deletes the temporary clones. They are made in a fresh folder under the system temp folder, never inside this repository: a clone writes `.git/config` and `.git/hooks/`, which some environments (an agent sandbox) refuse inside a project.
 
 The scheduled poll gets the current state from the same `scripts/docs-sources.ts` listing, so the sync and the poll cannot disagree on what a repository's state is.
 
-A sync reset empties `synced/` and the temporary clone folder and removes the previous `public/sync-state.json`. Nothing under `docs/` is touched: it holds content committed directly to this repository.
+A sync reset empties `synced/` and removes the previous `public/sync-state.json`. Nothing under `docs/` is touched: it holds content committed directly to this repository.
 
 ## Generate step
 

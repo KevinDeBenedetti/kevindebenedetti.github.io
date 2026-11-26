@@ -24,7 +24,7 @@ permissions: {}
 jobs:
   renovate:
     name: Renovate
-    uses: KevinDeBenedetti/github-workflows/.github/workflows/renovate.yml@v0.56.2
+    uses: KevinDeBenedetti/github-workflows/.github/workflows/renovate.yml@v0.57.0
     permissions: {}
     with:
       app-client-id: ${{ vars.RELEASE_APP_CLIENT_ID }}
